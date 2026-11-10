@@ -62,7 +62,7 @@ void check_buttons(uint32_t t_now) {
 
       if (mode_transition_queued == true) {
         skip_click = true;
-        mode_transition_queued = false;
+        k1_mode_request_cancel();  // Stage D: cancel the request with the fade
         MASTER_BRIGHTNESS = 1.0;
         if(debug_mode){USBSerial.println("DOUBLE CLICK");}
       }
@@ -71,8 +71,7 @@ void check_buttons(uint32_t t_now) {
 
       if (press_duration <= 250 && skip_click == false) {
         if (mode_transition_queued == false) {
-          mode_transition_queued = true; // See run_transition_fade() in led_utilities.h
-          mode_destination = -1;
+          k1_mode_request_post(-1);  // next mode; see run_transition_fade() in led_utilities.h
 
           save_config_delayed();
         }

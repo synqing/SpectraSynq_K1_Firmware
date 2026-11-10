@@ -144,7 +144,7 @@ static void k1_colour_lab_print_tune() {
   USBSerial.print(K1_COLOUR_LAB_USER_SLOT);
 #ifdef K1_LOOK_LIB_V1
   USBSerial.print(" type=");
-  USBSerial.print((unsigned)k1_look_table[K1_COLOUR_LAB_USER_SLOT].type);
+  USBSerial.print((unsigned)k1_look_slot_type(K1_COLOUR_LAB_USER_SLOT));
 #else
   USBSerial.print(" type=na");
 #endif

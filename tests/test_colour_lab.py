@@ -260,9 +260,15 @@ def test_klut_layout_payload_then_trailing_crc():
 
 
 def test_transactional_publish_and_save_reboot_load_order():
+    # Stage B (10 Nov 2026): a replacement is published by one descriptor swap
+    # and the old table is retired, never freed while a reader may hold it.
+    # Behavioural proof: tests/test_look_lifetime_native.py.
+    install = LOOK_FILE[LOOK_FILE.index("k1_look_install_parsed_ex(") :]
+    assert install.index("k1_look_desc[slot].store(&nb->desc") < install.index(
+        "k1_look_retired[k1_look_retired_n++] = old"
+    )
+    assert "k1_look_free_slot_ram" not in LOOK_FILE
     assert "k1_look_publish(0)" in LOOK_FILE
-    assert "k1_look_free_slot_ram(slot)" in LOOK_FILE
-    assert LOOK_FILE.index("k1_look_publish(0)") < LOOK_FILE.index("k1_look_free_slot_ram(slot)")
     assert ".klut.tmp" in LOOK_FILE
     assert "LittleFS.rename" in LOOK_FILE
     load_at = BRIDGE.index("k1_look_fs_load(15)")

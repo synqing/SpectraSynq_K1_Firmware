@@ -61,6 +61,28 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def place_copy(src: Path, dst: Path) -> None:
+    """Put a copy of src at dst without spending disk space on it where the volume allows.
+
+    On APFS this is a clone: dst is its own file holding the same bytes, and a later write
+    to either file never touches the other. Where a clone is not possible (another volume,
+    another filesystem, another OS) this is an ordinary copy. Either way dst is
+    byte-identical to src and dated now, exactly as shutil.copy leaves it. Every run folder
+    used to hold a full 24 MB copy of the same firmware.elf (2,530 of them on 10 Nov 2026).
+    """
+    try:
+        import ctypes
+        libc = ctypes.CDLL(None, use_errno=True)
+        if dst.exists() or dst.is_symlink():
+            dst.unlink()
+        if libc.clonefile(os.fsencode(src), os.fsencode(dst), 0) == 0:
+            os.utime(dst, None)
+            return
+    except (OSError, AttributeError):
+        pass
+    shutil.copy(src, dst)
+
+
 # --------------------------------------------------------------------------
 # Scenario schema: unknown fields, unsupported commands and bad windows are
 # rejected before anything is built or run.
@@ -90,8 +112,9 @@ EXPECT_KEYS = {"end_reason", "saves"}
 EPOCH_KEYS = {"policy", "us"}
 COMPARISON_KEYS = {"id", "kind", "a", "b", "edge", "from_hop", "criterion", "label", "before_case",
                    "default_case", "note", "expect"}
-COMPARISON_KINDS = {"equal", "isolation", "limit_coupling", "recovery_state", "fallback_state",
-                    "differs", "case", "startup_quiet_return", "tempo_lane", "semantic_continuity", "reverse"}
+COMPARISON_KINDS = {"equal", "isolation", "limit_coupling", "gx_limit_coupling", "recovery_state",
+                    "fallback_state", "differs", "case", "startup_quiet_return", "tempo_lane",
+                    "semantic_continuity", "reverse"}
 
 # Production command names the scenario may schedule (production parser vocabulary;
 # serial_cmd_handlers.cpp / serial_menu.cpp). Anything else is rejected up front.
@@ -636,7 +659,7 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
         "input_flash_from": flash_spec["from"], "image_patched": False,
     }
     elf = run_dir / "firmware.elf"
-    shutil.copy(build_dir / "firmware.elf", elf)
+    place_copy(build_dir / "firmware.elf", elf)
     emu_cfg = sc["profile"]["emulator"]
     base = [str(emu), "--chip", emu_cfg["chip"], "--firmware", str(flash_path), "--elf", str(elf),
             "--psram-size", emu_cfg["psram"], "--net", "user",
@@ -974,6 +997,45 @@ def evaluate_comparison(comp: dict, results: dict, hop_samples: int) -> dict:
         out.update(status="PASS" if ok else "FAIL",
                    detail=f"edge {comp['edge']}: pre-command frames differing={pre_diff}, changed frames={changed} "
                           f"(first at hop {first}), other-edge frames differing={other}, limiter scales={lim}")
+    elif kind == "gx_limit_coupling":
+        # K1_FE_BOARD_GX (FE profile). The Gx emit block neutralises FastLED's limit and
+        # applies k1_fe_gx_led_scale: ONE logical RGB16 scale over both edges, computed from
+        # both edges' pre-limit frames (visual/k1_fe_gx_led_power.h). This observes that
+        # current behaviour; it does not rule on whether the coupling is product intent.
+        # The capture's A/B frames are the packed wire (post-limit); GX lines carry the scale
+        # and a CRC-32 of each edge's pre-limit native frame.
+        edge = 0 if comp["edge"] == "A" else 1
+        other = 1 - edge
+        fa, fb = _by_hop(ca, hop_samples), _by_hop(cb, hop_samples)
+        ga, gb = ({h: c.gx_limits.get(f.index) for h, f in _by_hop(c, hop_samples).items()} for c in (ca, cb))
+        hops = sorted(h for h in fa if h in fb)
+        recorded = bool(hops) and all(ga.get(h) is not None and gb.get(h) is not None for h in hops)
+        if not recorded:
+            out.update(status="FAIL", detail=f"Gx limiter record (GX line) missing on {sum(ga.get(h) is None or gb.get(h) is None for h in hops)}"
+                                              f" of {len(hops)} common frames; not a Gx capture")
+            return out
+        before = [h for h in hops if h < comp["from_hop"]]
+        after = [h for h in hops if h >= comp["from_hop"]]
+        emit = lambda f, e: (f.A, f.B)[e]
+        binding = sum(1 for h in hops if ga[h][0] < 65535)
+        pre_scale = sum(ga[h][0] != gb[h][0] for h in before)
+        pre_emit = sum((fa[h].A, fa[h].B) != (fb[h].A, fb[h].B) for h in before)
+        edge_native = sum(ga[h][1 + edge] != gb[h][1 + edge] for h in after)
+        other_native = sum(ga[h][1 + other] != gb[h][1 + other] for h in hops)
+        scale_changed = sum(ga[h][0] != gb[h][0] for h in after)
+        other_emit = sum(emit(fa[h], other) != emit(fb[h], other) for h in after)
+        unexplained = sum(emit(fa[h], other) != emit(fb[h], other) and ga[h][0] == gb[h][0] for h in hops)
+        other_lit = sum(any(emit(fb[h], other)) for h in after)
+        ok = (binding > 0 and pre_scale == 0 and pre_emit == 0 and edge_native > 0 and other_native == 0
+              and scale_changed > 0 and other_emit > 0 and unexplained == 0 and other_lit > 0)
+        o = "AB"[other]
+        out.update(status="PASS" if ok else "FAIL",
+                   detail=f"Gx limiter binding in {binding}/{len(hops)} base frames; before hop {comp['from_hop']}: "
+                          f"scale differs {pre_scale}, emitted frames differ {pre_emit}; after: {comp['edge']} "
+                          f"pre-limit frames changed {edge_native}, shared scale changed {scale_changed}; edge {o} "
+                          f"pre-limit frames differing {other_native} (all hops), emitted {o} frames changed "
+                          f"{other_emit} (lit {other_lit}), {o} changes with an equal scale {unexplained}. "
+                          f"Observes current behaviour: one Gx scale covers both edges.")
     elif kind == "limit_coupling":
         edge = 0 if comp["edge"] == "A" else 1
         fa, fb = _by_hop(ca, hop_samples), _by_hop(cb, hop_samples)
@@ -1141,7 +1203,80 @@ def historical_references(sc: dict) -> list[dict]:
 # Host checks
 # --------------------------------------------------------------------------
 
-def host_checks(sc: dict, out: Path) -> dict:
+# Host-pytest receipt (Stage A, 10 Nov 2026). The pre-commit gate's single
+# `pytest tests/` run records it; --host-receipt lets the replay reuse that run
+# instead of executing the whole host suite a second time for the same content.
+RECEIPT_SCHEMA = "k1-host-pytest-receipt/1"
+RECEIPT_PATHS = ["SPECTRASYNQ_K1_FIRMWARE", "platformio.ini", "tools", "scripts", "tests", "libraries",
+                 "pytest.ini", "conftest.py", "pyproject.toml", "setup.cfg"]
+
+
+def receipt_content_sha256() -> str:
+    """Content of every file the host suite reads (tracked or not), independent of HEAD."""
+    h = hashlib.sha256()
+    for rel in RECEIPT_PATHS:
+        root = REPO / rel
+        files = sorted(root.rglob("*")) if root.is_dir() else ([root] if root.is_file() else [])
+        for p in files:
+            if not p.is_file() or {"__pycache__", ".pio", ".pytest_cache"} & set(p.parts):
+                continue
+            h.update(str(p.relative_to(REPO)).encode() + b"\0" + p.read_bytes() + b"\0")
+    return h.hexdigest()
+
+
+def pytest_version() -> str:
+    try:
+        import pytest  # noqa: PLC0415
+        return pytest.__version__
+    except ImportError:
+        return "missing"
+
+
+def record_host_pytest(receipt: Path) -> int:
+    """Run the host suite once (the commit gate's run) and write the receipt."""
+    started = dt.datetime.now(dt.timezone.utc).isoformat()
+    before = receipt_content_sha256()
+    argv = [sys.executable, "-m", "pytest", "tests/", "-q"]
+    proc = subprocess.run(argv, cwd=REPO, capture_output=True, text=True)
+    sys.stdout.write(proc.stdout)
+    sys.stderr.write(proc.stderr)
+    after = receipt_content_sha256()
+    lines = [l for l in proc.stdout.strip().splitlines() if l.strip()]
+    m = re.search(r"(\d+) passed", lines[-1]) if lines else None
+    rec = {"schema": RECEIPT_SCHEMA, "selection": ["tests/"], "ignored": [], "argv": argv[1:],
+           "python": sys.executable, "python_version": sys.version.split()[0], "pytest_version": pytest_version(),
+           "content_sha256_before": before, "content_sha256_after": after,
+           "exit_code": proc.returncode, "summary": lines[-1] if lines else "", "passed": int(m.group(1)) if m else 0,
+           "output_sha256": sha256_bytes(proc.stdout.encode()), "started_utc": started,
+           "finished_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
+    receipt.parent.mkdir(parents=True, exist_ok=True)
+    receipt.write_text(json.dumps(rec, indent=2) + "\n")
+    return proc.returncode
+
+
+def validate_host_receipt(receipt: Path, tests: list, ignore: list) -> tuple[dict | None, list]:
+    """Reuse only a complete, passing receipt for exactly this content and selection."""
+    problems = []
+    try:
+        rec = json.loads(receipt.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        return None, [f"receipt unreadable: {exc}"]
+    now = receipt_content_sha256()
+    checks = [
+        (rec.get("schema") == RECEIPT_SCHEMA, "schema"),
+        (rec.get("exit_code") == 0, "pytest exit code not 0"),
+        (rec.get("passed", 0) > 0, "no passing tests recorded (vacuous)"),
+        (rec.get("content_sha256_before") == rec.get("content_sha256_after"), "inputs changed during the recorded run"),
+        (rec.get("content_sha256_after") == now, "inputs changed since the recorded run"),
+        (rec.get("selection") == list(tests) and rec.get("ignored") == list(ignore), "different test selection"),
+        (rec.get("python") == sys.executable, "different interpreter"),
+        (rec.get("pytest_version") == pytest_version(), "different pytest version"),
+    ]
+    problems = [why for ok, why in checks if not ok]
+    return (rec if not problems else None), problems
+
+
+def host_checks(sc: dict, out: Path, receipt: Path | None = None) -> dict:
     """Repository commit gate: the declared pytest selection and the shipping builds."""
     cfg = sc.get("host_checks", {})
     tests = cfg.get("pytest", [])
@@ -1150,17 +1285,31 @@ def host_checks(sc: dict, out: Path) -> dict:
     excluded = list(cfg.get("requires_git", [])) if identity_kind() == "export" else []
     ignore = [f"--ignore={p}" for p in excluded]
     log = out / "host-pytest.log"
-    with log.open("w") as fh:
-        rc = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", *ignore, *tests],
-                            cwd=REPO, stdout=fh, stderr=subprocess.STDOUT).returncode
+    reuse, rejected = (validate_host_receipt(receipt, tests, ignore) if receipt else (None, []))
+    if reuse is not None:
+        log.write_text(f"REUSED validated host-pytest receipt {receipt} (not executed here)\n{reuse['summary']}\n")
+        rc = 0
+    else:
+        with log.open("w") as fh:
+            if receipt:
+                fh.write(f"host-pytest receipt {receipt} REJECTED: {'; '.join(rejected)}; executing\n")
+                fh.flush()
+            rc = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", *ignore, *tests],
+                                cwd=REPO, stdout=fh, stderr=subprocess.STDOUT).returncode
     tail = log.read_text().strip().splitlines()[-1:] or [""]
     builds = [build(env, out / f"build-{env}.log") for env in cfg.get("builds", [])]
     ok = rc == 0 and all(b["exit_code"] == 0 for b in builds)
     summary = tail[0] + "".join(f"; pio run -e {b['env']} exit={b['exit_code']}" for b in builds)
     if excluded:
         summary += f"; {len(excluded)} git-history test file(s) excluded in this export (run in the checkout)"
+    if reuse is not None:
+        summary = "REUSED receipt: " + summary
     return {"status": "PASS" if ok else "FAIL", "exit_code": rc, "tests": tests, "summary": summary,
-            "log": str(log), "builds": builds, "excluded_without_git": excluded}
+            "log": str(log), "builds": builds, "excluded_without_git": excluded,
+            "pytest_source": "reused_receipt" if reuse is not None else "executed",
+            "receipt": ({"path": str(receipt), "sha256": sha256_file(receipt), "content_sha256":
+                         reuse["content_sha256_after"], "summary": reuse["summary"]} if reuse is not None
+                        else ({"path": str(receipt), "rejected": rejected} if receipt else None))}
 
 
 # --------------------------------------------------------------------------
@@ -1185,6 +1334,28 @@ def select_profile(sc: dict, profile: str) -> dict:
     sc["profile"]["product_env"] = "k1_fe"
     sc["profile"]["adapter_flags"].extend(["K1_EMU_FE_MIC_ONLY", "K1_EMU_ONSET_TRACE", "K1_EMU_SPECTRUM_TRACE"])
     sc["profile"]["forbidden_in_product"].extend(["K1_EMU_FE_MIC_ONLY", "K1_EMU_ONSET_TRACE", "K1_EMU_SPECTRUM_TRACE"])
+    # k1_fe is the K1-FE-Gx board (c44172fa): its emit block sets FastLED's limit to
+    # UINT32_MAX and limits with k1_fe_gx_led_scale, one RGB16 scale over both edges whose
+    # model charges 1 mA idle per pixel. 300 mA is below the 2 x 160 px idle model, so the
+    # Main RPL value darkens both edges completely (every frame zero on 5bb142bc).
+    # 500 mA binds over the smoke PCM before and after hop 40 (the model's demand there is
+    # 347-591 mA before and 497-1410 mA after, from the 5bb142bc FE smoke-a/ctl-a frames).
+    sc["profile"]["limiter"] = ("K1-FE-Gx: FastLED's limit is neutralised in the Gx emit block; "
+        "k1_fe_gx_led_scale applies one logical RGB16 scale over both edges before 48-bit packing "
+        "(model: 1 mA idle per pixel + 20 mA per full-scale channel; replay budget = min(max_current_ma, "
+        "1900 mA 3 A-source assumption)). The fixture records that scale and each edge's pre-limit "
+        "native frame per captured frame (GX lines).")
+    for cid, purpose in (("limit-base", "Binding Gx limiter: max_current_ma=500, above the 320 mA idle model."),
+                         ("limit-a", "Binding Gx limiter (500 mA) plus A-only photons=0.25 at hop 40.")):
+        first = sc["cases"][cid]["commands"][0]
+        if first != {"hop": 0, "text": "max_current_ma=300"}:
+            raise ScenarioError(f"FE selection expects {cid} to start with max_current_ma=300 at hop 0")
+        first["text"] = "max_current_ma=500"
+        sc["cases"][cid]["purpose"] = purpose
+    for comp in sc["comparisons"]:
+        if comp["id"] == "limit-coupling":
+            comp["kind"] = "gx_limit_coupling"
+            comp["label"] = "binding shared Gx RGB16 limiter (observes current behaviour)"
     sc["compositions"]["fe_reverse_base"] = {
         "commands": ["set_mode=32", "secondary_mode=32", "mirror_enabled=false",
                      "secondary_mirror_enabled=false", "secondary_enabled=true"],
@@ -1223,9 +1394,13 @@ def select_profile(sc: dict, profile: str) -> dict:
 
 
 def main() -> int:
+    if len(sys.argv) == 3 and sys.argv[1] == "--record-host-pytest":
+        return record_host_pytest(Path(sys.argv[2]))
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--scenario", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--host-receipt", default=None,
+                        help="reuse the commit gate's host-pytest receipt if it matches this exact content")
     parser.add_argument("--suite", default="default")
     parser.add_argument("--profile", choices=("scenario", "fe"), default="scenario")
     args = parser.parse_args()
@@ -1261,7 +1436,7 @@ def main() -> int:
         print("emulator env build failed; see", emu_build["log"])
     build_dir = REPO / ".pio/build" / sc["profile"]["env"]
     product = normal_build_check(sc, out, nm)
-    hosts = host_checks(sc, out)
+    hosts = host_checks(sc, out, Path(args.host_receipt).resolve() if args.host_receipt else None)
     results: dict[str, dict] = {}
     assets: dict = {}
     for cid in sc["suites"][args.suite]:
@@ -1337,7 +1512,8 @@ def write_report(sc: dict, out: Path, result: dict, results: dict, check: bool =
             pcm=r.get("pcm", {})))
     comps = []
     for c in result["comparisons"]:
-        if c.get("a") and c.get("b") and c["kind"] in ("equal", "isolation", "limit_coupling", "differs"):
+        if c.get("a") and c.get("b") and c["kind"] in ("equal", "isolation", "limit_coupling", "gx_limit_coupling",
+                                                       "differs"):
             comps.append(rd.comparison_record(
                 c["id"], "equal" if c["kind"] == "equal" else "labelled", c["a"], c["b"],
                 compatible=c["status"] in ("PASS", "FAIL") and "not comparable" not in c.get("detail", ""),

@@ -159,8 +159,11 @@ run_pytest() {
     say "    install: pip install pytest   · or checkpoint on a wip/* branch."
     return 1
   fi
-  say "  → python3 -m pytest tests/ -q"
-  local out; out="$(python3 -m pytest tests/ -q 2>&1)"; local rc=$?
+  say "  → python3 -m pytest tests/ -q  (receipt: .git/k1-host-pytest-receipt.json)"
+  # Stage A (10 Nov 2026): the same single run, recorded with the content hash
+  # of everything it read, so the emulator replay can reuse it
+  # (tools/esp_emulator/run.py --host-receipt) instead of running it again.
+  local out; out="$(python3 tools/esp_emulator/run.py --record-host-pytest "$(git rev-parse --git-dir)/k1-host-pytest-receipt.json" 2>&1)"; local rc=$?
   printf '%s\n' "$out" | tail -4 >&2
   # Fail-closed against a VACUOUS pass: trust rc=0 only if pytest actually
   # reported >=1 passing test. Guards the observed class where a run exits 0

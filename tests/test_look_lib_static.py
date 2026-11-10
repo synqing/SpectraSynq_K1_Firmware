@@ -107,12 +107,14 @@ def test_packer_has_no_degamma_ifdef_on_convert():
 
 def test_look_apply_called_from_pack_frame_after_limiter_before_pack():
     pack = _fn_body(EMIT, "k1_lever2_pack_frame")
-    assert "k1_look_apply_u16" in pack
-    apply_at = pack.index("k1_look_apply_u16")
+    # One K1LookFrame per edge (reader registration + descriptor snapshot,
+    # Stage B 10 Nov 2026); each pixel goes through look.apply().
+    assert "K1LookFrame look(look_slot)" in pack
+    apply_at = pack.index("look.apply(")
     pack_at = pack.index("ws2816_pack_pixel")
     assert apply_at < pack_at
     # Identity-budget path still applies look (not only the tight-budget loop).
-    assert pack.count("k1_look_apply_u16") >= 2
+    assert pack.count("look.apply(") >= 2
 
 
 def test_pack_frame_snapshots_slot_once():

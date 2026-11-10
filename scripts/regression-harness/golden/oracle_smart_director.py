@@ -234,6 +234,13 @@ GLOBALS_STUB = r"""
 extern bool mode_transition_queued;
 extern int mode_destination;
 extern uint32_t g_last_encoder_activity_time;
+// Stage D (10 Nov 2026): the director reads the pending mode request through
+// k1_mode_request_peek() (globals.h). Host model: a request is pending exactly
+// when the harness sets mode_destination >= 0 (the previous condition).
+#define K1_MODE_REQUEST_NONE INT32_MIN
+static inline int32_t k1_mode_request_peek() {
+  return mode_destination >= 0 ? (int32_t)mode_destination : K1_MODE_REQUEST_NONE;
+}
 """
 
 # ---------------------------------------------------------------------------

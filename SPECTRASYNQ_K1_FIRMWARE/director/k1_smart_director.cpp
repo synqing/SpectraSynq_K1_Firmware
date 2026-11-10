@@ -351,7 +351,7 @@ void k1_smart_director_clear_manual_control() {
 }
 
 bool k1_smart_director_manual_owner_active(uint32_t now_ms) {
-  if (mode_transition_queued || mode_destination >= 0) {
+  if (mode_transition_queued || k1_mode_request_peek() != K1_MODE_REQUEST_NONE) {
     return true;
   }
 

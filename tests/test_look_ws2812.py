@@ -329,6 +329,9 @@ def test_parse_command_calls_typed_dispatcher_for_look():
     assert "serial_typed_cmd_lookup(command_type)" in parse
     assert 'strcmp(command_type, "look") == 0' in parse
     assert 'strcmp(command_type, "secondary_look") == 0' in parse
+    # Upload/clear must reach the typed table too (unrouted 21 Aug-11 Nov 2026).
+    assert 'strcmp(command_type, "look_load") == 0' in parse
+    assert 'strcmp(command_type, "look_clear") == 0' in parse
     assert "serial_dispatch_typed_setter" in parse
     # Catch-all typed-table fallback in the metadata else would re-route
     # severed family dispatchers (Gate Fα secondary_dispatcher_call_site_severed).

@@ -19,12 +19,16 @@
 #include <Arduino.h>
 #include <math.h>
 #include <string.h>
+#if !defined(ESP_PLATFORM)
+#include <atomic>  // host-test lock (see queue_lock)
+#endif
 
 #include <FS.h>
 #include <LittleFS.h>
 
 #include "Palettes.h"   // gGradientPaletteCount (slot-load palette clamp)
 #include "k1_tempo.h"   // k1_tempo_read() — any-core-safe value copy
+#include "k1_persisted_repair.h"  // Stage C: non-finite repair of saved slots
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
 #endif
@@ -46,13 +50,71 @@ constexpr uint8_t K1Q_SECONDARY = 1;
 
 inline uint8_t channel_index(bool secondary) { return secondary ? K1Q_SECONDARY : K1Q_PRIMARY; }
 
-// --- Pending (armed) state per channel (spec §1 state model) ------------------
-struct ChannelPendingState {
+// --- Request hand-off (Stage D, Modernes C++ next phase, 10 Nov 2026) ----------
+// Producers: the serial/hotkey loop (core 0) and the beat-aware director (render
+// task, core 1). Consumer: k1_effect_queue_frame_tick() (render task).
+//
+// Previously both producers edited one shared pending preset in place through
+// k1_queue_arm_begin()'s pointer while the render task copied it, and the
+// consumer cleared the armed flags and the request flag that a producer could
+// be setting again; a request could vanish or a mixed preset be applied and
+// saved. Now:
+//   * each producer core edits its OWN draft (the pointer arm_begin returns);
+//     no other core reads or writes it;
+//   * k1_queue_request_commit() publishes the caller's armed drafts, complete,
+//     into one mailbox under g_queue_mux (latest wins per channel; channels
+//     already waiting in the mailbox keep their request);
+//   * the frame tick takes the whole mailbox and clears it in ONE locked copy,
+//     then transitions/renders/persists outside the lock;
+//   * seeding a new draft reads the mailbox, else the consumer-published
+//     in-flight target, else the live fields (stable once no transition is
+//     in flight) — under the same lock.
+// The lock only guards small struct copies: no waits, allocation, logging,
+// file I/O or rendering inside it.
+struct ChannelDraft {
   bool armed;
   K1ChannelPreset preset;
 };
 
-ChannelPendingState g_pending[2] = {};
+struct CommitMailbox {
+  bool pending;
+  bool cued;               // true = honour quantise + style
+  uint32_t request_ms;
+  uint32_t seq;            // bumped on every publish; guards peek-then-take
+  bool armed[2];
+  K1ChannelPreset preset[2];
+};
+
+struct EffectiveTarget {   // consumer-published: what a channel is heading to
+  bool valid;
+  K1ChannelPreset preset;
+};
+
+ChannelDraft g_draft[2][2] = {};   // [producer core][channel]
+CommitMailbox g_mailbox = {};
+EffectiveTarget g_effective[2] = {};
+uint32_t g_mailbox_seq = 0;
+
+#if defined(ARDUINO_ARCH_ESP32) && !defined(ESP_PLATFORM)
+#error "k1_effect_queue: ESP_PLATFORM expected on the device build (real lock + core id)"
+#endif
+#if defined(ESP_PLATFORM)
+portMUX_TYPE g_queue_mux = portMUX_INITIALIZER_UNLOCKED;
+inline void queue_lock() { portENTER_CRITICAL(&g_queue_mux); }
+inline void queue_unlock() { portEXIT_CRITICAL(&g_queue_mux); }
+// Drafts are keyed by producer task, not core: the render task (beat-aware
+// director) is producer 1, every other caller (serial loop) producer 0. This
+// holds even in probe builds that run both on one core.
+inline uint8_t producer_slot() {
+  return (led_task != nullptr && xTaskGetCurrentTaskHandle() == led_task) ? 1 : 0;
+}
+#else
+std::atomic_flag g_queue_spin = ATOMIC_FLAG_INIT;
+thread_local uint8_t t_host_producer = 0;
+inline void queue_lock() { while (g_queue_spin.test_and_set(std::memory_order_acquire)) {} }
+inline void queue_unlock() { g_queue_spin.clear(std::memory_order_release); }
+inline uint8_t producer_slot() { return t_host_producer; }
+#endif
 
 bool g_queue_mode = false;  // RAM-only; not persisted (spec §5)
 
@@ -62,12 +124,6 @@ uint16_t g_dip_ms = K1_QUEUE_DIP_MS_DEFAULT;
 uint16_t g_xfade_ms = K1_QUEUE_XFADE_MS_DEFAULT;
 uint8_t  g_quantise = K1_QUEUE_QUANTISE_OFF;
 
-// --- Commit request (serial writes, Core 1 consumes) --------------------------
-// Plain-store ordering matches the existing mode_transition_queued tolerance:
-// the serial side fully writes g_pending BEFORE raising the request flag.
-volatile bool g_commit_request = false;
-volatile bool g_commit_cued = false;       // true = honour quantise + style
-volatile uint32_t g_commit_request_ms = 0;
 
 // --- Per-channel transition runtime (Core 1 only) ------------------------------
 enum K1QueueTransitionPhase : uint8_t {
@@ -351,6 +407,18 @@ bool read_preset_record(File& file, PresetSlot& slot) {
   if (p.palette_index >= gGradientPaletteCount) {
     p.palette_index = 0;
   }
+  // Stage C (10 Nov 2026): a slot saved by older firmware can hold NaN/Inf
+  // (the file has no CRC; old setters admitted them). A slot has no channel at
+  // load time, so a non-finite field takes the compiled primary default.
+  K1ChannelPreset defaults = p;
+  defaults.photons = CONFIG_DEFAULTS.PHOTONS;
+  defaults.chroma = CONFIG_DEFAULTS.CHROMA;
+  defaults.mood = CONFIG_DEFAULTS.MOOD;
+  defaults.saturation = CONFIG_DEFAULTS.SATURATION;
+  defaults.prism_count = CONFIG_DEFAULTS.PRISM_COUNT;
+  defaults.incandescent_filter = CONFIG_DEFAULTS.INCANDESCENT_FILTER;
+  defaults.base_coat_intensity = CONFIG_DEFAULTS.BASE_COAT_INTENSITY;
+  (void)k1_preset_repair_nonfinite(p, defaults);
   slot.valid = (valid != 0);
   slot.preset = p;
   return true;
@@ -469,46 +537,92 @@ K1ChannelPreset k1_queue_capture_live(bool secondary) {
   return p;
 }
 
+#if !defined(ESP_PLATFORM)
+void k1_queue_host_set_producer(uint8_t core) { t_host_producer = (uint8_t)(core & 1); }
+#endif
+
 K1ChannelPreset* k1_queue_arm_begin(bool secondary) {
-  ChannelPendingState& pending = g_pending[channel_index(secondary)];
-  if (!pending.armed) {
+  const uint8_t ch = channel_index(secondary);
+  ChannelDraft& draft = g_draft[producer_slot()][ch];
+  if (!draft.armed) {
     // Seed from the EFFECTIVE channel value so rapid stepping during an active
-    // transition (queue-off dip in flight) does not lose steps: prefer the
-    // in-flight transition target over the not-yet-swapped live fields.
-    const ChannelTransition& tr = g_transition[channel_index(secondary)];
-    pending.preset = (tr.phase != K1Q_IDLE) ? tr.target
-                                            : k1_queue_capture_live(secondary);
-    pending.armed = true;
+    // transition does not lose steps: a committed-but-untaken request first,
+    // then the in-flight transition target, then the live fields.
+    queue_lock();
+    if (g_mailbox.pending && g_mailbox.armed[ch]) {
+      draft.preset = g_mailbox.preset[ch];
+    } else if (g_effective[ch].valid) {
+      draft.preset = g_effective[ch].preset;
+    } else {
+      draft.preset = k1_queue_capture_live(secondary);
+    }
+    queue_unlock();
+    draft.armed = true;
   }
-  return &pending.preset;
+  return &draft.preset;  // this core's private draft
 }
 
 void k1_queue_arm_preset(bool secondary, const K1ChannelPreset& preset) {
-  ChannelPendingState& pending = g_pending[channel_index(secondary)];
-  pending.preset = preset;
-  pending.armed = true;
+  ChannelDraft& draft = g_draft[producer_slot()][channel_index(secondary)];
+  draft.preset = preset;
+  draft.armed = true;
 }
 
 bool k1_queue_channel_armed(bool secondary) {
-  return g_pending[channel_index(secondary)].armed;
+  const uint8_t ch = channel_index(secondary);
+  if (g_draft[producer_slot()][ch].armed) {
+    return true;
+  }
+  queue_lock();
+  const bool waiting = g_mailbox.pending && g_mailbox.armed[ch];
+  queue_unlock();
+  return waiting;
 }
 
 bool k1_queue_any_armed() {
-  return g_pending[K1Q_PRIMARY].armed || g_pending[K1Q_SECONDARY].armed;
+  return k1_queue_channel_armed(false) || k1_queue_channel_armed(true);
 }
 
+// Discards this core's drafts and any commit not yet taken by the render task
+// (as before: disarming meant the frame tick found nothing armed).
 void k1_queue_disarm_all() {
-  g_pending[K1Q_PRIMARY].armed = false;
-  g_pending[K1Q_SECONDARY].armed = false;
+  g_draft[producer_slot()][K1Q_PRIMARY].armed = false;
+  g_draft[producer_slot()][K1Q_SECONDARY].armed = false;
+  queue_lock();
+  g_mailbox.pending = false;
+  g_mailbox.armed[K1Q_PRIMARY] = false;
+  g_mailbox.armed[K1Q_SECONDARY] = false;
+  queue_unlock();
 }
 
-void k1_queue_request_commit(bool cued, uint32_t now_ms) {
-  g_commit_cued = cued;
-  g_commit_request_ms = now_ms;
-  g_commit_request = true;  // raised LAST: pending structs are already complete
+bool k1_queue_request_commit(bool cued, uint32_t now_ms) {
+  ChannelDraft* drafts = g_draft[producer_slot()];
+  if (!drafts[K1Q_PRIMARY].armed && !drafts[K1Q_SECONDARY].armed) {
+    return false;  // nothing armed by this caller: nothing to publish
+  }
+  queue_lock();
+  for (uint8_t ch = 0; ch < 2; ch++) {
+    if (drafts[ch].armed) {
+      g_mailbox.preset[ch] = drafts[ch].preset;  // complete preset, latest wins
+      g_mailbox.armed[ch] = true;
+    }
+  }
+  g_mailbox.cued = cued;
+  g_mailbox.request_ms = now_ms;
+  g_mailbox.seq = ++g_mailbox_seq;
+  g_mailbox.pending = true;
+  queue_unlock();
+  drafts[K1Q_PRIMARY].armed = false;   // published: the next edit re-seeds
+  drafts[K1Q_SECONDARY].armed = false;
+  return true;
 }
 
-bool k1_queue_commit_pending() { return g_commit_request; }
+bool k1_queue_commit_pending() {
+  queue_lock();
+  const bool pending = g_mailbox.pending;
+  queue_unlock();
+  return pending;
+}
 
 uint8_t k1_queue_transition_style() { return g_transition_style; }
 
@@ -583,24 +697,48 @@ bool k1_preset_slot_valid(uint8_t slot_index) {
 // =============================================================================
 
 void k1_effect_queue_frame_tick(uint32_t now_ms) {
-  // 1. Consume the commit request (with optional beat-quantise hold).
-  if (g_commit_request) {
+  // 1. Consume the commit request (with optional beat-quantise hold). Peek,
+  //    decide outside the lock (k1_tempo_read takes its own lock), then take
+  //    only the same request that was peeked.
+  queue_lock();
+  const bool pending = g_mailbox.pending;
+  const bool peek_cued = g_mailbox.cued;
+  const uint32_t peek_ms = g_mailbox.request_ms;
+  const uint32_t peek_seq = g_mailbox.seq;
+  queue_unlock();
+  if (pending) {
     bool fire = true;
-    const bool cued = g_commit_cued;
-    if (cued && g_quantise == K1_QUEUE_QUANTISE_BEAT) {
+    if (peek_cued && g_quantise == K1_QUEUE_QUANTISE_BEAT) {
       const K1TempoEvent tempo = k1_tempo_read();
       const bool on_beat = tempo.beat_tick && tempo.locked;
-      const bool timed_out =
-          (now_ms - g_commit_request_ms) >= K1_QUEUE_QUANTISE_TIMEOUT_MS;
+      const bool timed_out = (now_ms - peek_ms) >= K1_QUEUE_QUANTISE_TIMEOUT_MS;
       fire = on_beat || timed_out;  // 2000 ms fallback: commit anyway (spec §2)
     }
     if (fire) {
-      g_commit_request = false;
-      // `\` commits ALL armed channels in the same frame (scene-flip support).
-      for (uint8_t ch = 0; ch < 2; ch++) {
-        if (g_pending[ch].armed) {
-          g_pending[ch].armed = false;
-          start_transition(ch, g_pending[ch].preset, now_ms, cued);
+      CommitMailbox taken;
+      bool took = false;
+      queue_lock();
+      if (g_mailbox.pending && g_mailbox.seq == peek_seq) {
+        taken = g_mailbox;  // consume-and-clear: one coherent operation
+        g_mailbox.pending = false;
+        g_mailbox.armed[K1Q_PRIMARY] = false;
+        g_mailbox.armed[K1Q_SECONDARY] = false;
+        for (uint8_t ch = 0; ch < 2; ch++) {
+          if (taken.armed[ch]) {
+            g_effective[ch].valid = true;  // seeds see the new target at once
+            g_effective[ch].preset = taken.preset[ch];
+          }
+        }
+        took = true;
+      }
+      queue_unlock();
+      // A newer publish arrived after the peek: re-evaluated next frame.
+      if (took) {
+        // `\` commits ALL armed channels in the same frame (scene-flip support).
+        for (uint8_t ch = 0; ch < 2; ch++) {
+          if (taken.armed[ch]) {
+            start_transition(ch, taken.preset[ch], now_ms, taken.cued);
+          }
         }
       }
     }
@@ -610,6 +748,18 @@ void k1_effect_queue_frame_tick(uint32_t now_ms) {
   //    completion). All live-field writes happen here, at the frame boundary.
   advance_transition(K1Q_PRIMARY, now_ms);
   advance_transition(K1Q_SECONDARY, now_ms);
+
+  // 3. Publish where each channel is heading. Cleared only after the fields
+  //    have landed, so a producer seeds from the target, never a half-applied
+  //    or crossfade-overlaid live state.
+  queue_lock();
+  for (uint8_t ch = 0; ch < 2; ch++) {
+    g_effective[ch].valid = (g_transition[ch].phase != K1Q_IDLE);
+    if (g_effective[ch].valid) {
+      g_effective[ch].preset = g_transition[ch].target;
+    }
+  }
+  queue_unlock();
 }
 
 bool k1_queue_xfade_overlay_begin(bool secondary, uint32_t now_ms,

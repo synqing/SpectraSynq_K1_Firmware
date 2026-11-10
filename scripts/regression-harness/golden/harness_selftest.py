@@ -180,7 +180,17 @@ def _mutated_capture(mod, pattern, replacement):
 
 
 def run_selftest():
-    """Return list of (label, passed). All must pass for the harness to be trusted."""
+    """Return list of (label, passed). All must pass for the harness to be trusted.
+
+    RETIRED 2026-11-10: this builds firmware mutants, which the Captain's order
+    of 22 Oct 2026 bans. It runs only with K1_ALLOW_FIRMWARE_MUTANTS=1 set by an
+    explicitly re-authorised operator. ORACLE_MODULES above stays the registry
+    for tests/test_golden_master.py.
+    """
+    import os
+    if os.environ.get("K1_ALLOW_FIRMWARE_MUTANTS") != "1":
+        raise RuntimeError("harness_selftest is retired: it builds firmware mutants "
+                           "(Captain ban 2026-10-22). Use tests/test_golden_master.py.")
     results = []
     for module_name in ORACLE_MODULES:
         mod = _load(module_name)

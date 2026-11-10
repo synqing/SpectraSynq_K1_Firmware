@@ -8,6 +8,7 @@
 #include "k1_effect_queue.h" // K1_PRESET_SLOTS_FILE (factory_reset enumeration)
 #include "k1_show_state.h"   // K1_SHOW_STATE_FILE + boot restore after load_config
 #include "bridge_fs_config_codec.h" // N1: ConfigBlobHeader + bridge_fs_classify_config()
+#include "k1_persisted_repair.h"    // Stage C: non-finite repair at adoption
 #if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 #include "k1_look.h"
 #endif
@@ -405,6 +406,15 @@ void load_config() {
     if (debug_mode) {
       USBSerial.println("CONFIG INVALID -> DEFAULTS (no reboot)");
     }
+  }
+
+  // Stage C (10 Nov 2026): integrity is not validity. Older setters let NaN/Inf
+  // into CONFIG and a normal save stored them under a correct CRC. Repair only
+  // non-finite floats (to CONFIG_DEFAULTS) before anything consumes them, and
+  // re-save once so the file is clean and the repair does not repeat each boot.
+  if (k1_config_repair_nonfinite(CONFIG, CONFIG_DEFAULTS) != 0) {
+    need_resave = true;
+    USBSerial.println("CONFIG: repaired non-finite saved value(s) to defaults");
   }
 
 #ifdef K1_EFFECT_REGISTRY_V1
