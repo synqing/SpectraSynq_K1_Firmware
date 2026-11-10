@@ -21,7 +21,7 @@
     const L3 = smooth(Float32Array.from(t.e.map((d) => Math.pow(10, d / 10))), 30).map((v) => 10 * Math.log10(v + 1e-3));
     const top = Float32Array.from(L3).sort()[Math.floor(n * 0.95)], ok = Array.from(L3, (v) => v > top - 40);
     const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = 420; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    const L = 46, R = 10, rows = [[14, 110, "music: section loudness, dB below its loud parts"], [150, 110, "old level signal E (3 s mean) and AFE2 how_much"], [286, 110, "E x how_much (thin) and its 3 s mean"]];
+    const L = 46, R = 10, rows = [[14, 110, "music: section loudness (grey) and the anchor (dashed blue), dB below its loud parts"], [150, 110, "old level signal E, 3 s mean (orange), and AFE2 how_much (blue)"], [286, 110, "E x how_much (thin) and its 3 s mean"]];
     const X = (i) => L + (i / (n - 1)) * (W - L - R);
     ctx.font = "11.5px " + css("--f-body"); ctx.textBaseline = "alphabetic";
     function frame(y0, h, title, lo, hi, ticks) {

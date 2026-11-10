@@ -10,6 +10,7 @@ D = json.loads((HERE / "explainer_data.json").read_text())
 E = html.escape
 TRK = json.loads((HERE.parent / "emu" / "analysis-tracks" / "tracks.json").read_text())
 BAB = json.loads((HERE.parent.parent.parent / "k1-fe-show-m1_20261109" / "lane-d" / "runs" / "B_M1_bench_ab.json").read_text())
+BABS = json.loads((HERE / "bench_ab_series.json").read_text())  # bench_ab_series.py: series on the frames' own clock
 SIMV = json.loads((HERE / "sim_validation.json").read_text())
 PYT = (HERE / "pytest_final.txt").read_text().strip() if (HERE / "pytest_final.txt").exists() else "not re-run"
 
@@ -17,7 +18,13 @@ PYT = (HERE / "pytest_final.txt").read_text().strip() if (HERE / "pytest_final.t
 def chart(series, w=600, h=220, logx=False, x0=None, x1=None, y0=0.0, y1=None, xt=None, yt=None, xlab="", bands=(), hlines=(), vlines=(), legend=(), ylab="", yfmt="{:g}"):
     L, R, T, B = 46, 14, 14, 34
     xs = [v for s in series for v in s[0]]; ys = [v for s in series for v in s[1]]
-    x0 = min(xs) if x0 is None else x0; x1 = max(xs) if x1 is None else x1; y1 = max(ys) * 1.08 if y1 is None else y1
+    x0 = min(xs) if x0 is None else x0; x1 = max(xs) if x1 is None else x1
+    if y1 is None and yt is None:  # round ticks: step 1, 2, 2.5 or 5 x 10^k, top tick at or above the data
+        raw = (max(ys) * 1.04 - y0) / 4; mag = 10 ** math.floor(math.log10(raw)) if raw > 0 else 1
+        step = next(m * mag for m in (1, 2, 2.5, 5, 10) if m * mag >= raw)
+        y1 = y0 + math.ceil((max(ys) - y0) / step - 1e-9) * step
+        yt = [y0 + i * step for i in range(int(round((y1 - y0) / step)) + 1)]
+    y1 = max(ys) * 1.08 if y1 is None else y1
     fx = (lambda v: math.log10(v)) if logx else (lambda v: v)
     X = lambda v: L + (fx(max(v, x0)) - fx(x0)) / (fx(x1) - fx(x0)) * (w - L - R)
     Y = lambda v: h - B - (min(max(v, y0), y1) - y0) / (y1 - y0) * (h - T - B)
@@ -187,16 +194,19 @@ slope_on = [tc[f"{k}-m{m}-on"]["slope_db_per_db"] for k, m in pairs]; slope_off 
 def trow(k, name, kind, m):
     o, n = tc[f"{k}-m{m}-off"], tc[f"{k}-m{m}-on"]; g = tc.get(f"{k}-m{m}-g2")
     g2 = f"{g['slope_db_per_db']:+.2f} · {g['contrast']:.2f}" if g else ""
-    return f'<tr><th scope="row">{E(name)}</th><td>{kind}</td><td class="m">{m}</td><td class="m">{o["loud_minus_quiet_db"]:.1f}</td><td class="m">{o["r"]:+.2f} → {n["r"]:+.2f}</td><td class="m">{o["slope_db_per_db"]:+.2f} → {n["slope_db_per_db"]:+.2f}</td><td class="m">{o["contrast"]:.2f} → {n["contrast"]:.2f}</td><td class="m">{100 * n["movement_kept"]:.0f} %</td><td class="m">{g2}</td></tr>'
+    return f'<tr><th scope="row">{E(name)}</th><td>{kind}</td><td class="m">{m}</td><td class="m">{o["loud_minus_quiet_db"]:.1f}</td><td class="m">{o["r"]:+.2f} → {n["r"]:+.2f}</td><td class="m">{o["slope_db_per_db"]:+.2f} → {n["slope_db_per_db"]:+.2f}</td><td class="m nw">{o["contrast"]:.2f} → {n["contrast"]:.2f}</td><td class="m">{100 * n["movement_kept"]:.0f} %</td><td class="m">{g2}</td></tr>'
 five_rows = "".join(trow(k, n, kd, m) for k, n, kd in TNAMES for m in (22, 32))
 def trkchart(k, m=32):
     a_, b_ = TRK["series"][f"{k}-m{m}-off"], TRK["series"][f"{k}-m{m}-on"]
     return chart([(a_["t"], a_["light"], "old"), (b_["t"], b_["light"], "new")], w=400, h=210, x0=a_["t"][0], x1=a_["t"][-1], y0=0, xt=[(a_["t"][0] + i * 12, str(int(24 + i * 12))) for i in range(6)],
                  vlines=((a_["t"][0] + 36, "return", 0),), xlab="seconds into the passage", legend=(("ln-old", "off"), ("ln-new", "on")), ylab="light %", yfmt="{:.1f}")
 five_charts = "".join(f'<figure class="card fig"><h3>{E(n.split(" - ")[-1])}</h3>{trkchart(k)}</figure>' for k, n, _ in TNAMES)
-bt = [i * 0.5 for i in range(len(BAB["off"]["rgb_series"]))]
-f_bab = chart([(bt, [v * 100 for v in BAB["off"]["rgb_series"]], "old"), (bt, [v * 100 for v in BAB["on"]["rgb_series"]], "new")], w=1180, h=240, x0=0, x1=86, y0=0, xt=[(v, str(v)) for v in range(0, 87, 10)],
-              bands=((20, 34, "loud"), (66, 78, "breakdown")), xlab="seconds into the capture", legend=(("ln-old", "stage off"), ("ln-new", "stage on")), ylab="mean light output, edge 1, % of full scale (1.5 s mean)", yfmt="{:.1f}")
+BAND_S = {"loud": (20, 34), "breakdown": (66, 78)}
+bab_means = [([a, b], [BABS[st]["means"][k] * 100] * 2, f"{cls} mean") for st, cls in (("off", "old"), ("on", "new")) for k, (a, b) in BAND_S.items()]
+f_bab = chart([(BABS["off"]["t"], [v * 100 for v in BABS["off"]["light"]], "old thin"), (BABS["on"]["t"], [v * 100 for v in BABS["on"]["light"]], "new thin")] + bab_means,
+              w=1180, h=260, x0=0, x1=88, y0=0, xt=[(v, str(v)) for v in range(0, 89, 10)],
+              bands=((20, 34, "loud"), (66, 78, "breakdown")), xlab="seconds into the capture (from the first captured frame)",
+              legend=(("ln-old", "stage off"), ("ln-new", "stage on"), ("ln-bar", "section average")), ylab="light output, edge 1, % of full scale (1.5 s centred mean)", yfmt="{:g}")
 BR = lambda st_, e: BAB[st_][e]["ratio"]
 # ------------------------------------------------------------------ tables
 OLD = [  # name, operation, constants / time constants, telemetry, source, kind, effect
@@ -316,7 +326,8 @@ def cap(text): fig[0] += 1; return f'<p class="cap"><b>Fig. {fig[0]}.</b> {text}
 
 CSS = (HERE / "explainer.css").read_text() + (HERE / "explainer2.css").read_text()
 P = []
-P.append(f'''<title>K1 Audio Front End</title>
+P.append(f'''<meta charset="utf-8">
+<title>K1 Audio Front End</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Public+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -449,13 +460,13 @@ how    = clamp((S / A)^(γ/2), floor, 1)
     <figure class="card fig"><h3>Bench: the factor, and the guard it has not yet replaced</h3>{f_bn2}{cap("Same run. how_much reaches 1.0 in the loud parts and the floor in the breakdown. The old guard still trims (minimum 0.71), and silence was flagged on 11 of 76 music lines: stages 2 and 3.")}</figure>
   </div>
   <h3>Five tracks in the real firmware</h3>
-  <div class="card tw"><table class="spec"><thead><tr><th>Track</th><th>Kind</th><th>Mode</th><th>Loud − quiet (dB)</th><th>r (light, loudness)</th><th>dB light per dB sound</th><th>Contrast</th><th>Movement kept</th><th>γ = 2: slope · contrast</th></tr></thead><tbody>{five_rows}</tbody></table></div>
+  <div class="card tw"><table class="spec"><thead><tr><th>Track</th><th>Kind</th><th>Mode</th><th>Loud − quiet (<span class="nt">dB</span>)</th><th>r (light, loudness)</th><th><span class="nt">dB</span> light per <span class="nt">dB</span> sound</th><th>Contrast</th><th>Movement kept</th><th><span class="nt">γ</span> = 2: slope · contrast</th></tr></thead><tbody>{five_rows}</tbody></table></div>
   <p class="cap">Emulator, room level, 84 s passages ending 24 s after a breakdown returns; the last 60 s captured at every fourth hop (2,000 frames). r: correlation of the 3 s mean of light output with section loudness. Slope: least-squares dB of light per dB of sound. Contrast: loudest third ÷ quietest third. Off → on. With the stage off the slope is {min(slope_off):+.2f} to {max(slope_off):+.2f}; on, {min(slope_on):+.2f} to {max(slope_on):+.2f}. At γ = 2 the measured slope is 0.46, not the 1.0 of the static curve: the floor and the meter's 1.5 s release take part of it.</p>
   <div class="grid3">{five_charts}</div>
   <p class="cap">Mode 32 light output on each track, stage off and on. The breakdown returns at the dashed line.</p>
-  <figure class="card fig"><h3>Bench A/B on the real unit</h3><div class="scroller">{f_bab}</div>{cap(f"Main RPL at a6113aaf, mode 22, Loreen 75–155 s at 10 dB under the Captain's volume, played twice: stage off (:k1_afe=off), then on. Telemetry confirms the flag on every line of each run. Loud ÷ breakdown: {BR('off','rgb'):.2f} off, {BR('on','rgb'):.2f} on.")}</figure>
+  <figure class="card fig"><h3>Bench A/B on the real unit</h3><div class="scroller">{f_bab}</div>{cap(f"Main RPL at a6113aaf, mode 22, Loreen 75–155 s at 10 dB under the Captain's volume, played twice: stage off (:k1_afe=off), then on. Telemetry confirms the flag on every line of each run. Thick bars: section averages on the raw frames — off {BABS['off']['means']['loud']*100:.1f} % loud, {BABS['off']['means']['breakdown']*100:.1f} % breakdown; on {BABS['on']['means']['loud']*100:.1f} % and {BABS['on']['means']['breakdown']*100:.1f} %. Loud ÷ breakdown: {BR('off','rgb'):.2f} off, {BR('on','rgb'):.2f} on. The two runs are separate plays, so beats do not line up between the thin lines.")}</figure>
   <h3>Seven tracks, level-signal model</h3>
-  <div class="card tw"><table class="spec narrow"><thead><tr><th>Track</th><th>Kind</th><th>Loud − quiet (dB)</th><th>Section tracking r</th><th>Contrast</th><th>AFE2 contrast at −10 / 0 / +10 dB</th><th>Beat movement kept</th></tr></thead><tbody>{trk_rows}</tbody></table></div>
+  <div class="card tw"><table class="spec narrow"><thead><tr><th>Track</th><th>Kind</th><th>Loud − quiet (<span class="nt">dB</span>)</th><th>Section tracking r</th><th>Contrast</th><th>AFE2 contrast at −10 / 0 / +10 <span class="nt">dB</span></th><th>Beat movement kept</th></tr></thead><tbody>{trk_rows}</tbody></table></div>
   <p class="cap">Model of the level signal on seven tracks (E against E × how_much), all scaled by one factor so the reference track matches the microphone level measured on the unit. Contrast: mean in the loudest quarter of the track ÷ the quietest quarter. This is a model of a signal, not of LED output.</p>
   <h3>Hypotheses that were tested and failed</h3>
   <div class="card tw"><table class="spec"><thead><tr><th>Hypothesis</th><th>Test</th><th>Observed</th><th>Verdict</th></tr></thead><tbody>{fals_rows}</tbody></table></div>

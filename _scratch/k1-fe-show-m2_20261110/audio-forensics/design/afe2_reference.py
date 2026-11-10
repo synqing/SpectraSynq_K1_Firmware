@@ -15,6 +15,10 @@ One meter, one anchor, one output:
                         fast mode starts when the timer passes T_HOLD and ends when S > Q_EXIT * A;
                         fall with TAU_A_FAST in fast mode, TAU_A_SLOW otherwise
   how_much = clamp((S / A) ^ (gamma / 2), floor, 1)                   gamma 1 = proportional to sound pressure
+  quiet    = stage 2 (11 Nov 2026), the one silence test, on the same S with two levels:
+               not quiet -> quiet when S < SIL_ENTER;  quiet -> not quiet when S > SIL_EXIT
+             The firmware declares silence when `quiet` has held for its dwell (SILENCE_DWELL_MS, 5 s).
+             No crest, peak or SSL term: loud dense music has a large S whatever its crest factor.
 The published level is `what x how_much`, where `what` is the existing 2 s self-normalised beat signal.
 
 Why these numbers (sources in research_notes/K1 audio front end design/):
@@ -27,6 +31,11 @@ Why these numbers (sources in research_notes/K1 audio front end design/):
                    (dual-loop idea from hearing-aid AGC: slow loop normally, fast action only on a persistent change)
   A_MIN 36         6 counts rms: below this the music is quieter than the unit will expose to full
   gamma 1, floor 0.25   starting values for the Captain's eye; gamma 0 reproduces today's behaviour exactly
+  SIL_ENTER 16 (4.0 counts rms), SIL_EXIT 25 (5.0 counts rms)   measured on the Main RPL 9087A500, 11 Nov 2026:
+                   quiet room (no playback, nightly HVAC, builds running nearby) S = 1.1-4.2 counts rms, one
+                   start-up burst to 9.8 (bench/quiet-room-0450.jsonl, 59 lines); Loreen at 10 dB under the
+                   Captain's volume never under 4.9 (B_M1 runs, 175 lines). The old test called 16-21 of 88
+                   music lines silent at S = 13-30.
 """
 from __future__ import annotations
 
@@ -44,6 +53,8 @@ Q_EXIT = 0.70
 A_MIN = 36.0
 GAMMA_DEFAULT = 1.0
 FLOOR_DEFAULT = 0.25
+SIL_ENTER = 16.0
+SIL_EXIT = 25.0
 
 
 def biquad_highpass(fs: float, fc: float = FC_HZ):
@@ -71,6 +82,7 @@ class Afe2:
         self.gamma = GAMMA_DEFAULT
         self.floor = FLOOR_DEFAULT
         self.how_much = 1.0
+        self.quiet = False
 
     def process_hop(self, raw) -> float:
         n = len(raw)
@@ -113,4 +125,5 @@ class Afe2:
         else:
             h = ratio ** (self.gamma * 0.5) if ratio > 0.0 else 0.0
         self.how_much = min(1.0, max(self.floor, h))
+        self.quiet = (self.S < SIL_EXIT) if self.quiet else (self.S < SIL_ENTER)
         return self.how_much

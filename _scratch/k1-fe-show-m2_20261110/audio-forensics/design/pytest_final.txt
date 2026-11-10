@@ -1,1 +1,1 @@
-first run, on 7ea24446: 2,074 passed, 4 failed (3 pinned checks, since updated and passing; 1 needs another build's library files). Re-run on a6113aaf did not finish: it stalled at 31 % and was stopped
+Full pytest on a6113aaf (11 Nov, alone, clean export with a private git dir): 2,077 passed, 9 skipped, 0 failed, in 6 minutes; it did not stall. The first run reported 3 failures in one static test, which skips any file under a folder named _scratch, and the export was in one; from a copy outside _scratch that file passes 5 of 5.

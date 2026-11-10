@@ -1,0 +1,14 @@
+# 2026-11-10T21:13:55Z mono=888290.724472 UNIT rpl USB B4:3A:45:A5:87:90 PORT /dev/cu.usbmodem11301
+# 2026-11-10T21:13:55Z mono=888290.724487 SEND :prsm_exit
+sbr{{
+PRSM_SESSION: interactive
+}}
+[AP] SSL=157 DC=-238 max_raw=129 follower=157 peak_scaled=0.208 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=156 rms_raw=0.0013 pky=1.67 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=127.0 conf=0.37 lock=0 phase=0.40 beat=0 bstr=0.05 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=17 raw_i16_rms=12.8 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.981 agc_gain=1.096 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.007 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=22 | afe=1 afe_level=0 how=0.395 env=0.208 sec=3.0 anc=7.5 fast=0 gamma=1.00 floor=0.25 afe_us=41.6 afe_us_max=64
+
+# 2026-11-10T21:13:56Z mono=888291.747306 SEND :authored_status
+sbr{{
+AUTHORED_STATUS state=0 epoch=2 applied_seq=18599 applied_t_us=154991667 applied_ms=226830 hz=120 now_ms=229657 frames_applied=19172 frames_rejected=0 frames_duplicate=0 seq_gaps=28 rx_frames_ok=19172 rx_frames_bad=0 rx_dropped_bytes=575286 rx_cmd_aborts=0 sessions=2 exits=2 holds=3
+}}
+[AP] SSL=157 DC=-238 max_raw=85 follower=157 peak_scaled=0.261 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=154 rms_raw=0.0000 pky=1.77 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=127.0 conf=0.08 lock=0 phase=0.50 beat=0 bstr=0.04 | onset=0 bass=1 ostr=0.06 | raw_i16_abs_peak=15 raw_i16_rms=11.6 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.995 agc_gain=0.992 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.001 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=22 | afe=1 afe_level=0 how=0.373 env=0.261 sec=2.8 anc=7.5 fast=0 gamma=1.00 floor=0.25 afe_us=41.4 afe_us_max=70
+[AP] SSL=157 DC=-238 max_raw=215 follower=185 peak_scaled=0.505 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=212 rms_raw=0.0005 pky=2.13 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=127.0 conf=0.00 lock=0 phase=0.64 beat=0 bstr=0.04 | onset=0 bass=1 ostr=0.06 | raw_i16_abs_peak=21 raw_i16_rms=13.2 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.944 agc_gain=0.676 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.092 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=22 | afe=1 afe_level=0 how=0.440 env=0.505 sec=3.3 anc=7.4 fast=0 gamma=1.00 floor=0.25 afe_us=40.8 afe_us_max=68
+
