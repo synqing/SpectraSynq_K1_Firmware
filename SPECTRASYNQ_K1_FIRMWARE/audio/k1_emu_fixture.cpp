@@ -232,7 +232,7 @@ uint32_t s_shown_notes = 0;
 uint32_t s_pre_audio_shows = 0;
 
 constexpr uint16_t kMaxSidecar = 2000;  // = dual-edge trace capacity
-// K1_FE_BOARD_GX limiter record (G line): scale applied at packing and the
+// K1_FE_BOARD_GX limiter record (GX line; "G," belongs to K1_EMU_TEMPO_PROBE): scale applied at packing and the
 // CRC-32 of each edge's pre-limit native RGB16 frame. valid=0 on other boards.
 struct GxLimit {
   uint32_t a_crc;
@@ -1072,7 +1072,7 @@ void k1_emu_fixture_write_sidecar(uint32_t capture_index) {
                     (unsigned long)s.processed, (unsigned long)s.app_us,
                     (unsigned)s.limit_scale, (unsigned long)s.power_mw);
   if (s.gx.valid) {
-    K1_EMU_LOG.printf("G,%lu,%u,%08lx,%08lx\n", (unsigned long)capture_index, (unsigned)s.gx.scale,
+    K1_EMU_LOG.printf("GX,%lu,%u,%08lx,%08lx\n", (unsigned long)capture_index, (unsigned)s.gx.scale,
                       (unsigned long)s.gx.a_crc, (unsigned long)s.gx.b_crc);
   }
 }

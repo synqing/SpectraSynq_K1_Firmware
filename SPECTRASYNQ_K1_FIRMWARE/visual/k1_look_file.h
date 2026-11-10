@@ -329,7 +329,8 @@ inline uint8_t *k1_look_rx_buf = nullptr;
 
 // What one received byte did to an armed upload. A finished upload installs
 // first and saves second, so "live" and "saved" are separate facts: a table
-// can be live while its LittleFS save failed (it is then gone at reboot).
+// can be live while its LittleFS save failed (flash keeps the slot's older
+// file, if any; boot reloads only slot 15 from flash).
 enum class K1LookRxOutcome : uint8_t {
   Idle,               // no upload armed: the byte was not taken
   Pending,            // byte stored; more bytes expected

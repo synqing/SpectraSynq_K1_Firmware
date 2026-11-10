@@ -10,7 +10,8 @@ against the in-memory LittleFS stub and checks all three finished outcomes:
 
 * saved:            reply "ok"; table live; file on flash equals the upload;
 * save failed:      reply "installed, not saved"; new table live; the slot's
-                    previously saved file is untouched (it is what boots);
+                    previously saved file is untouched (this test fails the
+                    temporary-file open; boot reloads only slot 15 from flash);
 * refused (bad CRC): reply "fail"; old table still live; nothing written.
 
 The save failure is a real one: the stub's file table is full, so opening the

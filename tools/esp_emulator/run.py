@@ -994,7 +994,7 @@ def evaluate_comparison(comp: dict, results: dict, hop_samples: int) -> dict:
         # applies k1_fe_gx_led_scale: ONE logical RGB16 scale over both edges, computed from
         # both edges' pre-limit frames (visual/k1_fe_gx_led_power.h). This observes that
         # current behaviour; it does not rule on whether the coupling is product intent.
-        # The capture's A/B frames are the packed wire (post-limit); G lines carry the scale
+        # The capture's A/B frames are the packed wire (post-limit); GX lines carry the scale
         # and a CRC-32 of each edge's pre-limit native frame.
         edge = 0 if comp["edge"] == "A" else 1
         other = 1 - edge
@@ -1003,7 +1003,7 @@ def evaluate_comparison(comp: dict, results: dict, hop_samples: int) -> dict:
         hops = sorted(h for h in fa if h in fb)
         recorded = bool(hops) and all(ga.get(h) is not None and gb.get(h) is not None for h in hops)
         if not recorded:
-            out.update(status="FAIL", detail=f"Gx limiter record (G line) missing on {sum(ga.get(h) is None or gb.get(h) is None for h in hops)}"
+            out.update(status="FAIL", detail=f"Gx limiter record (GX line) missing on {sum(ga.get(h) is None or gb.get(h) is None for h in hops)}"
                                               f" of {len(hops)} common frames; not a Gx capture")
             return out
         before = [h for h in hops if h < comp["from_hop"]]
@@ -1336,7 +1336,7 @@ def select_profile(sc: dict, profile: str) -> dict:
         "k1_fe_gx_led_scale applies one logical RGB16 scale over both edges before 48-bit packing "
         "(model: 1 mA idle per pixel + 20 mA per full-scale channel; replay budget = min(max_current_ma, "
         "1900 mA 3 A-source assumption)). The fixture records that scale and each edge's pre-limit "
-        "native frame per captured frame (G lines).")
+        "native frame per captured frame (GX lines).")
     for cid, purpose in (("limit-base", "Binding Gx limiter: max_current_ma=500, above the 320 mA idle model."),
                          ("limit-a", "Binding Gx limiter (500 mA) plus A-only photons=0.25 at hop 40.")):
         first = sc["cases"][cid]["commands"][0]

@@ -26,8 +26,10 @@ def _pinned_libdeps():
     root = ROOT / ".pio/libdeps"
     for env in [root / "k1_bench_im69d_led150", *sorted(root.glob("*"))]:
         oracle = env / "FastLED/src/power_mgt.cpp"
-        if (oracle.is_file() and (env / "FixedPoints/src").is_dir()
-                and hashlib.sha256(oracle.read_bytes()).hexdigest() == ORACLE_SHA256):
+        manifest = env / "FastLED/library.json"
+        if (oracle.is_file() and manifest.is_file() and (env / "FixedPoints/src").is_dir()
+                and hashlib.sha256(oracle.read_bytes()).hexdigest() == ORACLE_SHA256
+                and json.loads(manifest.read_text()).get("version") == "3.10.3"):
             return env
     raise AssertionError("no .pio/libdeps env holds FastLED power_mgt.cpp sha256 "
                          f"{ORACLE_SHA256[:12]} with FixedPoints; build any FastLED env once")

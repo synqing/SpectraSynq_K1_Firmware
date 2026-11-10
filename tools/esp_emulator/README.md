@@ -23,7 +23,8 @@ applies `k1_fe_gx_led_scale`, one logical RGB16 scale over both edges, before
 packing. The FE profile therefore runs `limit-base`/`limit-a` at
 `max_current_ma=500` (300 mA is below the 2 x 160 px idle model and darkens
 both edges) and grades them with `gx_limit_coupling`. The fixture adds a
-`G,idx,scale,a_crc,b_crc` line per frame: the Gx scale (65535 = identity) and
+`GX,idx,scale,a_crc,b_crc` line per frame (not `G,`, which the tempo probe
+uses): the Gx scale (65535 = identity) and
 the CRC-32 of each edge's pre-limit native RGB16 frame. The check observes
 current behaviour; it does not rule on whether coupling is product intent.
 All product flags remain present; the runner checks that only the declared
@@ -437,4 +438,4 @@ audiovisual quality. No software trace here proves any of them.
 | 2026-10-20 | agent:claude-code (R3 owner) | Replaced the R2 one-hop GDB contract with the PCM → production processing → paired-capture/control/persistence interface. |
 | 2026-10-20 | agent:claude-code (next phase) | Added the client transport: existing client → run-owned pty → USB-Serial/JTAG → production receive loop, trace on UART1, client gates, SW13 cases. |
 | 2026-11-10 | agent:claude (FW lead) | Adopted the RX-record adapter (`rx_stream`) from the K1-FE-SHOW lane into mainline tooling; `EMU_HCMD` text is hex-escaped. |
-| 2026-11-11 | agent:claude-code (Modernes C++ W3) | FE profile: `gx_limit_coupling` grades the Gx RGB16 limiter (G lines) at 500 mA instead of FastLED's unused scale; Main RPL `limit_coupling` unchanged. |
+| 2026-11-11 | agent:claude-code (Modernes C++ W3) | FE profile: `gx_limit_coupling` grades the Gx RGB16 limiter (GX lines) at 500 mA instead of FastLED's unused scale; Main RPL `limit_coupling` unchanged. |

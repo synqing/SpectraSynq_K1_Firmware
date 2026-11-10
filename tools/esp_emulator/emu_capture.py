@@ -157,7 +157,7 @@ class Capture:
     client_gates: list[dict[str, str]] = field(default_factory=list)
     client_gate_dones: list[dict[str, str]] = field(default_factory=list)
     client_ready: list[dict[str, str]] = field(default_factory=list)
-    # K1_FE_BOARD_GX only (G lines): capture index -> (scale, edge A native CRC-32,
+    # K1_FE_BOARD_GX only (GX lines): capture index -> (scale, edge A native CRC-32,
     # edge B native CRC-32). The scale k1_fe_gx_led_scale applied at packing (65535 =
     # identity) and each edge's pre-limit RGB16 frame. Empty on every other board.
     gx_limits: dict[int, tuple[int, int, int]] = field(default_factory=dict)
@@ -204,7 +204,8 @@ def decode(uart: str) -> Capture:
             if values[0] in sidecars:
                 raise CaptureError(f"duplicate sidecar {values[0]}")
             sidecars[values[0]] = Sidecar(*values)
-        elif line.startswith("G,"):
+        elif line.startswith("GX,"):
+            # Not "G,": K1_EMU_TEMPO_PROBE builds print their own G lines (tempo_lane_emu.py).
             parts = line.split(",")
             if len(parts) != 5:
                 raise CaptureError(f"Gx limiter line has {len(parts)} fields, expected 5")
