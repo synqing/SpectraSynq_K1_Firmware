@@ -1,0 +1,25 @@
+# old /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318
+# new runs/live-default-c1
+smoke-a: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+smoke-b: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+time-zero-tail: status old PASS new PASS; frames old 136 new 136; differing A 0 B 0; IDENTICAL
+stall-probe: status old PASS new PASS; frames old 0 new 0; differing A 0 B 0; IDENTICAL
+ctl-a: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+ctl-b: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+reject: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+limit-base: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+limit-a: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+comp-save: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+comp-ref: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+comp-recover: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+cfg-save: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+cfg-recover: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+music-a: status old PASS new PASS; frames old 1334 new 1334; differing A 0 B 0; IDENTICAL
+music-b: status old PASS new PASS; frames old 1334 new 1334; differing A 0 B 0; IDENTICAL
+startup-sqr: status old PASS new PASS; frames old 1067 new 1067; differing A 0 B 0; IDENTICAL
+client-a: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+client-b: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+client-reject: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+client-comp-save: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+client-comp-recover: status old PASS new PASS; frames old 128 new 128; differing A 0 B 0; IDENTICAL
+cases 22; differing or not compared: 0

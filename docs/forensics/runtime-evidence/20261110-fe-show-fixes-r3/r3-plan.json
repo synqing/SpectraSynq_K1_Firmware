@@ -1,0 +1,137 @@
+{
+  "cases": {
+    "r31-cont-m32": {
+      "mode": 32,
+      "rx_sha256": "0d9afc61513d5d2fbd97f9d8176ead7fefec8c07b3e56e7249ac68e466d53383"
+    },
+    "r31-gaps-m32": {
+      "mode": 32,
+      "rx_sha256": "f3ac1d9d1ee6b9156694e46d1bc0ac834c03406c21bbb7a4c4890ce1b950f322"
+    },
+    "r31-cont-m18": {
+      "mode": 18,
+      "rx_sha256": "0d9afc61513d5d2fbd97f9d8176ead7fefec8c07b3e56e7249ac68e466d53383"
+    },
+    "r31-gaps-m18": {
+      "mode": 18,
+      "rx_sha256": "f3ac1d9d1ee6b9156694e46d1bc0ac834c03406c21bbb7a4c4890ce1b950f322"
+    },
+    "r31-gapszero-m32": {
+      "mode": 32,
+      "rx_sha256": "f3ac1d9d1ee6b9156694e46d1bc0ac834c03406c21bbb7a4c4890ce1b950f322"
+    },
+    "r31-seeks-m32": {
+      "mode": 32,
+      "rx_sha256": "03a5c14ac772d5671e02f3e8b6216f56753e320a31a2e170ac811f617da76455"
+    },
+    "r32-stairs-m32": {
+      "mode": 32,
+      "rx_sha256": "72c734b7767acae8e430a7246d31c89c045cb550a41d72c96a561e05471d31c6"
+    },
+    "r32-stairs-m18": {
+      "mode": 18,
+      "rx_sha256": "72c734b7767acae8e430a7246d31c89c045cb550a41d72c96a561e05471d31c6"
+    }
+  },
+  "gaps": {
+    "runs": [
+      {
+        "frames_lost": 4,
+        "first_lost_t_us": 102000000,
+        "last_lost_t_us": 102025000,
+        "last_before": 12239,
+        "first_after": 12244,
+        "quiet_ms": 41.666,
+        "resume_run_hop": 271,
+        "last_before_run_hop": 265
+      },
+      {
+        "frames_lost": 12,
+        "first_lost_t_us": 108000000,
+        "last_lost_t_us": 108091667,
+        "last_before": 12959,
+        "first_after": 12972,
+        "quiet_ms": 108.333,
+        "resume_run_hop": 1079,
+        "last_before_run_hop": 1065
+      },
+      {
+        "frames_lost": 60,
+        "first_lost_t_us": 114000000,
+        "last_lost_t_us": 114491667,
+        "last_before": 13679,
+        "first_after": 13740,
+        "quiet_ms": 508.333,
+        "resume_run_hop": 1933,
+        "last_before_run_hop": 1865
+      }
+    ],
+    "continuous": {
+      "frames_sent": 3000,
+      "frames_after_end_dropped": 0,
+      "records": 3000,
+      "bytes": 192064
+    },
+    "gapped": {
+      "frames_sent": 2924,
+      "frames_after_end_dropped": 0,
+      "records": 2924,
+      "bytes": 187200
+    }
+  },
+  "seeks": {
+    "parts": [
+      {
+        "part": "start",
+        "first_run_hop": 0,
+        "first_seq": 12000,
+        "first_t_us": 100000000
+      },
+      {
+        "part": "backward",
+        "first_run_hop": 533,
+        "first_seq": 12120,
+        "first_t_us": 101000000
+      },
+      {
+        "part": "forward, show time off",
+        "first_run_hop": 934,
+        "first_seq": 12480,
+        "first_t_us": 106000000
+      },
+      {
+        "part": "forward, consistent, 2 s",
+        "first_run_hop": 1335,
+        "first_seq": 13080,
+        "first_t_us": 111000000
+      }
+    ],
+    "run_s": 14.0
+  },
+  "steps": [
+    0.0,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.0
+  ],
+  "step_s": 4.0,
+  "suite": [
+    "r31-cont-m32",
+    "r31-gaps-m32",
+    "r31-cont-m18",
+    "r31-gaps-m18",
+    "r31-gapszero-m32",
+    "r31-seeks-m32",
+    "r32-stairs-m32",
+    "r32-stairs-m18"
+  ],
+  "tree": "/private/tmp/fwlead-r3/c1g"
+}

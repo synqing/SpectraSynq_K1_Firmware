@@ -117,11 +117,31 @@ int main() {
 
   k1_authored_tick(1000 + 49);
   if (k1_authored_state() != K1_SRC_AUTHORED) return fail("fresh_49");
+  /* Past 50 ms with no frame the source holds the last applied frame and the
+   * microphone stays out, up to the hold window; then it hands back. */
   k1_authored_tick(1000 + 51);
-  if (k1_authored_state() != K1_SRC_RECOVERY) return fail("stale_51_recovery");
-  k1_authored_tick(1000 + 52);
+  if (k1_authored_state() != K1_SRC_AUTHORED_DRAIN) return fail("stale_51_holds");
+  if (!k1_authored_suppresses_live_update()) return fail("hold_keeps_live_out");
+  if (!k1_authored_intent(&intent)) return fail("hold_keeps_intent");
+  if (intent.spectral_energy < 0.49f || intent.spectral_energy > 0.51f) {
+    return fail("hold_keeps_last_frame");
+  }
+  k1_authored_tick(1000 + K1_AUTHORED_HOLD_MS);
+  if (k1_authored_state() != K1_SRC_AUTHORED_DRAIN) return fail("hold_until_window_end");
+  k1_authored_tick(1000 + K1_AUTHORED_HOLD_MS + 1);
+  if (k1_authored_state() != K1_SRC_RECOVERY) return fail("hold_expired_recovery");
+  if (k1_authored_suppresses_live_update()) return fail("recovery_live");
+  k1_authored_tick(1000 + K1_AUTHORED_HOLD_MS + 2);
   if (k1_authored_state() != K1_SRC_STANDALONE) return fail("recovery_to_standalone");
   if (k1_authored_suppresses_live_update()) return fail("handback_live");
+
+  /* Explicit end of show: live at once, no hold. */
+  k1_authored_on_frame(&parsed, 5000);
+  if (k1_authored_state() != K1_SRC_AUTHORED) return fail("reacquire");
+  k1_authored_release();
+  if (k1_authored_state() != K1_SRC_STANDALONE) return fail("release_standalone");
+  if (k1_authored_suppresses_live_update()) return fail("release_live");
+  if (k1_authored_intent(&intent)) return fail("release_drops_intent");
 
   /* Reject out-of-range hz — fail closed, do not map. */
   k1_authored_reset();
@@ -132,5 +152,6 @@ int main() {
 
   std::printf("PASS authored_ingress\n");
   std::printf("freshness_ms %u\n", K1_AUTHORED_FRESHNESS_MS);
+  std::printf("hold_ms %u\n", K1_AUTHORED_HOLD_MS);
   return 0;
 }

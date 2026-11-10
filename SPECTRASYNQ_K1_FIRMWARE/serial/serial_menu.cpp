@@ -4184,7 +4184,7 @@ void cmd_authored_status() {
       "AUTHORED_STATUS state=%d epoch=%lu applied_seq=%lu applied_t_us=%llu "
       "applied_ms=%lu hz=%u now_ms=%lu frames_applied=%lu frames_rejected=%lu "
       "frames_duplicate=%lu seq_gaps=%lu rx_frames_ok=%lu rx_frames_bad=%lu "
-      "rx_dropped_bytes=%lu rx_cmd_aborts=%lu sessions=%lu exits=%lu\n",
+      "rx_dropped_bytes=%lu rx_cmd_aborts=%lu sessions=%lu exits=%lu holds=%lu\n",
       (int)st.state, (unsigned long)st.epoch, (unsigned long)st.applied_seq,
       (unsigned long long)st.applied_t_us, (unsigned long)st.applied_ms,
       (unsigned)st.applied_hz, (unsigned long)millis(),
@@ -4192,7 +4192,7 @@ void cmd_authored_status() {
       (unsigned long)st.frames_duplicate, (unsigned long)st.seq_gaps,
       (unsigned long)n.frames_ok, (unsigned long)n.frames_bad,
       (unsigned long)n.dropped_bytes, (unsigned long)n.cmd_aborts,
-      (unsigned long)n.sessions, (unsigned long)n.exits);
+      (unsigned long)n.sessions, (unsigned long)n.exits, (unsigned long)st.holds);
   tx_end();
 }
 
@@ -4218,6 +4218,9 @@ static void k1_serial_rx_act(k1_prsm_rx_event_t& rx_event, uint32_t t_now) {
 #endif
       break;
     case K1_PRSM_RX_SESSION_EXIT:
+      // The show is over: the microphone takes the picture back now, without
+      // waiting out the frame-loss hold.
+      k1_authored_release();
       tx_begin();
       USBSerial.println("PRSM_SESSION: interactive");
       tx_end();

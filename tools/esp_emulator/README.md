@@ -404,8 +404,13 @@ prepared-show (PRSM) stream:
   product's own receiver (`audio/k1_prsm_rx.cpp`) and frame scanner. Nothing is
   parsed in the fixture.
 - **Observation.** `EMU_AUTH after_hop= state=` on each change of the authored
-  source state, and `EMU_RX_END records=a/b queued= consumed= auth_state=`
-  before the counters at the end of the run. A run ends with `rx_backlog` if a
+  source state (0 live, 2 prepared, 3 holding the last frame while the stream
+  is quiet, 4 handing back), `EMU_PREP after_hop= epoch= applied_seq= seq_gaps=
+  holds=` on each change of the prepared-show epoch (playback start or seek;
+  frames lost on the way must not change it), and `EMU_RX_END records=a/b
+  queued= consumed= auth_state=` then `EMU_PREP_END epoch= applied_seq=
+  frames_applied= frames_duplicate= frames_rejected= seq_gaps= holds=` before
+  the counters at the end of the run. A run ends with `rx_backlog` if a
   hop's bytes were not drained before the next hop, and `rx_overflow` if one
   hop queues more than the 1,024-byte FIFO.
 - **Not modelled.** USB packet boundaries, packet loss and receive-queue
@@ -428,3 +433,4 @@ audiovisual quality. No software trace here proves any of them.
 | 2026-10-20 | agent:claude-code (R3 owner) | Replaced the R2 one-hop GDB contract with the PCM → production processing → paired-capture/control/persistence interface. |
 | 2026-10-20 | agent:claude-code (next phase) | Added the client transport: existing client → run-owned pty → USB-Serial/JTAG → production receive loop, trace on UART1, client gates, SW13 cases. |
 | 2026-11-10 | agent:claude (FW lead) | Adopted the RX-record adapter (`rx_stream`) from the K1-FE-SHOW lane into mainline tooling; `EMU_HCMD` text is hex-escaped. |
+| 2026-11-10 | agent:claude (FW lead) | `EMU_PREP` / `EMU_PREP_END` report the prepared-show epoch and lost-frame counters (change request R3-1). |

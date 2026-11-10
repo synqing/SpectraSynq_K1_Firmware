@@ -56,6 +56,7 @@ class AuthoredIngressNativeTest(unittest.TestCase):
         self.assertEqual(self.rc, 0, self.stderr + self.stdout)
         self.assertIn("PASS authored_ingress", self.stdout)
         self.assertIn("freshness_ms 50", self.stdout)
+        self.assertIn("hold_ms 1000", self.stdout)
 
     def test_check_serial_scans_before_hotkeys(self):
         text = SERIAL_CPP.read_text(encoding="utf-8")

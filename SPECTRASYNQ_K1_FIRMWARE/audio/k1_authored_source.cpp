@@ -15,6 +15,7 @@ static uint32_t s_frames_applied = 0;
 static uint32_t s_frames_rejected = 0;
 static uint32_t s_frames_duplicate = 0;
 static uint32_t s_seq_gaps = 0;
+static uint32_t s_holds = 0;
 
 void k1_authored_reset(void) {
   s_state = K1_SRC_STANDALONE;
@@ -30,6 +31,7 @@ void k1_authored_reset(void) {
   s_frames_rejected = 0;
   s_frames_duplicate = 0;
   s_seq_gaps = 0;
+  s_holds = 0;
 }
 
 static float u16_01(uint16_t v) {
@@ -66,13 +68,17 @@ bool k1_authored_map_prim8(const k1_prsm_frame_t *frame, uint32_t now_ms,
 }
 
 /* True when this frame follows the last applied one on the same timeline:
- * the sequence number advanced by 1..(1 + gap) and the show time advanced by
- * the matching number of ticks. Anything else is a seek or a new stream. */
+ * the sequence number moved forward by at least 1 and by no more than the
+ * hold window's worth of frames, and the show time moved by the matching
+ * number of ticks. Frames lost on the way therefore stay inside the epoch.
+ * Anything else is a seek or a new stream. A backward step wraps to a huge
+ * forward value and fails the bound. */
 static bool frame_continues(const k1_prsm_frame_t *frame) {
   if (!s_have_seq) return false;
-  const uint32_t forward = frame->seq - s_last_seq;
-  if (forward == 0 || forward > 1u + K1_AUTHORED_SEQ_GAP_MAX) return false;
   if (frame->hz != s_last_hz) return false;
+  const uint32_t forward = frame->seq - s_last_seq;
+  const uint32_t forward_max = ((uint32_t)frame->hz * K1_AUTHORED_HOLD_MS) / 1000u;
+  if (forward == 0 || forward > forward_max) return false;
   const uint64_t expected = s_last_t_us + ((uint64_t)forward * 1000000u) / frame->hz;
   const uint64_t diff = (frame->t_us > expected) ? (frame->t_us - expected)
                                                  : (expected - frame->t_us);
@@ -122,16 +128,26 @@ void k1_authored_tick(uint32_t now_ms) {
     return;
   }
   const uint32_t age = now_ms - s_last_prsm_ms;
-  if (age > K1_AUTHORED_FRESHNESS_MS) {
-    if (s_state == K1_SRC_AUTHORED || s_state == K1_SRC_AUTHORED_DRAIN ||
-        s_state == K1_SRC_AUTHORED_ACQUIRE) {
-      s_state = K1_SRC_RECOVERY;
-    } else if (s_state == K1_SRC_RECOVERY) {
-      s_state = K1_SRC_STANDALONE;
-      s_have_intent = false;
-      s_have_seq = false;
-    }
+  if (s_state == K1_SRC_RECOVERY) {
+    /* One tick after the hold ran out: the microphone has the snapshot back. */
+    s_state = K1_SRC_STANDALONE;
+    s_have_intent = false;
+    s_have_seq = false;
+  } else if (age > K1_AUTHORED_HOLD_MS) {
+    s_state = K1_SRC_RECOVERY;
+  } else if (age > K1_AUTHORED_FRESHNESS_MS && s_state == K1_SRC_AUTHORED) {
+    /* No frame for more than 50 ms: hold the last applied frame. The stream
+     * may resume inside the same epoch (see frame_continues). */
+    s_state = K1_SRC_AUTHORED_DRAIN;
+    s_holds++;
   }
+}
+
+void k1_authored_release(void) {
+  if (s_state == K1_SRC_STANDALONE) return;
+  s_state = K1_SRC_STANDALONE;
+  s_have_intent = false;
+  s_have_seq = false;
 }
 
 k1_authored_state_t k1_authored_state(void) { return s_state; }
@@ -162,4 +178,5 @@ void k1_authored_status(k1_authored_status_t *out) {
   out->frames_rejected = s_frames_rejected;
   out->frames_duplicate = s_frames_duplicate;
   out->seq_gaps = s_seq_gaps;
+  out->holds = s_holds;
 }

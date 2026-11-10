@@ -68,6 +68,7 @@
 #include "k1_audio_snapshot.h"
 #include <math.h>
 #include "k1_vp_audio_access.h"
+#include "k1_prepared_level.h"
 
 static const float TEMPO_QUIET_ALPHA = 0.82f;  // history drain when presence lost (matches Dense Forge)
 static const float TEMPO_PRESENCE_FLOOR = 0.02f;
@@ -134,6 +135,13 @@ static CRGB16 tempo_peak_fallback_colour(const RenderParams* rp, bool render_sec
                                float(fallback_col.b));
     if (fb > 0.0f && fb_max < 0.02f) {
       fallback_col = hsv(SQ15x16(rp->CHROMA), SQ15x16(rp->SATURATION), SQ15x16(fb));
+    }
+    if (k1_vp_prepared_active()) {
+      // Prepared show: the palette gives the hue, the show gives the level
+      // (k1_prepared_level.h). Without this the level is multiplied by how
+      // dark the palette is at the CHROMA coordinate.
+      (void)k1_prepared_level_colour(
+          palette_manual_colour(pal, SQ15x16(rp->CHROMA), SQ15x16(1.0f)), fb, &fallback_col);
     }
   } else {
     fallback_col = hsv(SQ15x16(rp->CHROMA), SQ15x16(rp->SATURATION), SQ15x16(fb));

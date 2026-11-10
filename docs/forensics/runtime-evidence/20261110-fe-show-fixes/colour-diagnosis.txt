@@ -1,0 +1,17 @@
+# Colour against energy, emulator capture g1-a1 (M1 stream over the passage PCM), Main RPL configuration.
+
+## development run rpl32 (working tree before commit; same prepared-path sources as a6bad318 except the colour-phase park moved one hop earlier)
+edge A: lit frames 1778/1778; hue 2-98 pct 262.4..321.0 deg (span 58.6); circular R 0.960; distinct hues(1deg) 76; r(position,hue) 0.912; position 2-98 pct 0.52..0.84
+edge B: lit frames 1778/1778; hue 2-98 pct 243.1..244.9 deg (span 1.8); circular R 0.997; distinct hues(1deg) 24; r(position,hue) -0.189; position 2-98 pct 0.53..0.85
+edge A brightest pixel: circular mean hue 283.3 deg, deviation 2-98 pct -32.5..56.8 deg, r(brightness,hue deviation) 0.127, peak level 2-98 pct 0.038..0.558
+edge B brightest pixel: circular mean hue 244.7 deg, deviation 2-98 pct -2.1..0.2 deg, r(brightness,hue deviation) -0.168, peak level 2-98 pct 0.053..0.980
+
+## development run rpl18 (working tree before commit; same prepared-path sources as a6bad318 except the colour-phase park moved one hop earlier)
+edge A: lit frames 1778/1778; hue 2-98 pct 0.4..357.3 deg (span 356.9); circular R 0.871; distinct hues(1deg) 112; r(position,hue) nan; position 2-98 pct 0.31..0.99
+edge B: lit frames 1778/1778; hue 2-98 pct 243.5..351.6 deg (span 108.1); circular R 0.921; distinct hues(1deg) 31; r(position,hue) -0.710; position 2-98 pct 0.32..0.99
+edge A brightest pixel: circular mean hue 321.0 deg, deviation 2-98 pct -60.3..39.0 deg, r(brightness,hue deviation) 0.449, peak level 2-98 pct 0.034..0.285
+edge B brightest pixel: circular mean hue 248.1 deg, deviation 2-98 pct -4.0..110.9 deg, r(brightness,hue deviation) 0.824, peak level 2-98 pct 0.056..0.257
+
+## base 8b202f46, mode 32 (K1-FE-SHOW lead's baseline run rplproxy-8b202f46-m32-20261110T160813)
+edge A: lit frames 1778/1778; hue 2-98 pct 244.0..303.3 deg (span 59.3); circular R 0.957; distinct hues(1deg) 75; r(position,hue) -0.438; position 2-98 pct 0.68..0.85
+edge B: lit frames 1778/1778; hue 2-98 pct 244.4..258.3 deg (span 14.0); circular R 0.995; distinct hues(1deg) 29; r(position,hue) 0.412; position 2-98 pct 0.68..0.85

@@ -1,0 +1,1182 @@
+{
+  "source": {
+    "repository": "/private/tmp/fwlead-r3/c1g",
+    "kind": "export",
+    "head": "unknown",
+    "branch": null,
+    "dirty_paths": [],
+    "dirty_inputs_sha256": "955d4641e1f8910ead7eac7e2fbfd9bdc860048e4e3ebb4ab6d361d5547a23ac",
+    "export_tree_sha256": "955d4641e1f8910ead7eac7e2fbfd9bdc860048e4e3ebb4ab6d361d5547a23ac",
+    "identity_paths": [
+      "SPECTRASYNQ_K1_FIRMWARE",
+      "platformio.ini",
+      "tools/esp_emulator",
+      "scripts/platformio",
+      "tests/test_esp_emulator_acceptance.py",
+      "tests/test_esp_emulator_report.py"
+    ]
+  },
+  "emu_build": {
+    "env": "k1_main_rpl_emu",
+    "exit_code": 0,
+    "seconds": 18.5,
+    "log": "/private/tmp/fwlead-r3/runs/c1/emu/build-emu.log",
+    "command": "bash scripts/agent/pio-build.sh k1_main_rpl_emu",
+    "firmware.elf_sha256": "6ddc70bad759e07603467af16241eae3d523bea3098d06eada7e555d8b7b381f",
+    "firmware.bin_sha256": "f52d3b0ab2aab8f8b489b61072424a0ac56cb36f74f9bd040384a38307ddebb5",
+    "bootloader.bin_sha256": "12c9a10fef2d95a3f6d74dc6089fa8fedc51a77a487be834c9207b8c687b8761",
+    "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+  },
+  "cases": {
+    "r31-cont-m32": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 3000,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 0
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "n_frames": 1567,
+      "edge_sha256": {
+        "A": "d554306410ed8fc23864dc7529ee7a05a4d7acc1946cce56a3c5594c0fd8ca4d",
+        "B": "a2b5d5b578af3d6f1dae32a5e587073cc05b0a352d803cb877c6b82bcf714e51"
+      }
+    },
+    "r31-gaps-m32": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 2924,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 76,
+        "holds": 2
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1072,
+          3
+        ],
+        [
+          1079,
+          2
+        ],
+        [
+          1872,
+          3
+        ],
+        [
+          1933,
+          2
+        ]
+      ],
+      "n_frames": 1567,
+      "edge_sha256": {
+        "A": "af50ae6f39fd121b03bdf41e22fc1002dc29c41f346398ce8c4b6aaa2e265f07",
+        "B": "90057c47e3754b2e22ccc2e18bd80b87cc35cfaf9963d16dc9c1c7cb98e81676"
+      }
+    },
+    "r31-cont-m18": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 3000,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 0
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "n_frames": 1567,
+      "edge_sha256": {
+        "A": "c54f322fcaf99e3f738878b33ae9c783ccb9d5b69ec86ee12aca43a05021050a",
+        "B": "7db67cc4d372fa49df92d864c919198dcb6fa6b56f21829709ba1db23e2564f5"
+      }
+    },
+    "r31-gaps-m18": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 2924,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 76,
+        "holds": 2
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1072,
+          3
+        ],
+        [
+          1079,
+          2
+        ],
+        [
+          1872,
+          3
+        ],
+        [
+          1933,
+          2
+        ]
+      ],
+      "n_frames": 1567,
+      "edge_sha256": {
+        "A": "19b422d734d16e5e0445c2aea8a58b043d2f1e6154b8cab41bcee4426c9591d0",
+        "B": "f14004797428b3fe6557ac7c62a15c21b7a89630c8573f43586e2dd1a6964bc6"
+      }
+    },
+    "r31-gapszero-m32": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 2924,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 76,
+        "holds": 2
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1072,
+          3
+        ],
+        [
+          1079,
+          2
+        ],
+        [
+          1872,
+          3
+        ],
+        [
+          1933,
+          2
+        ]
+      ],
+      "n_frames": 1567,
+      "edge_sha256": {
+        "A": "af50ae6f39fd121b03bdf41e22fc1002dc29c41f346398ce8c4b6aaa2e265f07",
+        "B": "90057c47e3754b2e22ccc2e18bd80b87cc35cfaf9963d16dc9c1c7cb98e81676"
+      }
+    },
+    "r31-seeks-m32": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        },
+        {
+          "after_hop": 533,
+          "epoch": 2,
+          "applied_seq": 12120,
+          "seq_gaps": 0,
+          "holds": 0
+        },
+        {
+          "after_hop": 934,
+          "epoch": 3,
+          "applied_seq": 12480,
+          "seq_gaps": 0,
+          "holds": 0
+        },
+        {
+          "after_hop": 1335,
+          "epoch": 4,
+          "applied_seq": 13080,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 4,
+        "applied_seq": 13439,
+        "frames_applied": 1560,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 1
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1741,
+          3
+        ]
+      ],
+      "n_frames": 312,
+      "edge_sha256": {
+        "A": "a2e5bfd1358a87797fa74ff709e41fb056f4e87448dca5f1ad9a4527ad9060ec",
+        "B": "d6f46c9e9fcb95531e7f811c6dc1d60c6663030daf2f4520286c7708af915db1"
+      }
+    },
+    "r32-stairs-m32": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 0,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 1,
+        "applied_seq": 5759,
+        "frames_applied": 5760,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 0
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "n_frames": 1600,
+      "edge_sha256": {
+        "A": "0ffeead4b86ac64d6fe388efc03c5063c10dbc228a435e06b61e0fd6ae6754ad",
+        "B": "b91ff9116776212ffd6c81926990dc6605e8976fb52115995a9d8ba1aa7736e7"
+      }
+    },
+    "r32-stairs-m18": {
+      "status": "PASS",
+      "reasons": [],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 0,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 1,
+        "applied_seq": 5759,
+        "frames_applied": 5760,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 0
+      },
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "n_frames": 1600,
+      "edge_sha256": {
+        "A": "c300735b2d77128b319a5cccbd180299042c08ab4a52bc66c2f9677e72e376fe",
+        "B": "cd685bc336560e3a1fd62f864586c22b1246e39c84f86bef0bc76b5d956513a6"
+      }
+    }
+  },
+  "checks": {
+    "R3-1 m32 one epoch across lost runs of 4, 12, 60": {
+      "verdict": "PASS",
+      "end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 2924,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 76,
+        "holds": 2
+      },
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "continuous_end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 3000,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 0
+      },
+      "auth_transitions": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1072,
+          3
+        ],
+        [
+          1079,
+          2
+        ],
+        [
+          1872,
+          3
+        ],
+        [
+          1933,
+          2
+        ]
+      ]
+    },
+    "R3-1 m32 both edges equal continuous play again after each gap (within R = 667 hops)": {
+      "verdict": "PASS",
+      "identical_before_first_gap": true,
+      "frames_before_first_gap": 33,
+      "per_gap": [
+        {
+          "frames_lost": 4,
+          "quiet_ms": 41.666,
+          "resume_run_hop": 271,
+          "compared_frames": 400,
+          "A": {
+            "differing_frames": 48,
+            "first_diff_hop": 266,
+            "last_diff_hop": 364,
+            "agrees_from_hop": 366,
+            "s_after_resume": 0.713,
+            "max_mean_abs_diff_16bit": 3728.51
+          },
+          "B": {
+            "differing_frames": 48,
+            "first_diff_hop": 266,
+            "last_diff_hop": 364,
+            "agrees_from_hop": 366,
+            "s_after_resume": 0.713,
+            "max_mean_abs_diff_16bit": 3860.09
+          }
+        },
+        {
+          "frames_lost": 12,
+          "quiet_ms": 108.333,
+          "resume_run_hop": 1079,
+          "compared_frames": 400,
+          "A": {
+            "differing_frames": 67,
+            "first_diff_hop": 1066,
+            "last_diff_hop": 1198,
+            "agrees_from_hop": 1200,
+            "s_after_resume": 0.907,
+            "max_mean_abs_diff_16bit": 4649.73
+          },
+          "B": {
+            "differing_frames": 67,
+            "first_diff_hop": 1066,
+            "last_diff_hop": 1198,
+            "agrees_from_hop": 1200,
+            "s_after_resume": 0.907,
+            "max_mean_abs_diff_16bit": 5244.4
+          }
+        },
+        {
+          "frames_lost": 60,
+          "quiet_ms": 508.333,
+          "resume_run_hop": 1933,
+          "compared_frames": 734,
+          "A": {
+            "differing_frames": 100,
+            "first_diff_hop": 1866,
+            "last_diff_hop": 2066,
+            "agrees_from_hop": 2068,
+            "s_after_resume": 1.012,
+            "max_mean_abs_diff_16bit": 5455.01
+          },
+          "B": {
+            "differing_frames": 99,
+            "first_diff_hop": 1866,
+            "last_diff_hop": 2062,
+            "agrees_from_hop": 2064,
+            "s_after_resume": 0.983,
+            "max_mean_abs_diff_16bit": 5800.36
+          }
+        }
+      ]
+    },
+    "R3-1 m18 one epoch across lost runs of 4, 12, 60": {
+      "verdict": "PASS",
+      "end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 2924,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 76,
+        "holds": 2
+      },
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "continuous_end": {
+        "epoch": 1,
+        "applied_seq": 14999,
+        "frames_applied": 3000,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 0
+      },
+      "auth_transitions": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1072,
+          3
+        ],
+        [
+          1079,
+          2
+        ],
+        [
+          1872,
+          3
+        ],
+        [
+          1933,
+          2
+        ]
+      ]
+    },
+    "R3-1 m18 both edges equal continuous play again after each gap (within R = 667 hops)": {
+      "verdict": "PASS",
+      "identical_before_first_gap": true,
+      "frames_before_first_gap": 33,
+      "per_gap": [
+        {
+          "frames_lost": 4,
+          "quiet_ms": 41.666,
+          "resume_run_hop": 271,
+          "compared_frames": 400,
+          "A": {
+            "differing_frames": 75,
+            "first_diff_hop": 266,
+            "last_diff_hop": 414,
+            "agrees_from_hop": 416,
+            "s_after_resume": 1.087,
+            "max_mean_abs_diff_16bit": 1100.45
+          },
+          "B": {
+            "differing_frames": 75,
+            "first_diff_hop": 266,
+            "last_diff_hop": 414,
+            "agrees_from_hop": 416,
+            "s_after_resume": 1.087,
+            "max_mean_abs_diff_16bit": 1263.9
+          }
+        },
+        {
+          "frames_lost": 12,
+          "quiet_ms": 108.333,
+          "resume_run_hop": 1079,
+          "compared_frames": 400,
+          "A": {
+            "differing_frames": 107,
+            "first_diff_hop": 1066,
+            "last_diff_hop": 1278,
+            "agrees_from_hop": 1280,
+            "s_after_resume": 1.508,
+            "max_mean_abs_diff_16bit": 743.39
+          },
+          "B": {
+            "differing_frames": 107,
+            "first_diff_hop": 1066,
+            "last_diff_hop": 1278,
+            "agrees_from_hop": 1280,
+            "s_after_resume": 1.508,
+            "max_mean_abs_diff_16bit": 849.26
+          }
+        },
+        {
+          "frames_lost": 60,
+          "quiet_ms": 508.333,
+          "resume_run_hop": 1933,
+          "compared_frames": 734,
+          "A": {
+            "differing_frames": 106,
+            "first_diff_hop": 1866,
+            "last_diff_hop": 2076,
+            "agrees_from_hop": 2078,
+            "s_after_resume": 1.087,
+            "max_mean_abs_diff_16bit": 2175.88
+          },
+          "B": {
+            "differing_frames": 106,
+            "first_diff_hop": 1866,
+            "last_diff_hop": 2076,
+            "agrees_from_hop": 2078,
+            "s_after_resume": 1.087,
+            "max_mean_abs_diff_16bit": 2173.82
+          }
+        }
+      ]
+    },
+    "R3-1 m32 gap run is the same over music PCM and all-zero PCM (the hold keeps the microphone out)": {
+      "verdict": "PASS",
+      "compare": {
+        "compared_frames": 1567,
+        "musical_hops": [
+          200,
+          3332
+        ],
+        "A": {
+          "differing_frames": 0,
+          "share": 0.0,
+          "first_diff_hop": null,
+          "last_diff_hop": null,
+          "identical": true
+        },
+        "B": {
+          "differing_frames": 0,
+          "share": 0.0,
+          "first_diff_hop": null,
+          "last_diff_hop": null,
+          "identical": true
+        },
+        "identical_both_edges": true
+      }
+    },
+    "R3-1 true seeks still start a new epoch (backward; show time off; forward longer than the hold)": {
+      "verdict": "PASS",
+      "expected_parts": [
+        {
+          "part": "start",
+          "first_run_hop": 0,
+          "first_seq": 12000,
+          "first_t_us": 100000000
+        },
+        {
+          "part": "backward",
+          "first_run_hop": 533,
+          "first_seq": 12120,
+          "first_t_us": 101000000
+        },
+        {
+          "part": "forward, show time off",
+          "first_run_hop": 934,
+          "first_seq": 12480,
+          "first_t_us": 106000000
+        },
+        {
+          "part": "forward, consistent, 2 s",
+          "first_run_hop": 1335,
+          "first_seq": 13080,
+          "first_t_us": 111000000
+        }
+      ],
+      "epoch_changes": [
+        {
+          "after_hop": 0,
+          "epoch": 1,
+          "applied_seq": 12000,
+          "seq_gaps": 0,
+          "holds": 0
+        },
+        {
+          "after_hop": 533,
+          "epoch": 2,
+          "applied_seq": 12120,
+          "seq_gaps": 0,
+          "holds": 0
+        },
+        {
+          "after_hop": 934,
+          "epoch": 3,
+          "applied_seq": 12480,
+          "seq_gaps": 0,
+          "holds": 0
+        },
+        {
+          "after_hop": 1335,
+          "epoch": 4,
+          "applied_seq": 13080,
+          "seq_gaps": 0,
+          "holds": 0
+        }
+      ],
+      "end": {
+        "epoch": 4,
+        "applied_seq": 13439,
+        "frames_applied": 1560,
+        "frames_duplicate": 0,
+        "frames_rejected": 0,
+        "seq_gaps": 0,
+        "holds": 1
+      }
+    },
+    "R3-2 m32 staircase rendered and lit at full pressure": {
+      "verdict": "PASS",
+      "full_pressure": {
+        "pressure": 1.0,
+        "frames": 66,
+        "A": {
+          "mean": 2760.8,
+          "max": 45323,
+          "brightest_pixel_mean": 45323.0,
+          "lit_pixels_mean": 16.0
+        },
+        "B": {
+          "mean": 2365.1,
+          "max": 65534,
+          "brightest_pixel_mean": 65534.0,
+          "lit_pixels_mean": 16.0
+        }
+      }
+    },
+    "R3-2 m18 staircase rendered and lit at full pressure": {
+      "verdict": "PASS",
+      "full_pressure": {
+        "pressure": 1.0,
+        "frames": 66,
+        "A": {
+          "mean": 368.1,
+          "max": 50633,
+          "brightest_pixel_mean": 50633.0,
+          "lit_pixels_mean": 2.0
+        },
+        "B": {
+          "mean": 294.0,
+          "max": 65534,
+          "brightest_pixel_mean": 65534.0,
+          "lit_pixels_mean": 2.0
+        }
+      }
+    }
+  },
+  "r32_mapping": {
+    "m32": [
+      {
+        "pressure": 0.0,
+        "frames": 67,
+        "A": {
+          "mean": 0.0,
+          "max": 0,
+          "brightest_pixel_mean": 0.0,
+          "lit_pixels_mean": 0.0
+        },
+        "B": {
+          "mean": 0.0,
+          "max": 0,
+          "brightest_pixel_mean": 0.0,
+          "lit_pixels_mean": 0.0
+        }
+      },
+      {
+        "pressure": 0.05,
+        "frames": 67,
+        "A": {
+          "mean": 482.2,
+          "max": 4124,
+          "brightest_pixel_mean": 4124.0,
+          "lit_pixels_mean": 104.0
+        },
+        "B": {
+          "mean": 540.2,
+          "max": 4264,
+          "brightest_pixel_mean": 4264.0,
+          "lit_pixels_mean": 104.0
+        }
+      },
+      {
+        "pressure": 0.1,
+        "frames": 66,
+        "A": {
+          "mean": 914.0,
+          "max": 5995,
+          "brightest_pixel_mean": 5995.0,
+          "lit_pixels_mean": 100.0
+        },
+        "B": {
+          "mean": 1027.5,
+          "max": 6387,
+          "brightest_pixel_mean": 6387.0,
+          "lit_pixels_mean": 100.0
+        }
+      },
+      {
+        "pressure": 0.2,
+        "frames": 67,
+        "A": {
+          "mean": 1634.3,
+          "max": 15119,
+          "brightest_pixel_mean": 15119.0,
+          "lit_pixels_mean": 92.0
+        },
+        "B": {
+          "mean": 1850.1,
+          "max": 16971,
+          "brightest_pixel_mean": 16971.0,
+          "lit_pixels_mean": 92.0
+        }
+      },
+      {
+        "pressure": 0.3,
+        "frames": 67,
+        "A": {
+          "mean": 2197.3,
+          "max": 21108,
+          "brightest_pixel_mean": 21108.0,
+          "lit_pixels_mean": 84.9
+        },
+        "B": {
+          "mean": 2503.3,
+          "max": 25331,
+          "brightest_pixel_mean": 25331.0,
+          "lit_pixels_mean": 84.9
+        }
+      },
+      {
+        "pressure": 0.4,
+        "frames": 66,
+        "A": {
+          "mean": 2630.9,
+          "max": 19814,
+          "brightest_pixel_mean": 19814.0,
+          "lit_pixels_mean": 77.0
+        },
+        "B": {
+          "mean": 3015.5,
+          "max": 25247,
+          "brightest_pixel_mean": 25247.0,
+          "lit_pixels_mean": 77.0
+        }
+      },
+      {
+        "pressure": 0.5,
+        "frames": 67,
+        "A": {
+          "mean": 2953.6,
+          "max": 38006,
+          "brightest_pixel_mean": 38006.0,
+          "lit_pixels_mean": 59.2
+        },
+        "B": {
+          "mean": 3407.3,
+          "max": 52340,
+          "brightest_pixel_mean": 52340.0,
+          "lit_pixels_mean": 59.2
+        }
+      },
+      {
+        "pressure": 0.6,
+        "frames": 67,
+        "A": {
+          "mean": 3165.4,
+          "max": 24998,
+          "brightest_pixel_mean": 24998.0,
+          "lit_pixels_mean": 63.3
+        },
+        "B": {
+          "mean": 3674.6,
+          "max": 37498,
+          "brightest_pixel_mean": 37498.0,
+          "lit_pixels_mean": 63.3
+        }
+      },
+      {
+        "pressure": 0.7,
+        "frames": 66,
+        "A": {
+          "mean": 3264.5,
+          "max": 35816,
+          "brightest_pixel_mean": 35816.0,
+          "lit_pixels_mean": 55.5
+        },
+        "B": {
+          "mean": 3803.7,
+          "max": 56658,
+          "brightest_pixel_mean": 56658.0,
+          "lit_pixels_mean": 55.5
+        }
+      },
+      {
+        "pressure": 0.8,
+        "frames": 67,
+        "A": {
+          "mean": 3229.5,
+          "max": 36698,
+          "brightest_pixel_mean": 36698.0,
+          "lit_pixels_mean": 48.0
+        },
+        "B": {
+          "mean": 3701.1,
+          "max": 59823,
+          "brightest_pixel_mean": 59823.0,
+          "lit_pixels_mean": 48.0
+        }
+      },
+      {
+        "pressure": 0.9,
+        "frames": 67,
+        "A": {
+          "mean": 3059.8,
+          "max": 27989,
+          "brightest_pixel_mean": 27989.0,
+          "lit_pixels_mean": 40.0
+        },
+        "B": {
+          "mean": 3615.6,
+          "max": 55418,
+          "brightest_pixel_mean": 55418.0,
+          "lit_pixels_mean": 40.0
+        }
+      },
+      {
+        "pressure": 1.0,
+        "frames": 66,
+        "A": {
+          "mean": 2760.8,
+          "max": 45323,
+          "brightest_pixel_mean": 45323.0,
+          "lit_pixels_mean": 16.0
+        },
+        "B": {
+          "mean": 2365.1,
+          "max": 65534,
+          "brightest_pixel_mean": 65534.0,
+          "lit_pixels_mean": 16.0
+        }
+      }
+    ],
+    "m18": [
+      {
+        "pressure": 0.0,
+        "frames": 67,
+        "A": {
+          "mean": 0.0,
+          "max": 0,
+          "brightest_pixel_mean": 0.0,
+          "lit_pixels_mean": 0.0
+        },
+        "B": {
+          "mean": 0.0,
+          "max": 0,
+          "brightest_pixel_mean": 0.0,
+          "lit_pixels_mean": 0.0
+        }
+      },
+      {
+        "pressure": 0.05,
+        "frames": 67,
+        "A": {
+          "mean": 0.0,
+          "max": 0,
+          "brightest_pixel_mean": 0.0,
+          "lit_pixels_mean": 0.0
+        },
+        "B": {
+          "mean": 0.0,
+          "max": 0,
+          "brightest_pixel_mean": 0.0,
+          "lit_pixels_mean": 0.0
+        }
+      },
+      {
+        "pressure": 0.1,
+        "frames": 66,
+        "A": {
+          "mean": 919.1,
+          "max": 9754,
+          "brightest_pixel_mean": 9754.0,
+          "lit_pixels_mean": 141.5
+        },
+        "B": {
+          "mean": 995.7,
+          "max": 10611,
+          "brightest_pixel_mean": 10611.0,
+          "lit_pixels_mean": 141.5
+        }
+      },
+      {
+        "pressure": 0.2,
+        "frames": 67,
+        "A": {
+          "mean": 982.6,
+          "max": 17772,
+          "brightest_pixel_mean": 17772.0,
+          "lit_pixels_mean": 127.7
+        },
+        "B": {
+          "mean": 1070.8,
+          "max": 21093,
+          "brightest_pixel_mean": 21093.0,
+          "lit_pixels_mean": 127.7
+        }
+      },
+      {
+        "pressure": 0.3,
+        "frames": 67,
+        "A": {
+          "mean": 1021.6,
+          "max": 24052,
+          "brightest_pixel_mean": 24052.0,
+          "lit_pixels_mean": 101.3
+        },
+        "B": {
+          "mean": 1125.5,
+          "max": 31450,
+          "brightest_pixel_mean": 31450.0,
+          "lit_pixels_mean": 101.3
+        }
+      },
+      {
+        "pressure": 0.4,
+        "frames": 66,
+        "A": {
+          "mean": 1036.6,
+          "max": 28593,
+          "brightest_pixel_mean": 28593.0,
+          "lit_pixels_mean": 82.4
+        },
+        "B": {
+          "mean": 1157.1,
+          "max": 41676,
+          "brightest_pixel_mean": 41676.0,
+          "lit_pixels_mean": 82.4
+        }
+      },
+      {
+        "pressure": 0.5,
+        "frames": 67,
+        "A": {
+          "mean": 1039.6,
+          "max": 31395,
+          "brightest_pixel_mean": 31395.0,
+          "lit_pixels_mean": 68.8
+        },
+        "B": {
+          "mean": 1177.1,
+          "max": 51779,
+          "brightest_pixel_mean": 51779.0,
+          "lit_pixels_mean": 68.8
+        }
+      },
+      {
+        "pressure": 0.6,
+        "frames": 67,
+        "A": {
+          "mean": 1066.5,
+          "max": 32462,
+          "brightest_pixel_mean": 32462.0,
+          "lit_pixels_mean": 60.8
+        },
+        "B": {
+          "mean": 1208.7,
+          "max": 58122,
+          "brightest_pixel_mean": 58122.0,
+          "lit_pixels_mean": 60.8
+        }
+      },
+      {
+        "pressure": 0.7,
+        "frames": 66,
+        "A": {
+          "mean": 1069.8,
+          "max": 31788,
+          "brightest_pixel_mean": 31788.0,
+          "lit_pixels_mean": 48.0
+        },
+        "B": {
+          "mean": 1196.9,
+          "max": 62057,
+          "brightest_pixel_mean": 62057.0,
+          "lit_pixels_mean": 48.0
+        }
+      },
+      {
+        "pressure": 0.8,
+        "frames": 67,
+        "A": {
+          "mean": 1064.9,
+          "max": 33846,
+          "brightest_pixel_mean": 33846.0,
+          "lit_pixels_mean": 32.0
+        },
+        "B": {
+          "mean": 1171.3,
+          "max": 65534,
+          "brightest_pixel_mean": 65534.0,
+          "lit_pixels_mean": 32.0
+        }
+      },
+      {
+        "pressure": 0.9,
+        "frames": 67,
+        "A": {
+          "mean": 1051.5,
+          "max": 42073,
+          "brightest_pixel_mean": 42073.0,
+          "lit_pixels_mean": 16.0
+        },
+        "B": {
+          "mean": 1117.3,
+          "max": 65534,
+          "brightest_pixel_mean": 65534.0,
+          "lit_pixels_mean": 16.0
+        }
+      },
+      {
+        "pressure": 1.0,
+        "frames": 66,
+        "A": {
+          "mean": 368.1,
+          "max": 50633,
+          "brightest_pixel_mean": 50633.0,
+          "lit_pixels_mean": 2.0
+        },
+        "B": {
+          "mean": 294.0,
+          "max": 65534,
+          "brightest_pixel_mean": 65534.0,
+          "lit_pixels_mean": 2.0
+        }
+      }
+    ]
+  }
+}
