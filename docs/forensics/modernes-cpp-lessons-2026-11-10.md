@@ -108,6 +108,7 @@ GPIO 15–18, and it is in use by the k1-fe-show-m2 lane. An unregistered ESP
 | 2026-11-10 | agent:claude-code (Opus 5.5) | Created: catalogue coverage, findings, fixes in e28dd927, verification. |
 | 2026-11-10 | agent:claude-code (Opus 5.5, next phase) | Abstract corrected (396 unique URLs; 4 of 19 lessons partial). Appended "Next phase" section: closeout corrections, Stages A–F status, evidence. Earlier sections left as written. |
 | 2026-11-11 | agent:claude-code (Opus 5.5, follow-on) | Appended "Follow-on — 11 Nov 2026": W1 ownership, W2 look-upload outcome (032a50ee), W3 Gx limit check + export-safe tests (032a50ee, review fixes 77283663), W5 replay/export results, W4 blocked prerequisites. Earlier sections left as written. |
+| 2026-11-11 | agent:claude-code (Opus 5.5, follow-on) | Appended "Hardware run on the Main RPL": the Captain ordered testing on available hardware; all W4 checks run on 9087A500; :look_load/:look_clear routing defect found and fixed (bd5d5a83); device restored to a6113aaf. Supersedes the "W4 — hardware: BLOCKED" subsection. |
 
 ## Next phase — 10 Nov 2026, session 2 (handover `docs/plans/MODERNES-CPP-NEXT-PHASE-HANDOVER.md`)
 
@@ -402,4 +403,76 @@ Missing prerequisites, per check:
    refused or clamped rather than darkening the board? Owner: FW lead /
    Captain.
 5. Merge into `lane/k1-fe-release`. Owner: K1-FE-SHOW lead / Captain.
+
+## Hardware run on the Main RPL — 11 Nov 2026, 03:24–03:51 AWST
+
+The Captain ordered: test on the hardware we have now, do not wait for a Gx
+board. This supersedes "W4 — hardware: BLOCKED" above.
+
+In plain English:
+- The fixes now run on a real K1 (the Main RPL) and behave as intended there:
+  identify flashes twice without stopping the show or the audio; looks load,
+  apply and clear during a running show; a saved NaN is repaired at boot;
+  over-long input is refused; both diagnostic probes complete.
+- The hardware test found a real defect that no host test could see:
+  `:look_load` and `:look_clear` had never been reachable over serial since
+  they were added on 21 Aug (`38428a82`). `parse_command` routed only `look`,
+  `look_status` and `secondary_look` to the typed table, so both answered
+  "Bad command" on every build. Fixed in `bd5d5a83` (gate: 2095 passed,
+  `k1_hardware` SUCCESS); `test_look_ws2812.py` now asserts both are routed.
+- The device is back exactly as it was: `a6113aaf`, all 30 CONFIG fields
+  identical.
+
+Unit and method:
+- Main RPL, chip `9087A500`, USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem11301`,
+  identified via ioreg and the upload guard. It is the K1-FE-SHOW bench, and
+  its lead handed over the port (it was mid-run until 03:24).
+- Before: `a6113aaf` `k1_main_rpl_show_bench`, epoch `1794338367`, mode 22,
+  LOOK slot 2.
+- Full 16 MB read-back first:
+  `_scratch/20261111-mcpp-w2-w3-close/hw/main-rpl-9087A500-full-flash-a6113aaf.bin`,
+  sha256 `70367545c98c8b1ac2b05a038986884834a84146be21adc4eb0341cd868397da`.
+- Flashes, all through `k1-flash-verified.sh` from a clean `git archive` with
+  a private git dir, and all `IDENTITY OK`:
+  - `77283663` (epoch `1794338954`);
+  - `bd5d5a83` (epoch `1794339720`);
+  - `bd5d5a83` plus `ENABLE_VP_PROBE_CMD=1` passed through
+    `PLATFORMIO_BUILD_FLAGS` (one-off, NON-SHIPPABLE; epoch `1794340083`).
+- The env is non-shippable (`k1_main_rpl_show_bench`), not the Gx product env.
+  `k1_fe` cannot go on this unit because of the GPIO8 conflict.
+- Evidence logs: `_scratch/20261111-mcpp-w2-w3-close/hw/` (`session1.txt` …
+  `session6-vpprobe.txt`, `ident-before.txt`, `ident-end.txt`, flash logs).
+- LED evidence comes from the render trace (`:rtrace_arm` / `:rtrace_dump`)
+  with the dump's own CRC-32 checked, not from looking at the plate.
+
+| Check (record item "Open after this phase" 1) | Result on the device | Evidence |
+|---|---|---|
+| `:identify` flashes twice and prints `IDENTIFY: done` while audio keeps publishing | PASS. Trace (566 frames, CRC `58307cdd` matched): edge A on 150 ms / off 145 / on 142 / off 146 (27, 27, 26, 27 frames), centre px 48–111 one colour, ends dark; normal frames resume with no gap. Edge B kept rendering (20 distinct frames in the window). `[AP]` lines continued about 1 per second with changing levels | `session1.txt` |
+| `:look_load` / `:look_clear` on slots 8–15 during a running show, no fault | FAIL on `77283663` ("Bad command" — routing defect above). PASS on `bd5d5a83`: `LOOK_LOAD: READY` then `LOOK_LOAD: ok` for slots 12 and 13; `:look=12` selects `MATRIX_3X4`; `:look_clear=12` while selected falls back to slot 0 with no reset; a cleared slot no longer loads from flash. Trace with the R↔B swap table: red share 0.387 → 0.863, blue 0.569 → 0.128 (both dump CRCs matched) | `session3.txt`, `session4.txt` |
+| An old CONFIG with NaN boots to finite values | PASS. `CONFIG.CHROMA` set to NaN inside `/CONFIG_IM69_40103.BIN` with a valid blob CRC, written through LittleFS (littlefs-python 0.19 in a scratch venv; superblock: disk 2.1, 4096 B × 864, name_max 255) to 0xC90000. Boot printed `CONFIG: repaired non-finite saved value(s) to defaults`; CHROMA 0.000000 (default); every other value kept | `nancfg/`, `session5-nanboot.txt` |
+| `:vp_probe=all` completes without `event=invalid` | PASS: `VPO … event=start` → `event=end`; `:vp_probe=secondary` `VPB` start → end; all 30 CONFIG fields identical before and after | `session6-vpprobe.txt` |
+| Oversized field / over-long line at the console | PASS: 32-char name and 94-char value each answered `Bad command: …<field too long>`, PHOTONS unchanged; a 200-char line was discarded and the next `:build` answered | `session1.txt` |
+| W2 "installed, not saved" on the device | NOT TESTED on hardware. Only the "ok" path ran there; a full LittleFS would still take a 68-byte inline file. The failure path is covered by the host test | — |
+
+My own error, recorded so it is not repeated:
+- The first `:look_load` attempt was refused. My serial helper still sent the
+  68 raw look bytes, which the device read as hotkeys (base coat, prism) and
+  then as a prepared-show session.
+- The helper now refuses to send raw bytes unless the last reply contains
+  `LOOK_LOAD: READY`. That guard fired correctly on the next refusal.
+- Opening the port from pyserial resets this chip (`rst:0x15`) even with
+  DTR/RTS set before open. Every session therefore starts from a clean boot,
+  which the tests account for.
+- All side effects were overwritten by the final full-flash restore.
+
+Restore: the full read-back was written back (hash verified). After restore:
+`BUILD git=a6113aaf epoch=1794338367 env=k1_main_rpl_show_bench`, chip
+`9087A500`, LOOK slot 2, 30/30 CONFIG fields identical to the 03:24 snapshot.
+The port was handed back to the K1-FE-SHOW lead at 03:51. The device registry
+was not edited: the file carries that lead's uncommitted edit, and the device
+ends where it began.
+
+Final candidate: `bd5d5a83`. Its difference from `77283663` is only the two
+routing lines and the static test. The FE replay and clean export above are of
+`77283663`; the full host suite ran on `bd5d5a83` in its commit gate.
 
