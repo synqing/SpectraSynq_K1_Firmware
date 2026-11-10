@@ -107,6 +107,7 @@ GPIO 15–18, and it is in use by the k1-fe-show-m2 lane. An unregistered ESP
 |---|---|---|
 | 2026-11-10 | agent:claude-code (Opus 5.5) | Created: catalogue coverage, findings, fixes in e28dd927, verification. |
 | 2026-11-10 | agent:claude-code (Opus 5.5, next phase) | Abstract corrected (396 unique URLs; 4 of 19 lessons partial). Appended "Next phase" section: closeout corrections, Stages A–F status, evidence. Earlier sections left as written. |
+| 2026-11-11 | agent:claude-code (Opus 5.5, follow-on) | Appended "Follow-on — 11 Nov 2026": W1 ownership, W2 look-upload outcome (032a50ee), W3 Gx limit check + export-safe tests (032a50ee, review fixes 77283663), W5 replay/export results, W4 blocked prerequisites. Earlier sections left as written. |
 
 ## Next phase — 10 Nov 2026, session 2 (handover `docs/plans/MODERNES-CPP-NEXT-PHASE-HANDOVER.md`)
 
@@ -225,4 +226,180 @@ Open after this phase (no software repair of mine outstanding):
    the four export-only host tests need export-safe inputs. Owner: FE-show lane.
 3. Merge: `mcpp/next-phase-fixes` sits on `a6bad318`; merging into the FE release
    lane is the FE-show lead's / Captain's call after its own acceptance.
+
+## Follow-on — 11 Nov 2026 (W1–W5)
+
+In plain English:
+- A look upload now reports what actually happened. If the new table went live
+  but saving it to flash failed, the reply is "installed, not saved" instead of
+  "fail". "ok" and "fail" mean what they meant before.
+- The emulator's limit check now measures the Gx board's own brightness limiter
+  instead of FastLED's, which Gx switches off. It also showed that at the old
+  test current (300 mA) a Gx board goes completely dark: by design, its power
+  model needs 320 mA just for 320 idle pixels. The FE check now runs at 500 mA.
+- The four host tests that failed only in a clean export are fixed. A clean
+  export of the final commit is SOFTWARE COMPLETE.
+- Nothing here is proven on a device: no Gx unit exists, and the Main RPL is
+  the FE-show bench.
+
+Candidate: `77283663` on `mcpp/next-phase-fixes` (`032a50ee` code, `77283663`
+review fixes), on top of `aad4d29d` (another session's storage fix to
+`run.py`, 23:46 AWST, not this lane, kept) and `cfaad9dd`.
+
+### W1 — shared checkout and ownership
+
+- The Captain paused this session at about 00:00 AWST ("too many operations
+  happening concurrently") and cleared it at about 01:23. Nothing was written
+  while paused.
+- The K1-FE-SHOW lead (session 3) is `spectrasynq-k1-firmware-72`. The first
+  message went to `k1-fe-s31w-rebase-7a` by mistake: it is a PCB routing
+  session, and it declined.
+- The lead's answers: it does not claim W3, so W3 was done here. No bench
+  timing was running. It has no ruling on Gx edge coupling: settle it from the
+  source and label the check "observes current behaviour". `/dev/cu.usbmodem11301`
+  is the Main RPL `9087A500` (USB `B4:3A:45:A5:87:90`, read via ioreg only;
+  port never opened), its bench.
+- The FW lead was relaunched at 22:34 and finished (`fe/k1-fe-show-fixes`
+  `c949151c`). The lead's `fe/k1-afe2` `7ea24446` (private index) edits
+  `serial_menu.cpp` and `led_utilities.h` in other places; it merges those.
+- Declined: adding `k1_afe*`, `sensitivity`, `k1_loud_guard` and
+  `vp_chroma_gate` to `run.py` `SUPPORTED_COMMANDS` on this branch. The
+  `k1_afe*` parser rows exist only on `fe/k1-afe2`, so the lead adds them
+  there.
+
+### W2 — look upload outcome (`032a50ee`)
+
+`k1_look_rx_push()` returns `K1LookRxOutcome` (Idle / Pending / NotInstalled /
+InstalledNotSaved / InstalledSaved). `check_serial()` prints
+`k1_look_rx_reply()`: "ok", "installed, not saved" or "fail". Install-then-save
+is kept, with no rollback. `check_serial` is the only caller (grep over
+firmware, tests, tools, scripts). No host tool parses the `LOOK_LOAD:` word.
+Evidence: `tests/test_look_upload_outcome_native.py` (product upload path,
+in-memory LittleFS, ASan/UBSan, one tracking allocator for the receive buffer
+and the table bundles), executed once, 1 passed.
+- Save failure is real: the stub's file table is full, so `open(tmp, "w")`
+  fails after the slot and heap pre-checks pass.
+- The new table is live, the slot's older file is untouched, nothing is
+  written, and nothing leaks.
+- Success: the bytes on flash equal the upload. Bad CRC: the old table is
+  kept and nothing is saved.
+
+Builds that compile the change: `k1_fe` and `k1_main_rpl_im69d` (both
+`K1_LOOK_LIB_V1`) built inside the replay runs, exit 0. The commit gate
+builds `k1_hardware`, which has no look library.
+
+### W3a — limit coupling on the Gx board
+
+Diagnosis, from the `5bb142bc` FE capture (`mcpp-next-phase-fe-5bb142bc-r2`):
+- At `max_current_ma=300`, every one of the 128 frames is zero on both edges,
+  in both `limit-base` and `limit-a` (same payload hash `9eb8fa54…`).
+- `k1_fe_gx_led_scale()` returns 0 when `budget_ma <= idle_ma`, and idle is
+  1 mA × (160+160) = 320 mA. The replay budget is min(max_current_ma, 1900).
+- The brief's acceptance ("A-only photons at hop 40 under 300 mA changes B's
+  emitted level") is therefore impossible on Gx.
+- From the same frames, the model starts binding at 347–591 mA before hop 40
+  and at 497–1410 mA after it.
+- Source settles the coupling question: `k1_fe_gx_led_power.h` says "One
+  scale covers both edges, including a held secondary", and the Gx emit block
+  passes both edge caches into one scale.
+
+Change (FE profile only, in `run.py` `select_profile`; the Main RPL scenario,
+its 300 mA cases and `limit_coupling` are untouched):
+- `limit-base` and `limit-a` run at 500 mA.
+- The comparison kind is `gx_limit_coupling`.
+- `k1_emu_fixture_note_gx_limit()` (one call under `#ifdef K1_EMU_FIXTURE`
+  after `gx_scale` in the Gx emit block; no heap, no clock read) records each
+  captured frame's scale and a CRC-32 of each edge's pre-limit native frame as
+  a `GX,` line.
+- The check requires: binding; no scale or emitted difference before hop 40;
+  A's pre-limit frames and the shared scale change after it; B's pre-limit
+  frames never change; B's emitted frames change, are lit, and change only
+  where the scale changed.
+
+Product note for the FW lead / Captain: `max_current_ma` accepts any value
+from 0. Every value below 320 makes a Gx board fully dark under the current
+model.
+
+### W3b — tests that failed only in an export
+
+- `test_serial_cmd_persist_flags_static`: `function_index()` skipped any file
+  with `"_scratch"` in its ABSOLUTE path parts. Every file of an export under
+  `_scratch/esp-emulator/` was dropped, so no handler resolved. It now tests
+  the path relative to the firmware tree.
+- `test_b489_legacy_power_host`: it read FastLED from the one libdeps env
+  `k1_bench_im69d_led150`. It now picks any env whose `power_mgt.cpp` has the
+  pinned SHA-256 and whose `library.json` says 3.10.3. The export carries
+  `k1_fe`, `k1_fe_emu` and `k1_hardware`, which hold the same bytes.
+- No exclusion was added to `host_checks.requires_git`.
+
+### Independent review (fresh reviewer, read-only) and dispositions
+
+Evidence: `_scratch/20261111-mcpp-w2-w3-close/review.md`.
+1. BLOCKER, mine — the record line first used the prefix `G,`. That prefix is
+   already printed by `K1_EMU_TEMPO_PROBE` builds (`k1_emu_fixture.cpp` tempo
+   block) and read by `tempo_lane_emu.py` / `tempo_lane_cost.py`, so the new
+   decoder rejected every tempo-probe capture. I reproduced it myself
+   ("Gx limiter line has 16 fields, expected 5"). Fixed in `77283663`
+   (`GX,`). The same capture
+   (`tempo-lock-r1/level-sweep/runs/music-lvl-m0`) decodes again: 1334
+   frames.
+2. Wording fixed: an unsaved table is not "gone at reboot" in general, because
+   boot reloads only slot 15 from flash (`bridge_fs.h:432`).
+3. Existed before this change, left OPEN: `k1_look_fs_save()` removes the old
+   slot file before `rename(tmp, path)`. If the rename fails, the reply is
+   "installed, not saved" and the old file is gone. The new test covers the
+   open-failure path only. Owner: FW lead (look library).
+4. Fixed: the FastLED test checks the version while choosing the env.
+5. Existed before, left: line citations in comments of
+   `test_serial_cmd_persist_flags_static.py` are stale; no assertion reads
+   them.
+
+### W5 — results on the final candidate `77283663`
+
+| Check | Label | Result | Evidence |
+|---|---|---|---|
+| Commit gate `032a50ee` | executed | `pytest tests/` 2095 passed, 2 skipped; `k1_hardware` SUCCESS; GATE PASSED (01:37:42–01:42:17 AWST) | `_scratch/20261111-mcpp-w2-w3-close/commit-gate.log` |
+| Commit gate `77283663` | executed | 2095 passed, 2 skipped; `k1_hardware` SUCCESS; GATE PASSED (01:49:29–01:53:54); receipt content hash before = after | `commit-gate-2.log`, `.git/k1-host-pytest-receipt.json` |
+| FE replay, checkout | host suite reused via receipt | 28/28 cases PASS. Payloads: 26/28 identical to `5bb142bc-r2`; `limit-base` / `limit-a` differ as intended (500 mA). SW05 FAIL→PASS; all other criteria unchanged; SW11 NOT_RUN (checkout) | `_scratch/esp-emulator/mcpp-w23-fe-77283663/` |
+| FE replay, clean `git archive` export of `77283663` | host suite executed there | SOFTWARE COMPLETE: SW01–SW11, SW13 PASS; SW12 N/A; EX01/EX02 deferred. Host run 1861 passed, 8 skipped, 0 failed (the `4e56c4dc` export had 4 failed, 1856 passed). 28/28 payloads identical to the checkout run | `_scratch/esp-emulator/mcpp-w23-export-77283663/_out/fe-final/` |
+| `gx_limit_coupling` (FE) | executed | PASS: binding in 105/128; before hop 40, scale and emitted frames differ 0; after, A pre-limit 88, scale 88; B pre-limit differs 0 (all hops); B emitted 88, lit 88, with an equal scale 0 | same `result.json` |
+| `limit_coupling` (Main RPL profile, two-case trial) | executed | PASS (scale changed in 85 frames); payloads byte-identical to the FE-show lane's `a6bad318` Main RPL run (`4ce0379c…`, `41a8bbf4…`) | `_scratch/20261111-mcpp-w2-w3-close/trial-rpl-2.log` |
+| Report inspected | executed | `report.html` read at 1440 px and 390 px. Badge SOFTWARE COMPLETE; limit-coupling label shown; no sideways scroll | `report-77283663-desktop.png`, `report-77283663-phone.png` |
+| G1–G4 (gates.py) | not run here | Sent to the K1-FE-SHOW lead (02:05 AWST) | — |
+
+Not tested: anything on a device. Concurrency: the W2 test is single-threaded
+and makes no concurrency claim (GCC on this Mac has no ThreadSanitizer
+runtime). Lesson: `run.py` builds into the checkout's own `.pio/build/<env>`
+and reads the ELF from there, so never set `PLATFORMIO_BUILD_DIR` for a replay
+(it would run a stale ELF).
+
+### W4 — hardware: BLOCKED
+
+Missing prerequisites, per check:
+- Gx (`k1_fe`) checks — `:identify`, `:look_load`/`:look_clear` slots 8–15
+  in a running show, NaN CONFIG boot, oversized field / over-long line at the
+  console: no Gx unit is registered. `k1_fe` stays in `blocked_envs` until the
+  first Gx MAC is registered (G5). Main RPL cannot take `k1_fe` (GPIO8 is its
+  microphone data pin).
+- Same checks on the Main RPL with its own look-library env: the unit belongs
+  to the FE-show bench (now `k1_main_rpl_show_bench` @ `7ea24446`), and its
+  owner asked that the port not be opened. Needs the owner's clearance and a
+  free bench slot.
+- B489 (`k1_fe_bench_b489`): not connected, and its env unflags
+  `K1_LOOK_LIB_V1` and `K1_FE_BOARD_GX`, so it cannot exercise the look
+  library.
+- `:vp_probe=all` on `k1_hardware_harness`: needs a unit that takes
+  `k1_hardware`. F887 went to the product consultancy, and none is connected.
+
+### Open after this follow-on
+
+1. Hardware (all of W4). Owner: FE bench owner, when a Gx unit is registered
+   or the Main RPL is cleared.
+2. G1–G4 on `77283663`. Owner: K1-FE-SHOW lead.
+3. Save path deletes the old file before rename (review item 3). Owner: FW
+   lead.
+4. Product decision: should `max_current_ma` below the Gx idle model be
+   refused or clamped rather than darkening the board? Owner: FW lead /
+   Captain.
+5. Merge into `lane/k1-fe-release`. Owner: K1-FE-SHOW lead / Captain.
 
