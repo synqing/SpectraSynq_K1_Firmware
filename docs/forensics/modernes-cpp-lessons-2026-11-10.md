@@ -165,8 +165,32 @@ Builds on the final source (isolated build dir, from `a6bad318` + these changes)
 flash 11.0 %), `k1_fe_bench_b489`, `k1_hardware_harness` (probe commands
 compiled) — all SUCCESS. Oracle goldens: 12/12 reproduce.
 
-Next action if resumed: builds (`k1_fe`, `k1_fe_emu`, `k1_hardware`,
-`k1_fe_bench_b489`, `k1_hardware_harness`), one pre-commit gate (writes the
-receipt), commit own files only on `mcpp/next-phase-fixes`, FE replay with
-`--host-receipt`, tell the K1-FE-SHOW lead the commit for G1–G4.
+### Integration (10 Nov 2026, evening)
+
+- Candidate: `5bb142bc` on `mcpp/next-phase-fixes` (parent `a6bad318`).
+  Committed through `scripts/hooks/pre-commit`: `pytest tests/` 2094 passed,
+  2 skipped (the one authoritative host run, executed); `pio run -e
+  k1_hardware` OK; "GATE PASSED". Receipt `.git/k1-host-pytest-receipt.json`:
+  exit 0, 2094 passed, content hash before == after
+  (`e7f816a1857e…`).
+- Receipt reuse exercised for real: `run.py --profile fe --host-receipt` on
+  the committed tree wrote `host-pytest.log` = "REUSED validated host-pytest
+  receipt … (not executed here) 2094 passed, 2 skipped"
+  (`_scratch/esp-emulator/mcpp-next-phase-fe-5bb142bc/`).
+- FE replay: NOT COMPLETED. Stopped by me after the first cases because the
+  K1-FE-SHOW lead was measuring USB send timing on the live Main RPL and the
+  emulator loads this Mac's CPU. That partial directory is not evidence for
+  any criterion. Re-run after the bench session (next action below).
+- K1-FE-SHOW lead has `5bb142bc` queued for gates.py G1–G4 after its bench
+  session.
+
+Next action if resumed: when the K1-FE-SHOW lead reports its bench session
+finished, run `python3 tools/esp_emulator/run.py --profile fe --scenario
+tools/esp_emulator/s3_music_regression.json --output
+_scratch/esp-emulator/mcpp-next-phase-fe-5bb142bc-r2 --host-receipt
+.git/k1-host-pytest-receipt.json` (receipt valid only while the tree content is
+unchanged), compare case names / frame counts / output hashes with
+`mcpp-final-export-e28dd927` (expected differences: none in the 28 music
+cases — no change here alters rendering of the replayed scenario), record the
+result here, commit docs-only.
 
