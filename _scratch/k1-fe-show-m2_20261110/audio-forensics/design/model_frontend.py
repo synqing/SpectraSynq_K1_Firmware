@@ -40,9 +40,12 @@ import json
 import subprocess
 from pathlib import Path
 
+import sys
+
 import numpy as np
 from scipy.signal import butter, sosfilt
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 RATE, HOP = 12800, 96
 FPS = RATE / HOP
 SSL = 157.0
@@ -106,22 +109,20 @@ def energy_mean_db(L: np.ndarray, seconds: float) -> np.ndarray:
 
 
 def proposed(raw: np.ndarray, E: np.ndarray) -> dict:
-    L = loudness_db(raw)
+    """The AFE2 reference (afe2_reference.py) on this track. The filter is vectorised with the reference's own
+    biquad coefficients; the per-hop update is the reference's own code."""
+    import afe2_reference as ref
+    from scipy.signal import lfilter
+    st = ref.Afe2(RATE)
+    y = lfilter([st.b0, st.b1, st.b2], [1.0, st.a1, st.a2], raw)
+    e = (hops(y) ** 2).mean(axis=1)
+    L = 10 * np.log10(e + 1e-3)
     L3 = energy_mean_db(L, 3.0)
+    how = np.zeros(len(e)); anchor = np.zeros(len(e)); dt = HOP / RATE
+    for i, v in enumerate(e):
+        how[i] = st.update(float(v), dt); anchor[i] = st.A
     gate = float(np.percentile(L3, 95) - PRESENT_DB)
-    a_up, a_dn = 1 - np.exp(-1 / (TAU_UP_S * FPS)), 1 - np.exp(-1 / (TAU_DOWN_S * FPS))
-    ref = np.zeros(len(L))
-    r = None
-    for i, v in enumerate(L3):
-        if v < gate:                               # silence: hold the exposure, never chase the noise
-            ref[i] = r if r is not None else gate
-            continue
-        if r is None:
-            r = v                                  # first music: lock on at once
-        r += (a_up if v > r else a_dn) * (v - r)
-        ref[i] = r
-    how_much = np.clip(10 ** ((L3 - ref) * GAMMA / 20.0), FLOOR, 1.0)
-    return {"L": L, "L3": L3, "ref": ref, "how_much": how_much, "drive": E * how_much, "gate": gate}
+    return {"L": L, "L3": L3, "ref": 10 * np.log10(anchor), "how_much": how, "drive": E * how, "gate": gate}
 
 
 def metrics(drive: np.ndarray, L3: np.ndarray, gate: float) -> dict:
