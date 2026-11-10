@@ -1133,7 +1133,80 @@ def historical_references(sc: dict) -> list[dict]:
 # Host checks
 # --------------------------------------------------------------------------
 
-def host_checks(sc: dict, out: Path) -> dict:
+# Host-pytest receipt (Stage A, 10 Nov 2026). The pre-commit gate's single
+# `pytest tests/` run records it; --host-receipt lets the replay reuse that run
+# instead of executing the whole host suite a second time for the same content.
+RECEIPT_SCHEMA = "k1-host-pytest-receipt/1"
+RECEIPT_PATHS = ["SPECTRASYNQ_K1_FIRMWARE", "platformio.ini", "tools", "scripts", "tests", "libraries",
+                 "pytest.ini", "conftest.py", "pyproject.toml", "setup.cfg"]
+
+
+def receipt_content_sha256() -> str:
+    """Content of every file the host suite reads (tracked or not), independent of HEAD."""
+    h = hashlib.sha256()
+    for rel in RECEIPT_PATHS:
+        root = REPO / rel
+        files = sorted(root.rglob("*")) if root.is_dir() else ([root] if root.is_file() else [])
+        for p in files:
+            if not p.is_file() or {"__pycache__", ".pio", ".pytest_cache"} & set(p.parts):
+                continue
+            h.update(str(p.relative_to(REPO)).encode() + b"\0" + p.read_bytes() + b"\0")
+    return h.hexdigest()
+
+
+def pytest_version() -> str:
+    try:
+        import pytest  # noqa: PLC0415
+        return pytest.__version__
+    except ImportError:
+        return "missing"
+
+
+def record_host_pytest(receipt: Path) -> int:
+    """Run the host suite once (the commit gate's run) and write the receipt."""
+    started = dt.datetime.now(dt.timezone.utc).isoformat()
+    before = receipt_content_sha256()
+    argv = [sys.executable, "-m", "pytest", "tests/", "-q"]
+    proc = subprocess.run(argv, cwd=REPO, capture_output=True, text=True)
+    sys.stdout.write(proc.stdout)
+    sys.stderr.write(proc.stderr)
+    after = receipt_content_sha256()
+    lines = [l for l in proc.stdout.strip().splitlines() if l.strip()]
+    m = re.search(r"(\d+) passed", lines[-1]) if lines else None
+    rec = {"schema": RECEIPT_SCHEMA, "selection": ["tests/"], "ignored": [], "argv": argv[1:],
+           "python": sys.executable, "python_version": sys.version.split()[0], "pytest_version": pytest_version(),
+           "content_sha256_before": before, "content_sha256_after": after,
+           "exit_code": proc.returncode, "summary": lines[-1] if lines else "", "passed": int(m.group(1)) if m else 0,
+           "output_sha256": sha256_bytes(proc.stdout.encode()), "started_utc": started,
+           "finished_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
+    receipt.parent.mkdir(parents=True, exist_ok=True)
+    receipt.write_text(json.dumps(rec, indent=2) + "\n")
+    return proc.returncode
+
+
+def validate_host_receipt(receipt: Path, tests: list, ignore: list) -> tuple[dict | None, list]:
+    """Reuse only a complete, passing receipt for exactly this content and selection."""
+    problems = []
+    try:
+        rec = json.loads(receipt.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        return None, [f"receipt unreadable: {exc}"]
+    now = receipt_content_sha256()
+    checks = [
+        (rec.get("schema") == RECEIPT_SCHEMA, "schema"),
+        (rec.get("exit_code") == 0, "pytest exit code not 0"),
+        (rec.get("passed", 0) > 0, "no passing tests recorded (vacuous)"),
+        (rec.get("content_sha256_before") == rec.get("content_sha256_after"), "inputs changed during the recorded run"),
+        (rec.get("content_sha256_after") == now, "inputs changed since the recorded run"),
+        (rec.get("selection") == list(tests) and rec.get("ignored") == list(ignore), "different test selection"),
+        (rec.get("python") == sys.executable, "different interpreter"),
+        (rec.get("pytest_version") == pytest_version(), "different pytest version"),
+    ]
+    problems = [why for ok, why in checks if not ok]
+    return (rec if not problems else None), problems
+
+
+def host_checks(sc: dict, out: Path, receipt: Path | None = None) -> dict:
     """Repository commit gate: the declared pytest selection and the shipping builds."""
     cfg = sc.get("host_checks", {})
     tests = cfg.get("pytest", [])
@@ -1142,17 +1215,31 @@ def host_checks(sc: dict, out: Path) -> dict:
     excluded = list(cfg.get("requires_git", [])) if identity_kind() == "export" else []
     ignore = [f"--ignore={p}" for p in excluded]
     log = out / "host-pytest.log"
-    with log.open("w") as fh:
-        rc = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", *ignore, *tests],
-                            cwd=REPO, stdout=fh, stderr=subprocess.STDOUT).returncode
+    reuse, rejected = (validate_host_receipt(receipt, tests, ignore) if receipt else (None, []))
+    if reuse is not None:
+        log.write_text(f"REUSED validated host-pytest receipt {receipt} (not executed here)\n{reuse['summary']}\n")
+        rc = 0
+    else:
+        with log.open("w") as fh:
+            if receipt:
+                fh.write(f"host-pytest receipt {receipt} REJECTED: {'; '.join(rejected)}; executing\n")
+                fh.flush()
+            rc = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", *ignore, *tests],
+                                cwd=REPO, stdout=fh, stderr=subprocess.STDOUT).returncode
     tail = log.read_text().strip().splitlines()[-1:] or [""]
     builds = [build(env, out / f"build-{env}.log") for env in cfg.get("builds", [])]
     ok = rc == 0 and all(b["exit_code"] == 0 for b in builds)
     summary = tail[0] + "".join(f"; pio run -e {b['env']} exit={b['exit_code']}" for b in builds)
     if excluded:
         summary += f"; {len(excluded)} git-history test file(s) excluded in this export (run in the checkout)"
+    if reuse is not None:
+        summary = "REUSED receipt: " + summary
     return {"status": "PASS" if ok else "FAIL", "exit_code": rc, "tests": tests, "summary": summary,
-            "log": str(log), "builds": builds, "excluded_without_git": excluded}
+            "log": str(log), "builds": builds, "excluded_without_git": excluded,
+            "pytest_source": "reused_receipt" if reuse is not None else "executed",
+            "receipt": ({"path": str(receipt), "sha256": sha256_file(receipt), "content_sha256":
+                         reuse["content_sha256_after"], "summary": reuse["summary"]} if reuse is not None
+                        else ({"path": str(receipt), "rejected": rejected} if receipt else None))}
 
 
 # --------------------------------------------------------------------------
@@ -1215,9 +1302,13 @@ def select_profile(sc: dict, profile: str) -> dict:
 
 
 def main() -> int:
+    if len(sys.argv) == 3 and sys.argv[1] == "--record-host-pytest":
+        return record_host_pytest(Path(sys.argv[2]))
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--scenario", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--host-receipt", default=None,
+                        help="reuse the commit gate's host-pytest receipt if it matches this exact content")
     parser.add_argument("--suite", default="default")
     parser.add_argument("--profile", choices=("scenario", "fe"), default="scenario")
     args = parser.parse_args()
@@ -1253,7 +1344,7 @@ def main() -> int:
         print("emulator env build failed; see", emu_build["log"])
     build_dir = REPO / ".pio/build" / sc["profile"]["env"]
     product = normal_build_check(sc, out, nm)
-    hosts = host_checks(sc, out)
+    hosts = host_checks(sc, out, Path(args.host_receipt).resolve() if args.host_receipt else None)
     results: dict[str, dict] = {}
     assets: dict = {}
     for cid in sc["suites"][args.suite]:

@@ -25,8 +25,13 @@ extern "C" {
  *   - a complete frame, accepted or rejected (bad version, length or CRC);
  *   - a frame header ('P','R' or more) broken by a byte that is not 'P';
  *   - a byte that is not text (anything but TAB, CR, LF and 0x20..0x7E).
- * It is also entered when a pending command line receives a non-text byte or
- * runs past its buffer; that line is discarded, never executed.
+ * It is also entered when a pending command line receives a non-text byte;
+ * that line is discarded, never executed.
+ *
+ * OVER-LONG TEXT LINE (Stage F, 10 Nov 2026). A ':' line longer than any
+ * command is discarded through its CR/LF: nothing in it executes, none of its
+ * bytes become hotkeys, and the receiver stays INTERACTIVE so the next line
+ * works. A non-text byte inside it still opens a binary session.
  * In a binary session only frames are acted on. Every other byte is dropped:
  * no hotkey, no ':' command.
  *
@@ -73,6 +78,7 @@ typedef struct {
   k1_prsm_scanner_t scanner;
   bool binary_session;
   bool command_mode;
+  bool discard_line;   /* dropping an over-long text line up to its CR/LF */
   bool have_rx;
   uint8_t exit_match;
   uint8_t cmd_len;

@@ -15,6 +15,7 @@
 
 #include "globals.h"  // ENABLE_SECONDARY_LEDS, CONFIG / SECONDARY_* via capture
 #include "Palettes.h" // gGradientPaletteCount
+#include "k1_persisted_repair.h"  // Stage C: non-finite repair at adoption
 #ifdef K1_EMU_FIXTURE
 #include "../audio/k1_emu_fixture.h"
 #endif
@@ -289,6 +290,18 @@ bool k1_show_state_load() {
   K1ShowState state = {};
   if (!k1_show_state_decode(buf, n, &state)) {
     return false;
+  }
+  // Stage C (10 Nov 2026): a CRC-valid show saved by older firmware can hold
+  // NaN/Inf channel values, and this overlay is applied AFTER load_config(), so
+  // it would undo CONFIG's repair. Non-finite fields keep the channel's current
+  // value (primary: the repaired CONFIG). RAM only; the show file is rewritten
+  // only by an explicit save, as before. Edge strength is already sanitised by
+  // k1_edgemixer_set_config().
+  const K1ShowState live = k1_show_state_capture_live();
+  const uint8_t repaired = k1_preset_repair_nonfinite(state.primary, live.primary) +
+                           k1_preset_repair_nonfinite(state.secondary, live.secondary);
+  if (repaired != 0) {
+    USBSerial.println("SHOW_STATE: kept current value for non-finite saved field(s)");
   }
   k1_show_state_apply(state);
   return true;

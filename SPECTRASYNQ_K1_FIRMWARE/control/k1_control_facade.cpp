@@ -478,13 +478,13 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
       result_error(&result, "range", "Mode out of range");
       return result;
     }
-    mode_transition_queued = true;
-    mode_destination = light_mode_next_enabled(uint8_t(mode), 1);
+    const uint8_t destination = light_mode_next_enabled(uint8_t(mode), 1);
+    k1_mode_request_post(destination);  // Stage D: one complete request
 #ifdef K1_COMMAND_CHANNELS_V1
-    k1_cmd_publish_dual_scene(mode_destination, SECONDARY_LIGHTSHOW_MODE, 0);
+    k1_cmd_publish_dual_scene(destination, SECONDARY_LIGHTSHOW_MODE, 0);
 #endif
     save_config_delayed();
-    return ok_number(float(mode_destination));
+    return ok_number(float(destination));
   }
 
   if (strcmp(record.control, "primary.palette") == 0) {
@@ -633,9 +633,12 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
     SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(uint8_t(mode), 1);
     ENABLE_SECONDARY_LEDS = true;
 #ifdef K1_COMMAND_CHANNELS_V1
-    k1_cmd_publish_dual_scene(
-        mode_transition_queued ? mode_destination : CONFIG.LIGHTSHOW_MODE,
-        SECONDARY_LIGHTSHOW_MODE, 0);
+    {
+      const int32_t pending_mode = k1_mode_request_peek();  // Stage D
+      k1_cmd_publish_dual_scene(
+          (pending_mode >= 0) ? (uint8_t)pending_mode : CONFIG.LIGHTSHOW_MODE,
+          SECONDARY_LIGHTSHOW_MODE, 0);
+    }
 #endif
     return ok_number(float(SECONDARY_LIGHTSHOW_MODE));
   }
@@ -1029,7 +1032,8 @@ void k1_control_snapshot(K1WirelessControlState* state) {
   }
 
   memset(state, 0, sizeof(*state));
-  state->primary_mode = mode_transition_queued ? mode_destination : CONFIG.LIGHTSHOW_MODE;
+  const int32_t pending_mode = k1_mode_request_peek();  // Stage D: the posted request, if any
+  state->primary_mode = (pending_mode >= 0) ? (uint8_t)pending_mode : CONFIG.LIGHTSHOW_MODE;
   state->primary_palette = CONFIG.PALETTE_INDEX;
   state->primary_palette_mode = CONFIG.PALETTE_MODE_ENABLED;
   state->primary_photons = CONFIG.PHOTONS;

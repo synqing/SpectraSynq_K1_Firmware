@@ -338,7 +338,11 @@ int main(int argc, char **argv) {
     k1_prsm_rx_reset(&rx);
     std::string longline = ":" + std::string(200, 'a') + "\n";
     feed(&rx, longline.c_str(), 100, &t);
-    check(t.commands == 0 && t.hotkeys == 0 && rx.binary_session, "over-long line is discarded, not run");
+    // Stage F (10 Nov 2026): an over-long TEXT line runs nothing and creates no
+    // hotkeys, but does not lock the port: the next line works.
+    check(t.commands == 0 && t.hotkeys == 0 && !rx.binary_session, "over-long line is discarded, not run");
+    feed(&rx, ":chroma=0.5\n", 100, &t);
+    check(t.commands == 1 && t.hotkeys == 0, "the line after an over-long line runs");
   }
 
   /* 9. Version 2: length and CRC decide. */

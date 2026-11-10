@@ -42,6 +42,7 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_prsm.h"
 #include "k1_prsm_rx.h"
 #include "k1_authored_source.h"
+#include "k1_diag_ownership.h"  // Stage E: render-owned :identify
 #ifdef K1_TUNABLE_REGISTRY_V1
 #include "k1_tunables.h"  // generic AP/VP runtime parameter access (:tune)
 #endif
@@ -1573,11 +1574,10 @@ void serial_queue_slot_save(uint8_t slot_index, bool from_secondary) {
   }
 }
 void serial_queue_commit() {
-  if (!k1_queue_any_armed()) {
+  if (!k1_queue_request_commit(true, millis())) {  // Stage D: only this loop's drafts
     USBSerial.println("QUEUE: nothing armed");
     return;
   }
-  k1_queue_request_commit(true, millis());
   if (k1_queue_commit_quantise() == K1_QUEUE_QUANTISE_BEAT) {
     USBSerial.println("COMMIT (waiting for beat)");
   } else {
@@ -2575,9 +2575,15 @@ void cmd_bootloop_inject() {
   abort();  // -> panic handler -> ESP_RST_PANIC -> k1_bootloop_reason_is_crash()==1
 }
 void cmd_identify() {
+  // Stage E: the render task draws the flash (k1_diag_ownership.h); this loop
+  // keeps acquiring audio. "IDENTIFY: done" follows from check_serial().
+  if (!k1_identify_post()) {
+    tx_begin();
+    USBSerial.println("IDENTIFY: busy");
+    tx_end();
+    return;
+  }
   ack();
-  CRGB16 col = {1.00, 0.25, 0.00};
-  blocking_flash(col);
 }
 void cmd_start_noise_cal_guidance() {
   tx_begin(true);
@@ -2758,9 +2764,11 @@ void cmd_event_status() {
   USBSerial.println(audio.silence ? 1 : 0);
   tx_end();
 }
+#if ENABLE_VP_PROBE_CMD
 void cmd_vp_out_test() {
   vp_run_output_probe();
 }
+#endif  // ENABLE_VP_PROBE_CMD
 void cmd_get_knobs() {
   USBSerial.print("{");
   USBSerial.print('"'); USBSerial.print("PHOTONS"); USBSerial.print('"'); USBSerial.print(':'); USBSerial.print(CONFIG.PHOTONS);
@@ -2987,6 +2995,19 @@ void parse_command(char* command_buf) {
       }
 	    }
 	    // PARSER #############################
+
+    // Stage F (10 Nov 2026): a name or value longer than its buffer is rejected
+    // whole. Acting on the truncated prefix turned e.g. note_offset=<93 zeros>12
+    // into note_offset=0 + save + reboot.
+    {
+      const char* eq = strchr(command_buf, '=');
+      const size_t name_len = eq ? (size_t)(eq - command_buf) : strlen(command_buf);
+      const size_t data_len = eq ? strlen(eq + 1) : 0;
+      if (name_len > sizeof(command_type) - 1 || data_len > sizeof(command_data) - 1) {
+        bad_command(command_type, "<field too long>");
+        return;
+      }
+    }
 
 	    if (serial_command_marks_manual_visual_control(command_type)) {
 	      k1_smart_director_mark_manual_control(millis(), K1_MANUAL_REASON_SERIAL_COMMAND);
@@ -4216,6 +4237,12 @@ static void k1_serial_rx_act(k1_prsm_rx_event_t& rx_event, uint32_t t_now) {
 void check_serial(uint32_t t_now) {
   // Update timer
   serial_iter++;
+
+  if (k1_identify_take_completion()) {  // Stage E: deferred :identify completion
+    tx_begin();
+    USBSerial.println("IDENTIFY: done");
+    tx_end();
+  }
 
   /* Drain every AP tick (not 10 ms). 120 Hz PRSM is 4080 B/s; a 32-byte/10 ms
    * cap starves the stream. Every byte goes through k1_prsm_rx_push() first

@@ -3,6 +3,9 @@
 #include "k1_look_flags.h"
 #include <stdint.h>
 #include <stddef.h>
+#ifdef K1_LOOK_LIB_V1
+#include <atomic>
+#endif
 #ifdef ARDUINO
 #include <esp_heap_caps.h>
 #endif
@@ -86,6 +89,58 @@ inline volatile uint8_t k1_look_slot_sec = 255;
 
 inline uint16_t k1_look_xfade_u16 = 0;  // 0 = fully A (live slot). Phase C optional.
 
+// ---------------------------------------------------------------------------
+// Slot descriptor lifetime (Modernes C++ next phase, Stage B, 10 Nov 2026).
+//
+// The renderer (Core 1) reads a slot's type and payload while the serial/control
+// loop (Core 0) can load, replace or clear loadable slots 8-15. A slot is read
+// through ONE pointer to a complete, immutable descriptor, so type and payload
+// always belong together. Writers publish a replacement with a single pointer
+// store and never free storage a reader could still hold:
+//
+//   reader:  k1_look_readers += 1 (seq_cst); d = k1_look_desc[slot] (seq_cst);
+//            use d ...; k1_look_readers -= 1 (release)
+//   writer:  k1_look_desc[slot] = new (seq_cst); retire old;
+//            free retired only after observing k1_look_readers == 0 (seq_cst)
+//
+// In the single total order of seq_cst operations either the reader registered
+// before the writer looked (the writer sees a reader and defers the free) or the
+// writer's store came first (the reader sees the new descriptor). Observing zero
+// readers at any moment after the swap therefore proves no reader still holds a
+// retired descriptor. Writers never wait on the renderer beyond a short bounded
+// poll; anything still retired is freed by the next look operation.
+// k1_look_table[] stays the static descriptor storage for compiled slots.
+inline std::atomic<const K1LookSlot *> k1_look_desc[16] = {
+    &k1_look_table[0],  &k1_look_table[1],  &k1_look_table[2],  &k1_look_table[3],
+    &k1_look_table[4],  &k1_look_table[5],  &k1_look_table[6],  &k1_look_table[7],
+    &k1_look_table[8],  &k1_look_table[9],  &k1_look_table[10], &k1_look_table[11],
+    &k1_look_table[12], &k1_look_table[13], &k1_look_table[14], &k1_look_table[15],
+};
+inline constexpr K1LookSlot k1_look_empty_desc = {K1_LOOK_EMPTY, nullptr};
+inline std::atomic<uint32_t> k1_look_readers{0};
+
+// Reader registration. Hold one for the whole time a descriptor (and its
+// payload) is in use; the render packers hold one per edge per frame.
+struct K1LookReadScope {
+  K1LookReadScope() { k1_look_readers.fetch_add(1, std::memory_order_seq_cst); }
+  ~K1LookReadScope() { k1_look_readers.fetch_sub(1, std::memory_order_release); }
+  K1LookReadScope(const K1LookReadScope &) = delete;
+  K1LookReadScope &operator=(const K1LookReadScope &) = delete;
+};
+
+// Only valid inside a K1LookReadScope (or on the writer thread).
+static inline const K1LookSlot *k1_look_slot_desc(uint8_t slot) {
+  if (slot > 15) {
+    return &k1_look_empty_desc;
+  }
+  const K1LookSlot *d = k1_look_desc[slot].load(std::memory_order_seq_cst);
+  return d != nullptr ? d : &k1_look_empty_desc;
+}
+
+static inline uint8_t k1_look_slot_type(uint8_t slot) {
+  return k1_look_slot_desc(slot)->type;
+}
+
 static inline bool k1_look_slot_compiled_ok(uint8_t slot) {
   return slot <= 3;
 }
@@ -98,7 +153,7 @@ static inline bool k1_look_publish(uint8_t slot) {
   if (slot > 15) {
     return false;
   }
-  if (k1_look_table[slot].type == K1_LOOK_EMPTY) {
+  if (k1_look_slot_type(slot) == K1_LOOK_EMPTY) {
     return false;
   }
   if (!k1_look_slot_compiled_ok(slot) && !k1_look_slot_loadable(slot)) {
@@ -116,7 +171,7 @@ static inline bool k1_look_publish_sec(uint8_t slot) {
   if (slot > 15) {
     return false;
   }
-  if (k1_look_table[slot].type == K1_LOOK_EMPTY) {
+  if (k1_look_slot_type(slot) == K1_LOOK_EMPTY) {
     return false;
   }
   if (!k1_look_slot_compiled_ok(slot) && !k1_look_slot_loadable(slot)) {
@@ -159,7 +214,7 @@ static inline const char *k1_look_status_type_name(uint8_t slot) {
   if (slot > 15) {
     return "EMPTY";
   }
-  return k1_look_type_name(k1_look_table[slot].type);
+  return k1_look_type_name(k1_look_slot_type(slot));
 }
 
 static inline uint16_t k1_look_lerp_1d(uint16_t v, const uint16_t *xs, const uint16_t *ys) {
@@ -284,15 +339,14 @@ static inline void k1_look_apply_cube17(uint16_t *r, uint16_t *g, uint16_t *b,
   *b = out[2];
 }
 
-static inline void k1_look_apply_u16(uint16_t *r, uint16_t *g, uint16_t *b, uint8_t slot) {
-  if (r == nullptr || g == nullptr || b == nullptr) {
+// Apply one descriptor. The caller holds a K1LookReadScope for `d`.
+static inline void k1_look_apply_desc(uint16_t *r, uint16_t *g, uint16_t *b,
+                                      const K1LookSlot *d) {
+  if (r == nullptr || g == nullptr || b == nullptr || d == nullptr) {
     return;
   }
-  if (slot > 15) {
-    return;
-  }
-  const uint8_t type = k1_look_table[slot].type;
-  const void *payload = k1_look_table[slot].payload;
+  const uint8_t type = d->type;
+  const void *payload = d->payload;
   switch (type) {
     case K1_LOOK_IDENTITY:
       return;
@@ -332,6 +386,23 @@ static inline void k1_look_apply_u16(uint16_t *r, uint16_t *g, uint16_t *b, uint
       return;
   }
 }
+
+static inline void k1_look_apply_u16(uint16_t *r, uint16_t *g, uint16_t *b, uint8_t slot) {
+  if (r == nullptr || g == nullptr || b == nullptr || slot > 15) {
+    return;
+  }
+  K1LookReadScope scope;
+  k1_look_apply_desc(r, g, b, k1_look_slot_desc(slot));
+}
+
+// One edge of one frame: registers the reader, then snapshots the slot's
+// descriptor once so every pixel of the edge uses the same complete table.
+struct K1LookFrame {
+  K1LookReadScope scope;  // declared first: registered before the snapshot
+  const K1LookSlot *desc;
+  explicit K1LookFrame(uint8_t slot) : scope(), desc(k1_look_slot_desc(slot)) {}
+  void apply(uint16_t *r, uint16_t *g, uint16_t *b) const { k1_look_apply_desc(r, g, b, desc); }
+};
 
 // Phase C proof cube (teal–orange). Slot 8 only. Not boot. PSRAM, never stack.
 #ifdef ARDUINO
@@ -373,8 +444,11 @@ static inline bool k1_look_install_proof_cube() {
     k1_look_proof_lattice = lat;
     k1_look_proof_payload.rgb = lat;
   }
+  // Boot only (before the render task exists): the static descriptor is
+  // completed first, then published.
   k1_look_table[8].type = K1_LOOK_CUBE_17;
   k1_look_table[8].payload = &k1_look_proof_payload;
+  k1_look_desc[8].store(&k1_look_table[8], std::memory_order_seq_cst);
   return true;
 }
 #endif

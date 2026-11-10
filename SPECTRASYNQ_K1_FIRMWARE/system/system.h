@@ -714,6 +714,10 @@ void check_settings(uint32_t t_now) {
   const bool quiet_save_due = silence && int32_t(t_now - next_save_time) >= 0;
   // Failed writes keep their backoff even if another control change arrives.
   if (retry_wait && uint32_t(t_now - last_attempt_ms) < 5000U) return;
+  // Stage D: a mode request posted with this save has not reached CONFIG
+  // until the render task's fade lands it; save after it lands (never past
+  // the 60 s maximum deferral).
+  if (mode_transition_queued && !maximum_deferral_reached) return;
   if (maximum_deferral_reached || quiet_save_due) {
     if (debug_mode) USBSerial.println("QUEUED CONFIG SAVE TRIGGERED");
     settings_updated = false;

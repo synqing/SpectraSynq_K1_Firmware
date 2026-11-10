@@ -310,13 +310,15 @@ inline void k1_fe_gx_prepare(const CRGB16* scaled, uint16_t count,
                               SQ15x16 inc_g, SQ15x16 inc_b, uint8_t look_slot) {
 #ifndef K1_LOOK_LIB_V1
   (void)look_slot;
+#else
+  const K1LookFrame look(look_slot);  // one reader + snapshot per edge
 #endif
   for (uint16_t i = 0; i < count; ++i) {
     native[i].r = k1_lever2_sq_to_u16(scaled[i].r, inc_r);
     native[i].g = k1_lever2_sq_to_u16(scaled[i].g, inc_g);
     native[i].b = k1_lever2_sq_to_u16(scaled[i].b, inc_b);
 #ifdef K1_LOOK_LIB_V1
-    k1_look_apply_u16(&native[i].r, &native[i].g, &native[i].b, look_slot);
+    look.apply(&native[i].r, &native[i].g, &native[i].b);
 #endif
   }
 }
@@ -343,13 +345,15 @@ inline void k1_b489_prepare_native(const CRGB16* scaled, uint16_t count,
                                     uint8_t look_slot) {
 #ifndef K1_LOOK_LIB_V1
   (void)look_slot;
+#else
+  const K1LookFrame look(look_slot);  // one reader + snapshot per edge
 #endif
   for (uint16_t i = 0; i < count; ++i) {
     native[i].r = k1_lever2_sq_to_u16(scaled[i].r, inc_r);
     native[i].g = k1_lever2_sq_to_u16(scaled[i].g, inc_g);
     native[i].b = k1_lever2_sq_to_u16(scaled[i].b, inc_b);
 #ifdef K1_LOOK_LIB_V1
-    k1_look_apply_u16(&native[i].r, &native[i].g, &native[i].b, look_slot);
+    look.apply(&native[i].r, &native[i].g, &native[i].b);
 #endif
   }
 }
@@ -2159,17 +2163,8 @@ inline void run_transition_fade() {
       MASTER_BRIGHTNESS = 0.0;
     }
   } else {
-    if (mode_transition_queued == true) {  // If transition for MODE button press
-      mode_transition_queued = false;
-      if (mode_destination == -1) {  // Triggered via button
-        CONFIG.LIGHTSHOW_MODE++;
-        if (CONFIG.LIGHTSHOW_MODE >= NUM_MODES) {
-          CONFIG.LIGHTSHOW_MODE = 0;
-        }
-      } else {  // Triggered via Serial
-        CONFIG.LIGHTSHOW_MODE = mode_destination;
-        mode_destination = -1;
-      }
+    if (mode_transition_queued == true) {  // A mode request is pending
+      k1_mode_request_land();  // Stage D: take the complete request (globals.h)
     }
 
     if (noise_transition_queued == true) {  // If transition for NOISE button press

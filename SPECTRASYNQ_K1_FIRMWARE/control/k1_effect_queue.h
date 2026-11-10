@@ -115,9 +115,17 @@ K1ChannelPreset k1_queue_capture_live(bool secondary);
 void k1_queue_apply_fields(bool secondary, const K1ChannelPreset& preset);
 
 // Begin/continue arming a channel: on first arm the pending struct is seeded
-// from the live channel, so relative stepping starts from reality. Returns the
-// mutable pending preset for the caller to step mode/palette/etc.
+// from the channel's effective value (an untaken commit, else the in-flight
+// transition target, else the live fields), so relative stepping starts from
+// reality. Returns the CALLING CORE's private draft (Stage D, 10 Nov 2026):
+// producers on different cores (serial loop, beat-aware director) never edit
+// the same object, and nothing reads a draft until k1_queue_request_commit()
+// publishes a complete copy of it.
 K1ChannelPreset* k1_queue_arm_begin(bool secondary);
+#if !defined(ESP_PLATFORM)
+// Host tests only: which producer "core" the calling thread acts as (0 or 1).
+void k1_queue_host_set_producer(uint8_t core);
+#endif
 
 // Overwrite the whole pending struct (slot load / slot arm).
 void k1_queue_arm_preset(bool secondary, const K1ChannelPreset& preset);
@@ -126,12 +134,19 @@ bool k1_queue_channel_armed(bool secondary);
 bool k1_queue_any_armed();
 void k1_queue_disarm_all();
 
-// Request a commit of ALL armed channels.
+// Request a commit of ALL channels armed by the calling core. The complete
+// presets are published to the render task in one locked copy; a channel
+// already waiting keeps its request unless this commit replaces it (latest
+// wins per channel). Published drafts are disarmed (the next edit re-seeds).
 //   cued=true  ('\' hotkey / :commit): honours commit_quantise and the
 //              configured transition style.
 //   cued=false (queue-mode-OFF immediate path): commits on the next frame
 //              boundary and always uses the DIP transition (spec §1).
-void k1_queue_request_commit(bool cued, uint32_t now_ms);
+// Returns false (and publishes nothing) when the caller has nothing armed.
+// Policy: a committed preset is the whole 15-field preset as the producer
+// last saw it — latest commit wins per channel, including fields another
+// producer changed after this draft was seeded (as with any later commit).
+bool k1_queue_request_commit(bool cued, uint32_t now_ms);
 bool k1_queue_commit_pending();  // true while a commit request awaits Core 1
 
 // Transition configuration (RAM-only this slice; CONFIG layout untouched).

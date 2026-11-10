@@ -47,7 +47,8 @@ static inline void k1_lever2_pack_frame(const CRGB16 *scaled, uint16_t n, CRGB *
                                         SQ15x16 inc_g, SQ15x16 inc_b,
                                         uint8_t look_slot) {
 #ifdef K1_LOOK_LIB_V1
-  const uint8_t look_slot_local = look_slot;
+  // One reader registration and one descriptor snapshot for the whole edge.
+  const K1LookFrame look(look_slot);
 #else
   (void)look_slot;
 #endif
@@ -59,7 +60,7 @@ static inline void k1_lever2_pack_frame(const CRGB16 *scaled, uint16_t n, CRGB *
       uint16_t g16 = k1_lever2_sq_to_u16(scaled[i].g, inc_g);
       uint16_t b16 = k1_lever2_sq_to_u16(scaled[i].b, inc_b);
 #ifdef K1_LOOK_LIB_V1
-      k1_look_apply_u16(&r16, &g16, &b16, look_slot_local);
+      look.apply(&r16, &g16, &b16);
 #endif
       ws2816_pack_pixel(wire, i, r16, g16, b16);
     }
@@ -77,7 +78,7 @@ static inline void k1_lever2_pack_frame(const CRGB16 *scaled, uint16_t n, CRGB *
     uint16_t g16 = k1_lever2_apply_q16(k1_lever2_sq_to_u16(scaled[i].g, inc_g), s);
     uint16_t b16 = k1_lever2_apply_q16(k1_lever2_sq_to_u16(scaled[i].b, inc_b), s);
 #ifdef K1_LOOK_LIB_V1
-    k1_look_apply_u16(&r16, &g16, &b16, look_slot_local);
+    look.apply(&r16, &g16, &b16);
 #endif
     ws2816_pack_pixel(wire, i, r16, g16, b16);
   }

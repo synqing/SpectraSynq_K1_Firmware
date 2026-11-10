@@ -495,7 +495,7 @@ bool k1_noise_cal_confirm(uint32_t /*now_ms*/) { return false; }
 bool k1_queue_any_armed() { return false; }
 K1ChannelPreset* k1_queue_arm_begin(bool /*secondary*/) { return nullptr; }
 void k1_queue_arm_preset(bool /*secondary*/, const K1ChannelPreset& /*preset*/) {}
-void k1_queue_request_commit(bool /*cued*/, uint32_t /*now_ms*/) {}
+bool k1_queue_request_commit(bool /*cued*/, uint32_t /*now_ms*/) { return false; }
 bool k1_queue_mode_enabled() { return false; }
 uint8_t k1_queue_transition_style() { return 0; }
 // k1_effect_queue.h config setters/getters (k1_effect_queue.h:134-140). EXTERNAL defs

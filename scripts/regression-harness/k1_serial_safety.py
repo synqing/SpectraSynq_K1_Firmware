@@ -86,7 +86,7 @@ __all__ = [
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
 TYPED_DEF_BLOB_SHA = "01b53783afa66e9eb99257d8e5bd63ef142fb969"
-BARE_DEF_BLOB_SHA = "ca8350134d4ff593e2aac3576c825ba469b5e1f6"
+BARE_DEF_BLOB_SHA = "c0a494d45e0317aff62f44b63ddff7cdc604d721"  # 2026-11-10: vp_out_test row gated by ENABLE_VP_PROBE_CMD (classification unchanged)
 
 # --------------------------------------------------------------------------
 # Literals generated from the two .def files (see module docstring).

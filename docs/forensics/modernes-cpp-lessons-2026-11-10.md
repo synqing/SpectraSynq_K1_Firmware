@@ -1,5 +1,5 @@
 ---
-abstract: "Modernes C++ lane (plan docs/plans/MODERNES-CPP-EXECUTION-PLAN.md), FE firmware, 10 Nov 2026. Catalogue surveyed (20 topic families, 398 article links); 19 lessons verified against primary references. Two independent code audits plus an independent review found real defects in serial input handling and in which core resets the noise calibration. Fixed in e28dd927 with tests that drive the production serial code. Replayed light output is byte-identical before and after (28/28 cases). Device run blocked: FE bench not connected; Main RPL is rewired and owned by another lane."
+abstract: "Modernes C++ lane (plan docs/plans/MODERNES-CPP-EXECUTION-PLAN.md), FE firmware, 10 Nov 2026. Catalogue surveyed (20 topic families, 396 unique article URLs; 398 was the per-row slot sum); 19 lessons retained, 15 verified and 4 only partly verified (L7, L12, L16, L17). Two independent code audits plus an independent review found real defects in serial input handling and in which core resets the noise calibration. Fixed in e28dd927 with tests that drive the production serial code. Replayed light output is byte-identical before and after (28/28 cases). Device run blocked: FE bench not connected; Main RPL is rewired and owned by another lane. Next phase (same day, session 2): five further software defects (look-table lifetime, saved-value validity, request hand-off, diagnostic ownership, serial overflow) and the mutation-test conflict — see the section at the end."
 ---
 
 # Modernes C++ lessons applied to the FE firmware
@@ -106,3 +106,67 @@ GPIO 15–18, and it is in use by the k1-fe-show-m2 lane. An unregistered ESP
 | Date | Author | Change |
 |---|---|---|
 | 2026-11-10 | agent:claude-code (Opus 5.5) | Created: catalogue coverage, findings, fixes in e28dd927, verification. |
+| 2026-11-10 | agent:claude-code (Opus 5.5, next phase) | Abstract corrected (396 unique URLs; 4 of 19 lessons partial). Appended "Next phase" section: closeout corrections, Stages A–F status, evidence. Earlier sections left as written. |
+
+## Next phase — 10 Nov 2026, session 2 (handover `docs/plans/MODERNES-CPP-NEXT-PHASE-HANDOVER.md`)
+
+### Corrections to the closeout above
+
+- "Only board validation remains" was wrong. Five software defects were open:
+  look-table lifetime (B), invalid saved values (C), mode/preset hand-off (D),
+  diagnostic ownership (E), oversized serial fields/lines (F). Dispositions below.
+- Baseline2's three host failures are not defects of a clean `e2e83e53`: its host
+  log shows the sources changing during the run (new parser compile errors, a
+  different constants hash, mismatched consecutive source manifests). Its
+  separately identified replay captures and the later clean-export pass stand.
+- Lessons: 19 retained, 15 verified, 4 partly verified (L7, L12, L16, L17 —
+  `catalogue/CATALOGUE.md` evidence column "P"). Links: 396 unique article URLs;
+  398 was the per-row slot sum (one umbrella link counted twice, one duplicate
+  URL) — `CATALOGUE.md` line 36. The ledger's "398 unique" was the slot sum.
+- The previous gate (`commit_gate.log`) EXECUTED firmware mutants through
+  `tests/test_harness_selftest.py` → `harness_selftest.run_selftest()` →
+  `_mutated_capture()` (copies the firmware tree, rewrites `.cpp/.h` from
+  `MUTATIONS`, recompiles). That breached the Captain's 22 Oct 2026 ban; the five
+  repointed serial anchors kept the banned run passing. Not harmless upkeep.
+
+### Ownership (shared checkout)
+
+Branch `fe/k1-fe-show-fixes` @ `8b202f46` is the FE-show FW lead's (headless
+session, process started 16:18). It was writing `serial_menu.cpp`, the `.ino`,
+`k1_prsm*`, `k1_authored_source*`, effects, serial tables, `platformio.ini`,
+`tools/esp_emulator/*` concurrently. This phase edits only its own files and
+hunks (list sent to the K1-FE-SHOW lead, recorded in
+`_scratch/k1-fe-show-m2_20261110/fw-candidates/SHARED-TREE-OWNERSHIP-2026-11-10.md`).
+No commit while the FW lead is working. Hooks that need `serial_menu.cpp`,
+the `.ino`, `k1_prsm_rx.cpp`, `serial_cmd_table.def`, `tools/esp_emulator/run.py`
+and `scripts/hooks/pre-commit` wait for its commit.
+
+### Stage status (live; updated as work lands)
+
+| Stage | State | Change | Evidence |
+|---|---|---|---|
+| A mutation run | DONE | `test_harness_selftest.py` now asserts the mutant builder refuses (no skip; a repo hook forbids skips); `harness_selftest.run_selftest()` refuses without `K1_ALLOW_FIRMWARE_MUTANTS=1`. Golden behaviour lock (`test_golden_master.py`) unchanged. | 5 passed |
+| A duplicate host run | DONE | `scripts/hooks/pre-commit` runs the one `pytest tests/` through `tools/esp_emulator/run.py --record-host-pytest`, which writes `.git/k1-host-pytest-receipt.json` (content hash of firmware/tests/scripts/tools/libraries before and after, selection, interpreter, pytest version, exit code, pass count). `run.py --host-receipt` reuses it only if all match the current content and it passed non-vacuously; otherwise runs pytest itself, labelled `executed`. Builds still run. | this commit's gate + replay result `host_checks.pytest_source` |
+| A planted captures (SW04) | KEPT | In-memory malformed captures fed once to the real decoder/acceptor (`ec.decode`/`ec.accept`): genuine malformed-input test of real code; no altered firmware, builds or extra runs. | — |
+| B look lifetime | DONE (host) | `k1_look.h` one-pointer immutable descriptors + reader registration; `k1_look_file.h` bundles, retire list, quiescence reclaim (no spin on the audio loop); failed replacement keeps old; 32-bit length-wrap check. Render packers take one snapshot per edge. | `test_look_lifetime_native.py` 2 passed (ASan/UBSan; 20,000 writer ops vs live renderer under TSan) |
+| C saved values | DONE (host) | `persistence/k1_persisted_repair.h`; repair at `load_config()`, `k1_show_state_load()`, preset-slot load; one CONFIG re-save. Golden re-pinned: `bridge_fs_config` (load_config body). | `test_persisted_repair_native.py` 2 passed (real loaders + real writers, in-memory LittleFS stub) |
+| D hand-off | DONE (host) | `k1_mode_request` atomic word (post/take/land/cancel), `mode_transition_queued` atomic, save deferred while a fade is pending (never past 60 s); per-producer-task drafts + locked mailbox in `k1_effect_queue.cpp`; `request_commit` reports nothing-armed. Policy: whole-preset latest-wins per channel. Golden re-pinned: `serial_struct` (set_mode body). | `test_request_handoff_native.py` 1 passed (behavioural; GCC on this Mac has no TSan runtime) |
+| E diagnostics | DONE (host) | `visual/k1_diag_ownership.h`; `:identify` posts a request (busy if one is running), the render task draws the same two flashes on its own frames, `IDENTIFY: done` printed later from `check_serial()`; output/bleed probes wait for a fresh park acknowledgement, hold the park (no 1 s self-heal; 10 s ceiling, then reported `event=invalid`), restore only CONFIG fields still holding the probe's value. `vp_out_test` gated by `ENABLE_VP_PROBE_CMD` (instrumentation boundary; harness env keeps it). | `test_diag_ownership_native.py` 1 passed; on-target timing NOT TESTED |
+| F serial overflow | DONE (host) | `parse_command()` rejects a name >31 or value >93 chars whole (`bad_command`, no commit/save/reboot); `k1_prsm_rx` discards an over-long text line through CR/LF and stays interactive (binary bytes still open a session). FW-lead host test updated to this contract. | `test_serial_overflow_native.py` 6 passed; `test_k1_prsm_rx_native.py` 2 passed |
+
+Independent review (fresh reviewer, Stages B–D): no blocking defects; five
+lower findings (cancel ordering, audio-loop spin, misleading COMMIT message,
+same-core producer drafts, whole-preset policy) — all fixed or documented above.
+Branch: `mcpp/next-phase-fixes` from `a6bad318` (the FW lead's commit; the
+FE-show lead keeps `fe/k1-fe-show-fixes` as its candidate).
+
+Builds on the final source (isolated build dir, from `a6bad318` + these changes):
+`k1_fe` (RAM 44.4 %, flash 11.7 %), `k1_fe_emu`, `k1_hardware` (RAM 36.0 %,
+flash 11.0 %), `k1_fe_bench_b489`, `k1_hardware_harness` (probe commands
+compiled) — all SUCCESS. Oracle goldens: 12/12 reproduce.
+
+Next action if resumed: builds (`k1_fe`, `k1_fe_emu`, `k1_hardware`,
+`k1_fe_bench_b489`, `k1_hardware_harness`), one pre-commit gate (writes the
+receipt), commit own files only on `mcpp/next-phase-fixes`, FE replay with
+`--host-receipt`, tell the K1-FE-SHOW lead the commit for G1–G4.
+
