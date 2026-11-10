@@ -1,0 +1,23 @@
+Shipping build unchanged by the Gx cherry-pick (FW lead, 10 Nov 2026 AWST)
+
+Env: k1_main_rpl_im69d (the bench control / shipping Main RPL build).
+pre  = aac13ff9 (lane head before the Gx commit), built from `git archive aac13ff9`
+       in /tmp/fwlead_pre_gx_aac13ff9, re-initialised as a git repo with
+       core.abbrev=8 so its provenance stamp (git=861c6964) has the same length
+       as the release build's stamp (git=545f00e4).
+rc2  = 545f00e4 (tag fe-1.0.0-rc2), built in the repo checkout.
+
+Sections compared: the three reproducible loadable sections
+(scripts/regression-harness/mic_stable_byte_gate.sh header).
+
+.dram0.data    19376/19376 bytes  pre 3bfdd50772212754  rc2 3bfdd50772212754  differing bytes 0
+.iram0.text    71651/71651 bytes  pre 7344c1ad67eeb0fd  rc2 7344c1ad67eeb0fd  differing bytes 0
+.iram0.vectors  1027/1027  bytes  pre 0a38b8c1ab881973  rc2 0a38b8c1ab881973  differing bytes 0
+
+Method note: the first attempt built the export without a .git directory, so it
+stamped git=unknown (7 chars) and 76 / 425 bytes differed in .dram0.data /
+.iram0.text: rodata pointers shifted by 12 bytes. A second attempt with a 7-char
+hash still differed (9 / 353 bytes). With equal-length stamps the sections are
+identical, so those differences were the provenance string, not code. Same cause
+the rc1 verifier found (RECEIPT-FE-FW-2026-11-03.md, C3).
+.flash.text / .flash.rodata are not compared: they change every build (build epoch).
