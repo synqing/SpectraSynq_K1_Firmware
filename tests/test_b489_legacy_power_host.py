@@ -12,8 +12,25 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 VISUAL = ROOT / "SPECTRASYNQ_K1_FIRMWARE/visual"
-DEPS = ROOT / ".pio/libdeps/k1_bench_im69d_led150"
 ORACLE_SHA256 = "95aefcb6be05286bcf5cd7e01e2e30325871d99178c0247971e4bc664c1eb10c"
+
+
+def _pinned_libdeps():
+    """A PlatformIO libdeps env folder holding the pinned FastLED oracle.
+
+    Every env pins fastled/FastLED@3.10.3, so any env whose power_mgt.cpp has
+    ORACLE_SHA256 holds the same oracle. The bench env is preferred; a clean
+    git-archive export only carries the envs its build copied in (k1_fe,
+    k1_fe_emu, k1_hardware), so fall back to those by content, never by name.
+    """
+    root = ROOT / ".pio/libdeps"
+    for env in [root / "k1_bench_im69d_led150", *sorted(root.glob("*"))]:
+        oracle = env / "FastLED/src/power_mgt.cpp"
+        if (oracle.is_file() and (env / "FixedPoints/src").is_dir()
+                and hashlib.sha256(oracle.read_bytes()).hexdigest() == ORACLE_SHA256):
+            return env
+    raise AssertionError("no .pio/libdeps env holds FastLED power_mgt.cpp sha256 "
+                         f"{ORACLE_SHA256[:12]} with FixedPoints; build any FastLED env once")
 
 
 def _function(source, name):
@@ -28,6 +45,7 @@ def _function(source, name):
 
 
 def test_native_limit_matches_pinned_fastled_and_production_pack(tmp_path):
+    DEPS = _pinned_libdeps()
     oracle = (DEPS / "FastLED/src/power_mgt.cpp").read_bytes()
     assert hashlib.sha256(oracle).hexdigest() == ORACLE_SHA256
     assert json.loads((DEPS / "FastLED/library.json").read_text())["version"] == "3.10.3"

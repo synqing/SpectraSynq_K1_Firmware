@@ -327,6 +327,32 @@ inline uint32_t k1_look_rx_need = 0;
 inline uint32_t k1_look_rx_got = 0;
 inline uint8_t *k1_look_rx_buf = nullptr;
 
+// What one received byte did to an armed upload. A finished upload installs
+// first and saves second, so "live" and "saved" are separate facts: a table
+// can be live while its LittleFS save failed (it is then gone at reboot).
+enum class K1LookRxOutcome : uint8_t {
+  Idle,               // no upload armed: the byte was not taken
+  Pending,            // byte stored; more bytes expected
+  NotInstalled,       // finished; table refused, old table unchanged, nothing saved
+  InstalledNotSaved,  // finished; table live now, save failed
+  InstalledSaved,     // finished; table live and saved
+};
+
+// Serial reply word for a finished upload ("LOOK_LOAD: <word>"), or nullptr
+// while there is nothing to report yet.
+static inline const char *k1_look_rx_reply(K1LookRxOutcome outcome) {
+  switch (outcome) {
+    case K1LookRxOutcome::InstalledSaved:
+      return "ok";
+    case K1LookRxOutcome::InstalledNotSaved:
+      return "installed, not saved";
+    case K1LookRxOutcome::NotInstalled:
+      return "fail";
+    default:
+      return nullptr;
+  }
+}
+
 #ifndef K1_LOOK_FS_MIN_INTERNAL_BLOCK
 #define K1_LOOK_FS_MIN_INTERNAL_BLOCK 8192
 #endif
@@ -456,21 +482,27 @@ static inline bool k1_look_rx_arm(uint8_t slot, uint32_t nbytes) {
   return true;
 }
 
-static inline bool k1_look_rx_push(uint8_t byte) {
+static inline K1LookRxOutcome k1_look_rx_push(uint8_t byte) {
   if (k1_look_rx_buf == nullptr || k1_look_rx_got >= k1_look_rx_need) {
-    return false;
+    return K1LookRxOutcome::Idle;
   }
   k1_look_rx_buf[k1_look_rx_got++] = byte;
   if (k1_look_rx_got < k1_look_rx_need) {
-    return true;
+    return K1LookRxOutcome::Pending;
   }
-  const bool ok = k1_look_install_parsed(k1_look_rx_slot, k1_look_rx_buf, k1_look_rx_need) &&
-                  k1_look_fs_save(k1_look_rx_slot, k1_look_rx_buf, k1_look_rx_need);
+  // Install, then save. Once installed the table is published and the old one
+  // may already be retired, so a failed save is reported, not rolled back.
+  K1LookRxOutcome outcome = K1LookRxOutcome::NotInstalled;
+  if (k1_look_install_parsed(k1_look_rx_slot, k1_look_rx_buf, k1_look_rx_need)) {
+    outcome = k1_look_fs_save(k1_look_rx_slot, k1_look_rx_buf, k1_look_rx_need)
+                  ? K1LookRxOutcome::InstalledSaved
+                  : K1LookRxOutcome::InstalledNotSaved;
+  }
   heap_caps_free(k1_look_rx_buf);
   k1_look_rx_buf = nullptr;
   k1_look_rx_need = 0;
   k1_look_rx_got = 0;
-  return ok;
+  return outcome;
 }
 
 #endif  // ARDUINO

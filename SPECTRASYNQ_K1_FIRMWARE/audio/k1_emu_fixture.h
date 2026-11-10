@@ -74,6 +74,13 @@ void k1_emu_fixture_write_sidecar(uint32_t capture_index);
 void k1_emu_fixture_note_submission(void);
 void k1_emu_fixture_note_power_limit_mw(uint32_t milliwatts);
 
+// K1_FE_BOARD_GX: the logical RGB16 limiter scale (k1_fe_gx_led_scale, one
+// scale over both edges) and each edge's PRE-limit native frame, noted where
+// the render task computes the scale; attached to the frame the trace stores
+// next and printed as a G line (scale, CRC-32 of edge A and edge B natives).
+void k1_emu_fixture_note_gx_limit(uint16_t scale, const void* a, uint32_t a_bytes,
+                                  const void* b, uint32_t b_bytes);
+
 // A configuration or show-state save reached flash.
 void k1_emu_fixture_note_save(const char* kind, bool ok);
 

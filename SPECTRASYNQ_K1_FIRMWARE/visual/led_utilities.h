@@ -1348,6 +1348,10 @@ inline void show_leds() {
         k1_fe_gx_cache(false), CONFIG.LED_COUNT,
         k1_fe_gx_cache(true), gx_peer_count,
         k1_fe_gx_led_budget_ma(gx_power_token, CONFIG.MAX_CURRENT_MA));
+#ifdef K1_EMU_FIXTURE
+    k1_emu_fixture_note_gx_limit(gx_scale, k1_fe_gx_cache(false), CONFIG.LED_COUNT * sizeof(Pixel16),
+                                 k1_fe_gx_cache(true), gx_peer_count * sizeof(Pixel16));
+#endif
     k1_fe_gx_pack(k1_fe_gx_cache(false), CONFIG.LED_COUNT, ws2816_wire, gx_scale);
     if (gx_peer_count != 0) {
       k1_fe_gx_pack(k1_fe_gx_cache(true), gx_peer_count, ws2816_wire_secondary, gx_scale);

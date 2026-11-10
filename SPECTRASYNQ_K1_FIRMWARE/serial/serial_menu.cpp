@@ -4264,13 +4264,13 @@ void check_serial(uint32_t t_now) {
 
 #ifdef K1_LOOK_LIB_V1
       if (k1_look_rx_need > 0 && k1_look_rx_got < k1_look_rx_need) {
-        const uint32_t need = k1_look_rx_need;
-        const bool done = (k1_look_rx_got + 1u >= need);
-        const bool ok = k1_look_rx_push(byte);
-        if (done) {
+        // "ok" = live and saved; "installed, not saved" = live until reboot;
+        // "fail" = refused, old table unchanged.
+        const char *reply = k1_look_rx_reply(k1_look_rx_push(byte));
+        if (reply != nullptr) {
           tx_begin();
           USBSerial.print("LOOK_LOAD: ");
-          USBSerial.println(ok ? "ok" : "fail");
+          USBSerial.println(reply);
           tx_end();
         }
         continue;

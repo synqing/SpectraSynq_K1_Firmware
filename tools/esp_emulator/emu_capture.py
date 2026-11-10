@@ -157,6 +157,10 @@ class Capture:
     client_gates: list[dict[str, str]] = field(default_factory=list)
     client_gate_dones: list[dict[str, str]] = field(default_factory=list)
     client_ready: list[dict[str, str]] = field(default_factory=list)
+    # K1_FE_BOARD_GX only (G lines): capture index -> (scale, edge A native CRC-32,
+    # edge B native CRC-32). The scale k1_fe_gx_led_scale applied at packing (65535 =
+    # identity) and each edge's pre-limit RGB16 frame. Empty on every other board.
+    gx_limits: dict[int, tuple[int, int, int]] = field(default_factory=dict)
 
 
 def decode(uart: str) -> Capture:
@@ -174,6 +178,7 @@ def decode(uart: str) -> Capture:
     meanings: dict[int, Meaning] = {}
     novelty: dict[int, tuple] = {}
     render_state: dict[int, tuple] = {}
+    gx_limits: dict[int, tuple[int, int, int]] = {}
     for line in uart.splitlines():
         line = line.rstrip("\r")
         if line.startswith("F,"):
@@ -199,6 +204,19 @@ def decode(uart: str) -> Capture:
             if values[0] in sidecars:
                 raise CaptureError(f"duplicate sidecar {values[0]}")
             sidecars[values[0]] = Sidecar(*values)
+        elif line.startswith("G,"):
+            parts = line.split(",")
+            if len(parts) != 5:
+                raise CaptureError(f"Gx limiter line has {len(parts)} fields, expected 5")
+            try:
+                idx, scale, a_crc, b_crc = int(parts[1]), int(parts[2]), int(parts[3], 16), int(parts[4], 16)
+            except ValueError:
+                raise CaptureError(f"Gx limiter line has a malformed field: {line[:60]}") from None
+            if idx in gx_limits:
+                raise CaptureError(f"duplicate Gx limiter line {idx}")
+            if not 0 <= scale <= 65535:
+                raise CaptureError(f"Gx limiter scale {scale} outside 0..65535")
+            gx_limits[idx] = (scale, a_crc, b_crc)
         elif line.startswith("R,"):
             parts = line.split(",")
             if len(parts) != 9:
@@ -272,7 +290,7 @@ def decode(uart: str) -> Capture:
         rejects=rejects, power_limits=limits, epochs=epochs, meanings=meanings, novelty=novelty, render_state=render_state, begin_count=len(begins),
         end_marker_count=uart.count("[RTRACE-END]"), computed_crc32=crc & 0xFFFFFFFF,
         panics=panics, host_commands=host_commands, host_results=host_results,
-        client_gates=gates, client_gate_dones=gate_dones, client_ready=ready,
+        client_gates=gates, client_gate_dones=gate_dones, client_ready=ready, gx_limits=gx_limits,
     )
 
 

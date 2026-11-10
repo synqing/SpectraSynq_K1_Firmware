@@ -112,8 +112,9 @@ EXPECT_KEYS = {"end_reason", "saves"}
 EPOCH_KEYS = {"policy", "us"}
 COMPARISON_KEYS = {"id", "kind", "a", "b", "edge", "from_hop", "criterion", "label", "before_case",
                    "default_case", "note", "expect"}
-COMPARISON_KINDS = {"equal", "isolation", "limit_coupling", "recovery_state", "fallback_state",
-                    "differs", "case", "startup_quiet_return", "tempo_lane", "semantic_continuity", "reverse"}
+COMPARISON_KINDS = {"equal", "isolation", "limit_coupling", "gx_limit_coupling", "recovery_state",
+                    "fallback_state", "differs", "case", "startup_quiet_return", "tempo_lane",
+                    "semantic_continuity", "reverse"}
 
 # Production command names the scenario may schedule (production parser vocabulary;
 # serial_cmd_handlers.cpp / serial_menu.cpp). Anything else is rejected up front.
@@ -988,6 +989,45 @@ def evaluate_comparison(comp: dict, results: dict, hop_samples: int) -> dict:
         out.update(status="PASS" if ok else "FAIL",
                    detail=f"edge {comp['edge']}: pre-command frames differing={pre_diff}, changed frames={changed} "
                           f"(first at hop {first}), other-edge frames differing={other}, limiter scales={lim}")
+    elif kind == "gx_limit_coupling":
+        # K1_FE_BOARD_GX (FE profile). The Gx emit block neutralises FastLED's limit and
+        # applies k1_fe_gx_led_scale: ONE logical RGB16 scale over both edges, computed from
+        # both edges' pre-limit frames (visual/k1_fe_gx_led_power.h). This observes that
+        # current behaviour; it does not rule on whether the coupling is product intent.
+        # The capture's A/B frames are the packed wire (post-limit); G lines carry the scale
+        # and a CRC-32 of each edge's pre-limit native frame.
+        edge = 0 if comp["edge"] == "A" else 1
+        other = 1 - edge
+        fa, fb = _by_hop(ca, hop_samples), _by_hop(cb, hop_samples)
+        ga, gb = ({h: c.gx_limits.get(f.index) for h, f in _by_hop(c, hop_samples).items()} for c in (ca, cb))
+        hops = sorted(h for h in fa if h in fb)
+        recorded = bool(hops) and all(ga.get(h) is not None and gb.get(h) is not None for h in hops)
+        if not recorded:
+            out.update(status="FAIL", detail=f"Gx limiter record (G line) missing on {sum(ga.get(h) is None or gb.get(h) is None for h in hops)}"
+                                              f" of {len(hops)} common frames; not a Gx capture")
+            return out
+        before = [h for h in hops if h < comp["from_hop"]]
+        after = [h for h in hops if h >= comp["from_hop"]]
+        emit = lambda f, e: (f.A, f.B)[e]
+        binding = sum(1 for h in hops if ga[h][0] < 65535)
+        pre_scale = sum(ga[h][0] != gb[h][0] for h in before)
+        pre_emit = sum((fa[h].A, fa[h].B) != (fb[h].A, fb[h].B) for h in before)
+        edge_native = sum(ga[h][1 + edge] != gb[h][1 + edge] for h in after)
+        other_native = sum(ga[h][1 + other] != gb[h][1 + other] for h in hops)
+        scale_changed = sum(ga[h][0] != gb[h][0] for h in after)
+        other_emit = sum(emit(fa[h], other) != emit(fb[h], other) for h in after)
+        unexplained = sum(emit(fa[h], other) != emit(fb[h], other) and ga[h][0] == gb[h][0] for h in hops)
+        other_lit = sum(any(emit(fb[h], other)) for h in after)
+        ok = (binding > 0 and pre_scale == 0 and pre_emit == 0 and edge_native > 0 and other_native == 0
+              and scale_changed > 0 and other_emit > 0 and unexplained == 0 and other_lit > 0)
+        o = "AB"[other]
+        out.update(status="PASS" if ok else "FAIL",
+                   detail=f"Gx limiter binding in {binding}/{len(hops)} base frames; before hop {comp['from_hop']}: "
+                          f"scale differs {pre_scale}, emitted frames differ {pre_emit}; after: {comp['edge']} "
+                          f"pre-limit frames changed {edge_native}, shared scale changed {scale_changed}; edge {o} "
+                          f"pre-limit frames differing {other_native} (all hops), emitted {o} frames changed "
+                          f"{other_emit} (lit {other_lit}), {o} changes with an equal scale {unexplained}. "
+                          f"Observes current behaviour: one Gx scale covers both edges.")
     elif kind == "limit_coupling":
         edge = 0 if comp["edge"] == "A" else 1
         fa, fb = _by_hop(ca, hop_samples), _by_hop(cb, hop_samples)
@@ -1286,6 +1326,28 @@ def select_profile(sc: dict, profile: str) -> dict:
     sc["profile"]["product_env"] = "k1_fe"
     sc["profile"]["adapter_flags"].extend(["K1_EMU_FE_MIC_ONLY", "K1_EMU_ONSET_TRACE", "K1_EMU_SPECTRUM_TRACE"])
     sc["profile"]["forbidden_in_product"].extend(["K1_EMU_FE_MIC_ONLY", "K1_EMU_ONSET_TRACE", "K1_EMU_SPECTRUM_TRACE"])
+    # k1_fe is the K1-FE-Gx board (c44172fa): its emit block sets FastLED's limit to
+    # UINT32_MAX and limits with k1_fe_gx_led_scale, one RGB16 scale over both edges whose
+    # model charges 1 mA idle per pixel. 300 mA is below the 2 x 160 px idle model, so the
+    # Main RPL value darkens both edges completely (every frame zero on 5bb142bc).
+    # 500 mA binds over the smoke PCM before and after hop 40 (the model's demand there is
+    # 347-591 mA before and 497-1410 mA after, from the 5bb142bc FE smoke-a/ctl-a frames).
+    sc["profile"]["limiter"] = ("K1-FE-Gx: FastLED's limit is neutralised in the Gx emit block; "
+        "k1_fe_gx_led_scale applies one logical RGB16 scale over both edges before 48-bit packing "
+        "(model: 1 mA idle per pixel + 20 mA per full-scale channel; replay budget = min(max_current_ma, "
+        "1900 mA 3 A-source assumption)). The fixture records that scale and each edge's pre-limit "
+        "native frame per captured frame (G lines).")
+    for cid, purpose in (("limit-base", "Binding Gx limiter: max_current_ma=500, above the 320 mA idle model."),
+                         ("limit-a", "Binding Gx limiter (500 mA) plus A-only photons=0.25 at hop 40.")):
+        first = sc["cases"][cid]["commands"][0]
+        if first != {"hop": 0, "text": "max_current_ma=300"}:
+            raise ScenarioError(f"FE selection expects {cid} to start with max_current_ma=300 at hop 0")
+        first["text"] = "max_current_ma=500"
+        sc["cases"][cid]["purpose"] = purpose
+    for comp in sc["comparisons"]:
+        if comp["id"] == "limit-coupling":
+            comp["kind"] = "gx_limit_coupling"
+            comp["label"] = "binding shared Gx RGB16 limiter (observes current behaviour)"
     sc["compositions"]["fe_reverse_base"] = {
         "commands": ["set_mode=32", "secondary_mode=32", "mirror_enabled=false",
                      "secondary_mirror_enabled=false", "secondary_enabled=true"],
@@ -1442,7 +1504,8 @@ def write_report(sc: dict, out: Path, result: dict, results: dict, check: bool =
             pcm=r.get("pcm", {})))
     comps = []
     for c in result["comparisons"]:
-        if c.get("a") and c.get("b") and c["kind"] in ("equal", "isolation", "limit_coupling", "differs"):
+        if c.get("a") and c.get("b") and c["kind"] in ("equal", "isolation", "limit_coupling", "gx_limit_coupling",
+                                                       "differs"):
             comps.append(rd.comparison_record(
                 c["id"], "equal" if c["kind"] == "equal" else "labelled", c["a"], c["b"],
                 compatible=c["status"] in ("PASS", "FAIL") and "not comparable" not in c.get("detail", ""),

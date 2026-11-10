@@ -171,7 +171,9 @@ def function_index() -> dict:
     """name -> list of {path, line, body, masked, first_param} for every definition."""
     index: dict = {}
     for path in sorted(FW.rglob("*")):
-        if path.suffix not in (".cpp", ".h", ".hpp", ".ino") or "_scratch" in path.parts:
+        # Relative parts: a clean export itself lives under _scratch/, so the
+        # absolute path would exclude every firmware file there.
+        if path.suffix not in (".cpp", ".h", ".hpp", ".ino") or "_scratch" in path.relative_to(FW).parts:
             continue
         text = _strip_comments(path.read_text(encoding="utf-8", errors="replace"))
         masked = _mask_literals(text)
