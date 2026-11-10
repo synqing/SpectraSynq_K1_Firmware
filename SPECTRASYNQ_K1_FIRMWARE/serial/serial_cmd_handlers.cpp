@@ -441,7 +441,9 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
         CONFIG.MAX_CURRENT_MA = uint32_t(value);
       }
 
+#ifndef K1_FE_BOARD_GX
       FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
+#endif  // Gx consumes CONFIG in the shared logical RGB16 limiter, before packing
 #ifdef K1_EMU_FIXTURE
       k1_emu_fixture_note_power_limit_mw((uint32_t)(5 * CONFIG.MAX_CURRENT_MA));
 #endif

@@ -37,6 +37,9 @@
 #endif
 #ifdef K1_WS2816_LEVER2_V1
 #include "k1_lever2_emit.h"
+#ifdef K1_FE_BOARD_GX
+#include "k1_fe_gx_led_power.h"
+#endif
 #ifdef K1_B489_WS2816_V1
 #include "k1_b489_legacy_power.h"
 #endif
@@ -292,6 +295,41 @@ inline void clip_led_values_count(CRGB16* buffer, uint16_t count) {
 inline void clip_led_values(CRGB16* buffer) {
   clip_led_values_count(buffer, NATIVE_RESOLUTION);
 }
+
+#ifdef K1_FE_BOARD_GX
+// Retain unscaled post-look pixels so a held peer can be re-limited without
+// repeatedly dimming its previous output. Function-local caches, one owner.
+inline Pixel16* k1_fe_gx_cache(bool secondary) {
+  static Pixel16 primary[LED_COUNT_VALUE] = {};
+  static Pixel16 peer[SECONDARY_LED_COUNT_VALUE] = {};
+  return secondary ? peer : primary;
+}
+
+inline void k1_fe_gx_prepare(const CRGB16* scaled, uint16_t count,
+                              Pixel16* native, SQ15x16 inc_r,
+                              SQ15x16 inc_g, SQ15x16 inc_b, uint8_t look_slot) {
+#ifndef K1_LOOK_LIB_V1
+  (void)look_slot;
+#endif
+  for (uint16_t i = 0; i < count; ++i) {
+    native[i].r = k1_lever2_sq_to_u16(scaled[i].r, inc_r);
+    native[i].g = k1_lever2_sq_to_u16(scaled[i].g, inc_g);
+    native[i].b = k1_lever2_sq_to_u16(scaled[i].b, inc_b);
+#ifdef K1_LOOK_LIB_V1
+    k1_look_apply_u16(&native[i].r, &native[i].g, &native[i].b, look_slot);
+#endif
+  }
+}
+
+inline void k1_fe_gx_pack(const Pixel16* native, uint16_t count,
+                           CRGB* wire, uint16_t scale) {
+  for (uint16_t i = 0; i < count; ++i)
+    ws2816_pack_pixel(wire, i,
+        k1_fe_gx_apply_led_scale(native[i].r, scale),
+        k1_fe_gx_apply_led_scale(native[i].g, scale),
+        k1_fe_gx_apply_led_scale(native[i].b, scale));
+}
+#endif
 
 #ifdef K1_B489_WS2816_V1
 // Cache post-look, pre-limit logical pixels. Keeping the held secondary in this
@@ -1245,6 +1283,12 @@ inline void show_leds() {
   // emit (160 logical pixels → 320 wire slots, two 160-slot halves). Do not
   // consult LED_TYPE here — persisted X2 must not skip the packer.
   if (ws2816_wire != nullptr) {
+#ifdef K1_FE_BOARD_GX
+    // Only the logical RGB16 limiter below may change the submitted levels.
+    // Neutralize carrier-byte scaling before preparing or packing this frame.
+    FastLED.setBrightness(255);
+    FastLED.setMaxPowerInMilliWatts(UINT32_MAX);
+#endif
 #ifdef K1_LED_I2S_DIRECT_V1
     k1_i2s_apply_pattern_if_armed(leds_scaled, CONFIG.LED_COUNT);
 #endif
@@ -1269,7 +1313,7 @@ inline void show_leds() {
     // Product paint wins over the harness stim so paint=card dumps stay honest.
     k1_colour_lab_apply_primary(leds_scaled, CONFIG.LED_COUNT);
 #endif
-#ifndef K1_B489_WS2816_V1
+#if !defined(K1_B489_WS2816_V1) && !defined(K1_FE_BOARD_GX)
     const uint64_t budget_proxy =
         (uint64_t)CONFIG.LED_COUNT * 3ull * 65535ull;
 #endif
@@ -1277,7 +1321,28 @@ inline void show_leds() {
     const int64_t vp_perf_pack_start_us =
         vp_perf.running ? esp_timer_get_time() : 0;
 #endif
-#ifdef K1_B489_WS2816_V1
+#if defined(K1_FE_BOARD_GX)
+    const uint32_t gx_power_token = k1_fe_gx_power_budget_snapshot();
+    k1_fe_gx_prepare(leds_scaled, CONFIG.LED_COUNT, k1_fe_gx_cache(false),
+                       k1_inc_r, k1_inc_g, k1_inc_b,
+#ifdef K1_LOOK_LIB_V1
+                       k1_look_slot);
+#else
+                       0);
+#endif
+    const uint16_t gx_peer_count =
+        ws2816_wire_secondary != nullptr ? SECONDARY_LED_COUNT : 0;
+    const uint16_t gx_scale = k1_fe_gx_led_scale(
+        k1_fe_gx_cache(false), CONFIG.LED_COUNT,
+        k1_fe_gx_cache(true), gx_peer_count,
+        k1_fe_gx_led_budget_ma(gx_power_token, CONFIG.MAX_CURRENT_MA));
+    k1_fe_gx_pack(k1_fe_gx_cache(false), CONFIG.LED_COUNT, ws2816_wire, gx_scale);
+    if (gx_peer_count != 0) {
+      k1_fe_gx_pack(k1_fe_gx_cache(true), gx_peer_count, ws2816_wire_secondary, gx_scale);
+      if (SECONDARY_REVERSE_ORDER)
+        ws2816_reverse_packed_pixels(ws2816_wire_secondary, gx_peer_count);
+    }
+#elif defined(K1_B489_WS2816_V1)
     k1_b489_prepare_native(leds_scaled, CONFIG.LED_COUNT,
                            k1_b489_native_primary, k1_inc_r, k1_inc_g, k1_inc_b,
 #ifdef K1_LOOK_LIB_V1
@@ -1381,6 +1446,9 @@ inline void show_leds() {
 #else
     FastLED.setDither(DISABLE_DITHER);
     FastLED.show();
+#ifdef K1_FE_BOARD_GX
+    k1_fe_gx_frame_submitted(gx_power_token);
+#endif
 #endif
 #endif
 #if ENABLE_VP_PERF_AUDIT
@@ -3020,7 +3088,7 @@ inline void show_secondary_leds() {
       k1_inc_g = inv + mix * incandescent_lookup.g;
       k1_inc_b = inv + mix * incandescent_lookup.b;
     }
-#ifndef K1_B489_WS2816_V1
+#if !defined(K1_B489_WS2816_V1) && !defined(K1_FE_BOARD_GX)
     const uint64_t budget_proxy =
         (uint64_t)SECONDARY_LED_COUNT * 3ull * 65535ull;
 #endif
@@ -3028,7 +3096,16 @@ inline void show_secondary_leds() {
     const int64_t vp_perf_sec_pack_start_us =
         vp_perf.running ? esp_timer_get_time() : 0;
 #endif
-#ifdef K1_B489_WS2816_V1
+#if defined(K1_FE_BOARD_GX)
+    k1_fe_gx_prepare(leds_scaled_secondary, SECONDARY_LED_COUNT,
+                       k1_fe_gx_cache(true), k1_inc_r, k1_inc_g, k1_inc_b,
+#ifdef K1_LOOK_LIB_V1
+                       k1_look_effective_sec());
+#else
+                       0);
+#endif
+    // The primary emitter limits and packs both edges together.
+#elif defined(K1_B489_WS2816_V1)
     k1_b489_prepare_native(leds_scaled_secondary, SECONDARY_LED_COUNT,
                            k1_b489_native_secondary, k1_inc_r, k1_inc_g, k1_inc_b,
 #ifdef K1_LOOK_LIB_V1

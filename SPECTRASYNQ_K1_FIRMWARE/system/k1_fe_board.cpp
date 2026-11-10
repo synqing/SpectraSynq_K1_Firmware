@@ -8,6 +8,10 @@
 #include <string.h>
 
 #include "k1_pcm1808_input.h"
+#ifdef K1_FE_BOARD_GX
+#include <atomic>
+#include "k1_fe_gx_power_policy.h"
+#endif
 
 #ifndef USBSerial
 #define USBSerial Serial
@@ -18,12 +22,11 @@
 #endif
 
 // ── Policy timings ──────────────────────────────────────────────────────────
+#ifndef K1_FE_BOARD_GX
 static const uint32_t K1_FE_PG_RISE_STABLE_MS = 250;  // INPUT_20V_PG high this long before POWER_PERMIT
 static const uint32_t K1_FE_PERMIT_TO_LED_MS = 20;    // POWER_PERMIT settles before LED_ENABLE
 static const uint32_t K1_FE_LED_PG_READ_MS = 150;     // eFuse + buck soft-start before LED_PG readback
-static const uint32_t K1_FE_JACK_STABLE_MS = 100;     // jack contact debounce
 static const uint32_t K1_FE_DARK_REMINDER_MS = 60000; // repeat the "why dark" line while 5 V-only
-static const int64_t K1_FE_HEARTBEAT_HALF_US = 500000; // 1 Hz blink
 static const int K1_FE_PG_DROP_LATCH_COUNT = 3;        // this many 20 V drops while lit ...
 static const uint32_t K1_FE_PG_DROP_LATCH_WINDOW_MS = 10000; // ... inside this window latch the LEDs off
 
@@ -90,10 +93,29 @@ static_assert(k1_fe_nvm_current_ma(k1_fe_nvm_current_code(K1_FE_PD_PDO3_MA)) == 
 static const uint16_t K1_FE_PD_PDO23_V50 = (uint16_t)(K1_FE_PD_PDO23_MV / 50u);  // 10-bit, 50 mV units
 static_assert(K1_FE_PD_PDO23_MV / 50u < 1024u, "PDO voltage must fit the 10-bit NVM field");
 
+#endif  // legacy STUSB4500 policy constants
+static const uint32_t K1_FE_JACK_STABLE_MS = 100;
+static const int64_t K1_FE_HEARTBEAT_HALF_US = 500000;
+
 // ── State ───────────────────────────────────────────────────────────────────
 enum K1FeSrcOverride : uint8_t { K1_FE_SRC_AUTO = 0, K1_FE_SRC_MIC = 1, K1_FE_SRC_LINE = 2 };
 
-static bool s_board;            // STUSB4500 answered at boot; written once before led_task exists
+static bool s_board;            // selected physical profile initialized at boot
+#ifdef K1_FE_BOARD_GX
+static bool s_i2c_ready;
+static int s_vbus_pg = -1;
+static K1FeGxPowerPolicy s_gx_power;
+alignas(4) static std::atomic<uint32_t> s_gx_budget_token{0};
+alignas(4) static std::atomic<uint32_t> s_gx_submitted_token{0};
+alignas(4) static std::atomic<uint32_t> s_gx_policy_seen_ms{0};
+static uint16_t s_gx_budget_generation;
+static uint32_t s_gx_cc1_mv, s_gx_cc2_mv, s_gx_sample_ms;
+static bool s_gx_sampled;
+// Xtensa advertises sometimes-lock-free atomics; this mailbox uses only
+// aligned 32-bit loads/stores. Target disassembly is l32i/s32i + memw,
+// with no atomic helper, lock, compare/exchange or retry loop.
+static_assert(sizeof(std::atomic<uint32_t>) == 4, "Gx mailbox must stay one word");
+#else
 static uint8_t s_device_id;
 static bool s_permit;
 static bool s_led_enable;
@@ -109,6 +131,7 @@ static bool s_dark_reported;
 static bool s_latched_off;      // 20 V input kept dropping while lit: LEDs stay off until reboot
 static uint32_t s_pg_drop_at[K1_FE_PG_DROP_LATCH_COUNT];
 static int s_pg_drop_n;
+#endif  // legacy power-policy state
 static bool s_cal_hold_reported;
 
 static bool s_jack_raw;
@@ -120,6 +143,7 @@ static bool s_line_active;      // latched per hop by k1_fe_audio_line_hop_begin
 static int s_reported_source = -1;
 static bool s_unavailable_reported;
 
+#ifndef K1_FE_BOARD_GX
 // ── STUSB4500 I2C ───────────────────────────────────────────────────────────
 static bool pd_write(uint8_t reg, const uint8_t *data, size_t n) {
   Wire.beginTransmission((uint8_t)K1_FE_STUSB4500_ADDR);
@@ -401,6 +425,80 @@ static void k1_fe_power_poll(uint32_t t_now) {
   }
 }
 
+#else
+static const char* k1_fe_gx_source_name(K1FeGxSource source) {
+  switch (source) {
+    case K1FeGxSource::DefaultUsb: return "default_usb";
+    case K1FeGxSource::Amp1_5: return "1.5A";
+    case K1FeGxSource::Amp3: return "3A";
+    default: return "unqualified";
+  }
+}
+
+static void k1_fe_gx_power_status_poll(uint32_t now) {
+  if (s_gx_sampled && uint32_t(now - s_gx_sample_ms) < 10) return;
+  s_gx_sampled = true;
+  s_gx_sample_ms = now;
+  const int pg = digitalRead(K1_FE_VBUS_PG_PIN);
+  // Discard one conversion after each channel change. This is not proof that
+  // the fitted 100k source impedance meets ADC settling/error requirements.
+  (void)analogReadMilliVolts(K1_FE_CC1_SENSE_PIN);
+  s_gx_cc1_mv = analogReadMilliVolts(K1_FE_CC1_SENSE_PIN);
+  (void)analogReadMilliVolts(K1_FE_CC2_SENSE_PIN);
+  s_gx_cc2_mv = analogReadMilliVolts(K1_FE_CC2_SENSE_PIN);
+
+  const uint32_t token = s_gx_budget_token.load(std::memory_order_acquire);
+  const bool lower_frame = token != 0 && uint16_t(token) <= K1_FE_GX_LED_LOW_MA &&
+      s_gx_submitted_token.load(std::memory_order_acquire) == token;
+  const bool was_permit = s_gx_power.permit;
+  const auto was_source = s_gx_power.observed;
+  s_gx_power.update(now, pg != 0, s_gx_cc1_mv, s_gx_cc2_mv, lower_frame);
+  // On upgrade set the hardware threshold before publishing a larger LED
+  // allowance. On downgrade the policy waits for a reduced frame or timeout.
+  if (s_gx_power.permit != was_permit)
+    gpio_set_level((gpio_num_t)K1_FE_POWER_PERMIT_PIN, s_gx_power.permit ? 1 : 0);
+  if (uint16_t(token) != s_gx_power.led_budget_ma) {
+    const uint32_t next = (uint32_t(++s_gx_budget_generation) << 16) |
+                          s_gx_power.led_budget_ma;
+    s_gx_budget_token.store(next, std::memory_order_release);
+  }
+  s_gx_policy_seen_ms.store(now, std::memory_order_release);
+  if (pg != s_vbus_pg || was_source != s_gx_power.observed ||
+      was_permit != s_gx_power.permit || uint16_t(token) != s_gx_power.led_budget_ma) {
+    USBSerial.printf("[FEPWR] profile=Gx pg=%d cc1_mv=%u cc2_mv=%u source=%s "
+                     "permit=%d led_budget_est_ma=%u board_reserve_est_ma=400\n",
+                     pg, (unsigned)s_gx_cc1_mv, (unsigned)s_gx_cc2_mv,
+                     k1_fe_gx_source_name(s_gx_power.observed), s_gx_power.permit,
+                     (unsigned)s_gx_power.led_budget_ma);
+    s_vbus_pg = pg;
+  }
+}
+
+uint32_t k1_fe_gx_power_budget_snapshot() {
+#ifdef K1_EMU_FE_MIC_ONLY
+  // This non-uploadable fixture has no CC/PG hardware. Replay uses an explicit
+  // 3 A-source assumption; it must never be reported as a supply measurement.
+  return K1_FE_GX_LED_HIGH_MA;
+#else
+  // Observe the publication before sampling now: opposite evaluation order
+  // can read a newer cross-core timestamp and underflow into false stale.
+  const uint32_t seen_ms = s_gx_policy_seen_ms.load(std::memory_order_acquire);
+  const uint32_t now_ms = millis();
+  if (uint32_t(now_ms - seen_ms) > 100)
+    return 0;  // stale housekeeping must not retain an unrestricted LED frame
+  return s_gx_budget_token.load(std::memory_order_acquire);
+#endif
+}
+
+uint16_t k1_fe_gx_led_budget_ma(uint32_t token, uint32_t requested_ma) {
+  return k1_fe_gx_effective_led_ma(requested_ma, uint16_t(token));
+}
+
+void k1_fe_gx_frame_submitted(uint32_t token) {
+  s_gx_submitted_token.store(token, std::memory_order_release);
+}
+#endif  // K1_FE_BOARD_GX
+
 // ── Audio source ────────────────────────────────────────────────────────────
 static void k1_fe_source_poll(uint32_t t_now) {
   if (s_board) {
@@ -476,6 +574,29 @@ void k1_fe_board_begin() {
   // The replay supplies microphone PCM; it does not model FE peripherals.
   return;
 #endif
+#ifdef K1_FE_BOARD_GX
+  // This explicit board profile has no STUSB4500 to probe. Keep its I2C bus
+  // available for the ADC header, regardless of whether a board is plugged in.
+  k1_fe_output_low(K1_FE_ADC_SHDNZ_PIN);
+  k1_fe_output_low(K1_FE_POWER_PERMIT_PIN);  // low until stable 3 A CC qualification
+  k1_fe_input(K1_FE_LED_OE_A_PIN);          // external 10k pull-up enables buffer
+  k1_fe_input(K1_FE_LED_OE_B_PIN);          // these are OE controls, not PG inputs
+  k1_fe_input(K1_FE_CC1_SENSE_PIN);
+  k1_fe_input(K1_FE_CC2_SENSE_PIN);
+  analogSetPinAttenuation(K1_FE_CC1_SENSE_PIN, ADC_11db);
+  analogSetPinAttenuation(K1_FE_CC2_SENSE_PIN, ADC_11db);
+  k1_fe_input(K1_FE_ADC_DOUT_PIN);  // separate from PCM_DOUT; never drive the strap
+  k1_fe_input(K1_FE_VBUS_PG_PIN);
+  k1_fe_input(K1_FE_JACK_DET_PIN);
+  k1_fe_output_low(K1_FE_HEARTBEAT_PIN);
+  s_i2c_ready = Wire.begin(K1_FE_I2C_SDA_PIN, K1_FE_I2C_SCL_PIN, 100000);
+  s_board = true;
+  s_jack_raw = s_jack_stable = digitalRead(K1_FE_JACK_DET_PIN) != 0;
+  USBSerial.printf("[FEBOARD] profile=Gx i2c=%s sda=%d scl=%d external_adc=held_shutdown\n",
+                   s_i2c_ready ? "ready" : "FAIL", K1_FE_I2C_SDA_PIN, K1_FE_I2C_SCL_PIN);
+  k1_fe_gx_power_status_poll(millis());
+  k1_fe_source_poll(millis());
+#else
   s_board = false;
   if (Wire.begin(K1_FE_PD_SDA_PIN, K1_FE_PD_SCL_PIN, 100000)) {
     for (int attempt = 0; attempt < 3 && !s_board; attempt++) {
@@ -530,11 +651,16 @@ void k1_fe_board_begin() {
   k1_fe_power_poll(millis());
   k1_fe_source_poll(millis());
   k1_fe_pd_status();
+#endif  // K1_FE_BOARD_GX
 }
 
 void k1_fe_board_poll(uint32_t t_now_ms) {
   if (s_board) {
+#ifdef K1_FE_BOARD_GX
+    k1_fe_gx_power_status_poll(t_now_ms);
+#else
     k1_fe_power_poll(t_now_ms);
+#endif
   }
   k1_fe_source_poll(t_now_ms);
 }
@@ -569,6 +695,17 @@ bool k1_fe_audio_line_hop_begin(bool hold_mic) {
 bool k1_fe_audio_line_active() { return s_line_active; }
 
 static void k1_fe_status() {
+#ifdef K1_FE_BOARD_GX
+  USBSerial.printf("[FESTATUS] profile=Gx fe_board=%d i2c_ready=%d vbus_protected_pg=%d "
+                   "power_permit=%d source=%s led_budget_est_ma=%u "
+                   "cc1_mv=%u cc2_mv=%u oe_a=external_pullup oe_b=external_pullup adc_shdnz=%d\n",
+                   s_board ? 1 : 0, s_i2c_ready ? 1 : 0,
+                   s_board ? digitalRead(K1_FE_VBUS_PG_PIN) : -1,
+                   s_gx_power.permit, k1_fe_gx_source_name(s_gx_power.observed),
+                   (unsigned)s_gx_power.led_budget_ma,
+                   (unsigned)s_gx_cc1_mv, (unsigned)s_gx_cc2_mv,
+                   s_board ? digitalRead(K1_FE_ADC_SHDNZ_PIN) : -1);
+#else
   USBSerial.printf("[FESTATUS] fe_board=%d stusb4500=%s permit=%d led_enable=%d input_20v_pg=%d "
                    "led_pg_a=%d led_pg_b=%d pd_fault_n=%d\n",
                    s_board ? 1 : 0, s_board ? "present" : "absent", s_permit ? 1 : 0, s_led_enable ? 1 : 0,
@@ -576,14 +713,17 @@ static void k1_fe_status() {
                    s_board ? digitalRead(K1_FE_LED_PG_A_PIN) : -1,
                    s_board ? digitalRead(K1_FE_LED_PG_B_PIN) : -1,
                    s_board ? digitalRead(K1_FE_PD_FAULT_N_PIN) : -1);
+#endif
   USBSerial.printf("[FESTATUS] source=%s override=%s jack=%s pcm1808_gate=%s\n",
                    s_line_active ? "line" : "mic",
                    s_override == K1_FE_SRC_LINE ? "line" : s_override == K1_FE_SRC_MIC ? "mic" : "auto",
                    s_board ? (s_jack_stable ? "in" : "out") : "n/a",
                    k1_pcm1808_clock_gate_pass() ? "PASS" : "FAIL");
+#ifndef K1_FE_BOARD_GX
   if (s_latched_off) {
     USBSerial.println("[FESTATUS] power=LATCHED_OFF (20 V input unstable; replug to retry)");
   }
+#endif
   if (k1_pcm1808_clock_gate_pass()) {
     k1_pcm1808_print_telemetry();  // line-in stats since the last print (on demand only)
   }
@@ -594,6 +734,12 @@ bool k1_fe_board_dispatch(const char *command_type, char *command_data) {
     k1_fe_status();
     return true;
   }
+#ifdef K1_FE_BOARD_GX
+  if (strcmp(command_type, "pd_status") == 0 || strcmp(command_type, "pd_nvm_write") == 0) {
+    USBSerial.println("[FEPD] unavailable: K1-FE-Gx has no STUSB4500; protected VBUS is 5 V");
+    return true;
+  }
+#else
   if (strcmp(command_type, "pd_status") == 0) {
     k1_fe_pd_status();
     return true;
@@ -606,6 +752,7 @@ bool k1_fe_board_dispatch(const char *command_type, char *command_data) {
     k1_fe_pd_nvm_write(strcmp(command_data, "golden") == 0);
     return true;
   }
+#endif
   if (strcmp(command_type, "audio_src") == 0) {
     if (strcmp(command_data, "auto") == 0) {
       s_override = K1_FE_SRC_AUTO;

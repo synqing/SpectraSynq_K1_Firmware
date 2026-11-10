@@ -3,6 +3,9 @@
 #include <stdint.h>
 
 #include "k1_audio_source.h"
+#ifdef K1_FE_BOARD_GX
+#include "k1_fe_board.h"  // shared physical pin map before generic bench defaults
+#endif
 
 #ifndef K1_PCM1808_DIN_PIN
 #define K1_PCM1808_DIN_PIN 10

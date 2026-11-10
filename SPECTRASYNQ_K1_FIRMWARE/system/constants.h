@@ -6,6 +6,9 @@
 #include <stdint.h>      // Include for uint32_t type used within
 #include "config_types.h" // PIO-SPIKE2: ODR-safe enums/macros (LED_STRIP_MODE, LED_COUNT_VALUE, DEFAULT_SAMPLE_RATE, led_types, lightshow_modes) + struct conf, shared with globals_config.cpp
 #include "k1_platform.h"  // ADR-0007 dual-target chip guard
+#ifdef K1_FE_BOARD_GX
+#include "k1_fe_board.h"  // Gx PDM/PCM/board pins share one physical map
+#endif
 
 // The product builds with -ffast-math, which implies -ffinite-math-only and lets
 // GCC fold every isnan()/isfinite() guard to a constant without a warning.
@@ -474,7 +477,9 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #if defined(K1_FE_BENCH_B489_V1)
       #error "k1_fe_bench_b489 is single-wire WS2812 on GPIO4/5: it must use the bench-reference pin map, not the Main RPL WS2816 map"
       #endif
-      #if defined(K1_B489_WS2816_V1) && !defined(K1_MAIN_RPL_PINMAP_V1)
+      #if defined(K1_FE_BOARD_GX)
+        // MIC_CLK / MIC_DATA come from the physical map in k1_fe_board.h.
+      #elif defined(K1_B489_WS2816_V1) && !defined(K1_MAIN_RPL_PINMAP_V1)
         // Captain-confirmed B489 reference wiring, 13 October 2026.
         // The four LED DINs match RPL; its microphone pin map does not.
         // Main RPL keeps DATA=8 / CLK=9 even when the shared WS2816 packer is on.
@@ -489,7 +494,11 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
         #define K1_PDM_CLK_PIN 9
         #define K1_PDM_DIN_PIN 8
       #endif
-      #define K1_IM69_PDM_SEL_PIN 12     // unused on Main RPL; do not drive as LR
+      #ifdef K1_FE_BOARD_GX
+        #define K1_IM69_PDM_SEL_PIN (-1)  // capsule SELECT is strapped on the board
+      #else
+        #define K1_IM69_PDM_SEL_PIN 12    // unused on Main RPL; do not drive as LR
+      #endif
     #else
       #error "K1_MAIN_RPL_PINMAP_V1 requires K1_MIC_IM69D_PDM_V1 (dual IM69D130 on 8/9)"
     #endif
