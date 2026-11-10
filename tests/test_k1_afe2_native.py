@@ -29,10 +29,14 @@ RATE, HOP = 12800, 96
 FC_HZ, TAU_S_ATTACK, TAU_S_RELEASE = 110.0, 0.030, 1.5
 TAU_A_UP, TAU_A_SLOW, TAU_A_FAST = 3.0, 60.0, 4.0
 T_HOLD, Q_QUIET, Q_EXIT, A_MIN = 45.0, 0.25, 0.70, 36.0
+SIL_ENTER, SIL_EXIT = 16.0, 25.0   # stage 2 silence test, counts^2 (4.0 / 5.0 counts rms)
 
 # (seconds, peak amplitude in raw counts). 400 is about the Main RPL microphone level at
 # living-room volume; 126 is 10 dB below it; 80 is 14 dB below it.
 PROGRAMME = ((5, 400), (10, 126), (5, 400), (70, 80), (5, 0), (5, 400))
+# Stage 2: the same programme, then the music stops (20 s of digital silence), a quiet room
+# (peak 3 counts, about 1.7 counts rms, the measured room floor), and the music again.
+PROGRAMME_S2 = PROGRAMME + ((20, 0), (10, 3), (5, 400))
 
 
 def _compiler():
@@ -42,11 +46,11 @@ def _compiler():
     raise AssertionError("C++17 host compiler required")
 
 
-def _programme():
+def _programme(programme=PROGRAMME):
     """Deterministic broadband noise (a 32-bit LCG) at the scheduled peak amplitudes."""
     out = array.array("h")
     state = 0x1234ABCD
-    for seconds, amp in PROGRAMME:
+    for seconds, amp in programme:
         for _ in range(seconds * RATE):
             state = (state * 1664525 + 1013904223) & 0xFFFFFFFF
             out.append(int(((state >> 8) / 8388608.0 - 1.0) * amp))
@@ -57,13 +61,13 @@ def _alpha(dt, tau):
     return 1.0 - math.exp(-dt / tau)
 
 
-def _reference(samples, gamma=1.0, floor=0.25):
+def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None):
     w0 = 2.0 * math.pi * FC_HZ / RATE
     cw, al = math.cos(w0), math.sin(w0) / (2.0 * math.sqrt(0.5))
     a0 = 1.0 + al
     b0, b1, b2, a1, a2 = (1 + cw) / 2 / a0, -(1 + cw) / a0, (1 + cw) / 2 / a0, -2 * cw / a0, (1 - al) / a0
     z1 = z2 = 0.0
-    S, A, quiet, fast = 0.0, A_MIN, 0.0, False
+    S, A, quiet, fast, silent = 0.0, A_MIN, 0.0, False, False
     dt = HOP / RATE
     out = []
     for h0 in range(0, len(samples) - HOP + 1, HOP):
@@ -97,10 +101,13 @@ def _reference(samples, gamma=1.0, floor=0.25):
         else:
             h = ratio ** (gamma * 0.5) if ratio > 0.0 else 0.0
         out.append(min(1.0, max(floor, h)))
+        silent = (S < SIL_EXIT) if silent else (S < SIL_ENTER)
+        if quiet_out is not None:
+            quiet_out.append(1 if silent else 0)
     return out
 
 
-def _run(tmp_path, samples, gamma, floor):
+def _run(tmp_path, samples, gamma, floor, column=0):
     exe = tmp_path / "k1_afe2_host"
     if not exe.exists():
         cmd = [_compiler(), "-std=c++17", "-O2", "-Wall", "-Wextra", "-Werror", f"-I{AUDIO}",
@@ -113,7 +120,7 @@ def _run(tmp_path, samples, gamma, floor):
     ran = subprocess.run([str(exe), str(pcm), str(HOP), str(RATE), str(gamma), str(floor)],
                          capture_output=True, text=True)
     assert ran.returncode == 0, ran.stderr
-    return [float(line.split()[0]) for line in ran.stdout.splitlines()]
+    return [float(line.split()[column]) for line in ran.stdout.splitlines()]
 
 
 def _at(values, seconds):
@@ -138,6 +145,26 @@ def test_afe2_matches_reference_and_behaves(tmp_path):
     assert min(got) >= 0.25 and max(got) <= 1.0
 
 
+def test_afe2_silence_test_matches_reference_and_behaves(tmp_path):
+    """Stage 2: the quiet flag equals the reference on every hop, never rises while music plays
+    (including a passage 14 dB under the loud one), rises after the music stops, holds through a
+    quiet room, and falls within 100 ms when the music returns."""
+    samples = _programme(PROGRAMME_S2)
+    got = [int(v) for v in _run(tmp_path, samples, 1.0, 0.25, column=4)]
+    want = []
+    _reference(samples, quiet_out=want)
+    assert len(got) == len(want) == len(samples) // HOP
+    mismatched = [i for i, (g, w) in enumerate(zip(got, want)) if g != w]
+    assert not mismatched, f"firmware and reference quiet differ on {len(mismatched)} hops, first {mismatched[:5]}"
+
+    hop_s = HOP / RATE
+    assert not any(got[:int(100.0 / hop_s)])         # 100 s of programme: never quiet
+    assert _at(got, 101.0) == 0                      # 1 s after a loud stop: still counted as music
+    assert _at(got, 115.0) == 1                      # 15 s after: quiet (the dwell then applies)
+    assert all(got[int(115.0 / hop_s):int(130.0 / hop_s)])  # silence, then a quiet room: stays quiet
+    assert _at(got, 130.1) == 0                      # music again: not quiet within 100 ms
+
+
 def test_afe2_gamma_zero_is_identity(tmp_path):
     got = _run(tmp_path, _programme(), 0.0, 0.25)
     assert set(got) == {1.0}
@@ -153,3 +180,5 @@ def test_afe2_wiring():
     assert "(k1_afe2_peak_env >= K1_LOUD_GUARD_PEAK_PIN_THRESHOLD)" in i2s
     assert "if (!k1_authored_suppresses_live_update()) brightness *= SQ15x16(k1_afe2_brightness_scale());" in led
     assert "if (!k1_authored_suppresses_live_update()) bright_val *= k1_afe2_brightness_scale();" in led
+    # Stage 2: when switched on, the IM69D silence decision is the meter's quiet flag.
+    assert "if (K1_AFE2_V1 && k1_afe2_ready && k1_afe2_silence_enabled) {\n        k1_rms_silent_state = k1_afe2.quiet;" in i2s

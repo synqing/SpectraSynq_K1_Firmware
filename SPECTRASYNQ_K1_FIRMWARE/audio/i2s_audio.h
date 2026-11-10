@@ -1461,6 +1461,13 @@ void acquire_sample_chunk(uint32_t t_now) {
         ap_drive.silence_threshold.structured_evidence_ms);
     if (k1_structured_audio) {
 #else
+    // AFE2 stage 2: silence is the meter's two-level quiet test on section loudness
+    // (audio/k1_afe2.h, always included). The dwell below still applies. No crest, peak
+    // or SSL term. A plain condition rather than a preprocessor guard, so this IM69D
+    // block keeps a single closing directive (tests/test_im69d_env_static.py reads it).
+    if (K1_AFE2_V1 && k1_afe2_ready && k1_afe2_silence_enabled) {
+        k1_rms_silent_state = k1_afe2.quiet;
+    } else
     if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
         (float)max_waveform_val_raw >=
             (float)CONFIG.SWEET_SPOT_MIN_LEVEL * K1_SILENCE_JOINT_LEVEL_SSL_FRAC) {
@@ -1735,6 +1742,8 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_afe2.how_much, k1_afe2_peak_env,
       sqrtf(k1_afe2.section), sqrtf(k1_afe2.anchor), k1_afe2.fast ? 1 : 0, k1_afe2_gamma, k1_afe2_floor);
     // afe_us = mean and worst time of the meter per hop since the last line (microseconds).
+    // afe_sil = stage 2 silence test in charge (1) or the old test (0); quiet = its flag.
+    USBSerial.printf(" afe_sil=%d quiet=%d", (k1_afe2_ready && k1_afe2_silence_enabled) ? 1 : 0, k1_afe2.quiet ? 1 : 0);
     USBSerial.printf(" afe_us=%.1f afe_us_max=%u",
       k1_afe2_us_count ? (float)k1_afe2_us_sum / (float)k1_afe2_us_count : 0.0f, (unsigned)k1_afe2_us_max);
     k1_afe2_us_sum = 0;

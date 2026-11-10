@@ -25,6 +25,12 @@
 // The caller multiplies the existing level-free beat signal ("what") by how_much. gamma 0
 // gives how_much = 1, which is exactly the behaviour before this module.
 //
+// Stage 2 (11 Nov 2026): the one silence test, from the same meter. quiet is a two-level
+// test on S: it starts when S < K1_AFE2_SILENCE_ENTER and ends when S > K1_AFE2_SILENCE_EXIT.
+// When k1_afe2_silence_enabled, the IM69D silence decision in i2s_audio.h is this flag (the
+// existing SILENCE_DWELL_MS still applies). It replaces the crest/peak/SSL test, which called
+// loud dense music silent (16-21 of 88 telemetry lines at S = 13-30 counts rms, 11 Nov).
+//
 // Specification and reference implementation:
 //   _scratch/k1-fe-show-m2_20261110/audio-forensics/design/afe2_reference.py
 // Host test against that reference: tests/test_k1_afe2_native.py.
@@ -42,6 +48,11 @@
 #define K1_AFE2_DEFAULT_ON 0
 #endif
 
+// 1 = the stage 2 silence test decides silence at boot (IM69D builds). 0 = the old test decides.
+#ifndef K1_AFE2_SILENCE_DEFAULT_ON
+#define K1_AFE2_SILENCE_DEFAULT_ON 0
+#endif
+
 constexpr float K1_AFE2_HPF_HZ          = 110.0f;
 constexpr float K1_AFE2_TAU_S_ATTACK_S  = 0.030f;
 constexpr float K1_AFE2_TAU_S_RELEASE_S = 1.5f;
@@ -54,6 +65,10 @@ constexpr float K1_AFE2_FAST_EXIT_RATIO = 0.70f;
 constexpr float K1_AFE2_ANCHOR_MIN      = 36.0f;   // counts^2: 6 counts rms
 constexpr float K1_AFE2_GAMMA_DEFAULT   = 1.0f;
 constexpr float K1_AFE2_FLOOR_DEFAULT   = 0.25f;
+// counts^2. Measured on the Main RPL (9087A500), 11 Nov 2026: quiet room S = 1.1-4.2 counts rms;
+// music at 10 dB under the Captain's volume never below 4.9 counts rms.
+constexpr float K1_AFE2_SILENCE_ENTER   = 16.0f;   // 4.0 counts rms
+constexpr float K1_AFE2_SILENCE_EXIT    = 25.0f;   // 5.0 counts rms
 
 struct K1Afe2State {
   float b0, b1, b2, a1, a2;      // high-pass biquad, a0 normalised to 1
@@ -66,6 +81,7 @@ struct K1Afe2State {
   uint16_t alpha_count;          // hop length the cached coefficients belong to
   float a_s_attack, a_s_release, a_a_up, a_a_slow, a_a_fast;
   bool fast;                     // re-anchoring to a persistently quieter programme
+  bool quiet;                    // stage 2: S under the silence floor (two levels)
 };
 
 void  k1_afe2_init(K1Afe2State& st, float sample_rate_hz);
@@ -81,6 +97,8 @@ inline bool  k1_afe2_ready = false;
 // mode 32, measured 10 Nov 2026); off unless asked for.
 inline bool  k1_afe2_enabled = (K1_AFE2_DEFAULT_ON != 0);
 inline bool  k1_afe2_level_enabled = false;
+// Stage 2: the meter's quiet flag decides silence (:k1_afe_silence=on|off).
+inline bool  k1_afe2_silence_enabled = (K1_AFE2_SILENCE_DEFAULT_ON != 0);
 inline float k1_afe2_gamma = K1_AFE2_GAMMA_DEFAULT;
 inline float k1_afe2_floor = K1_AFE2_FLOOR_DEFAULT;
 // The level-free beat envelope ("what"). waveform_peak_scaled is this value, times how_much

@@ -1,6 +1,6 @@
 // Host driver for audio/k1_afe2.cpp (tests/test_k1_afe2_native.py).
 // Usage: k1_afe2_host <raw int16 little-endian file> <hop samples> <sample rate> <gamma> <floor>
-// Prints one line per hop: how_much section anchor fast
+// Prints one line per hop: how_much section anchor fast quiet
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
   std::vector<int16_t> buf(hop);
   while (fread(buf.data(), sizeof(int16_t), hop, f) == hop) {
     const float h = k1_afe2_process_hop(st, buf.data(), (uint16_t)hop, gamma, floor_v);
-    printf("%.6f %.4f %.4f %d\n", (double)h, (double)st.section, (double)st.anchor, st.fast ? 1 : 0);
+    printf("%.6f %.4f %.4f %d %d\n", (double)h, (double)st.section, (double)st.anchor, st.fast ? 1 : 0, st.quiet ? 1 : 0);
   }
   fclose(f);
   return 0;

@@ -31,6 +31,7 @@ void k1_afe2_init(K1Afe2State& st, float sample_rate_hz) {
   st.alpha_count = 0;
   st.a_s_attack = st.a_s_release = st.a_a_up = st.a_a_slow = st.a_a_fast = 0.0f;
   st.fast = false;
+  st.quiet = false;
 }
 
 float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, float gamma, float floor) {
@@ -97,5 +98,6 @@ float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, f
   if (h < floor) h = floor;
   if (h > 1.0f) h = 1.0f;
   st.how_much = h;
+  st.quiet = st.quiet ? (st.section < K1_AFE2_SILENCE_EXIT) : (st.section < K1_AFE2_SILENCE_ENTER);
   return h;
 }
