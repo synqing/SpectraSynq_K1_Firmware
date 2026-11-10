@@ -19,7 +19,8 @@
 #ifdef K1_MIC_AUTO_SENSE_V1
 #include "k1_mic_auto_sense.h"
 #endif
-#include "k1_agc_dt_clock.h"  // follower / peak_scaled α = dt/(τ+dt)
+#include "k1_agc_dt_clock.h"
+#include "k1_afe2.h"          // AFE2 exposure: one loudness meter, one slow anchor ("how much")  // follower / peak_scaled α = dt/(τ+dt)
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
 #endif
@@ -243,7 +244,11 @@ static inline void k1_loud_guard_update(uint32_t t_now) {
   const float sample_count = k1_loud_frame_sample_count > 0 ? float(k1_loud_frame_sample_count) : 1.0f;
   const float clip_now = float(k1_loud_frame_clip_count) / sample_count;
   const float near_now = float(k1_loud_frame_near_rail_count) / sample_count;
+#if K1_AFE2_V1
+  const float peak_pin_now = (k1_afe2_peak_env >= K1_LOUD_GUARD_PEAK_PIN_THRESHOLD) ? 1.0f : 0.0f;
+#else
   const float peak_pin_now = (waveform_peak_scaled >= K1_LOUD_GUARD_PEAK_PIN_THRESHOLD) ? 1.0f : 0.0f;
+#endif
 
   uint16_t spec_sat_bins = 0;
   for (uint16_t i = 0; i < NUM_FREQS; i++) {
@@ -847,6 +852,17 @@ void acquire_sample_chunk(uint32_t t_now) {
   im69d_raw_i16_abs_peak = im69d_raw_peak;
   im69d_raw_i16_rms = sqrtf((float)im69d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
   im69d_raw_i16_near_pct = (float)im69d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#if K1_AFE2_V1
+  // AFE2 exposure: the one loudness meter, fed with the RAW hop (before gain and clamp), so
+  // it is independent of SENSITIVITY. It always runs; k1_afe2_enabled decides whether its
+  // result is applied to the published level further down.
+  if (!k1_afe2_ready) {
+    k1_afe2_init(k1_afe2, (float)CONFIG.SAMPLE_RATE);
+    k1_afe2_ready = true;
+  }
+  k1_afe2_process_hop(k1_afe2, im69d_samples_i16, (uint16_t)CONFIG.SAMPLES_PER_CHUNK,
+                      k1_afe2_gamma, k1_afe2_floor);
+#endif
 #ifdef K1_MIC_HEALTH_V1
   {
     const K1MicHealthFrame health_frame = {
@@ -1270,15 +1286,29 @@ void acquire_sample_chunk(uint32_t t_now) {
     if (!isfinite(waveform_peak_scaled_raw)) waveform_peak_scaled_raw = 0.0f;
 #endif
 
-    if (waveform_peak_scaled_raw > waveform_peak_scaled) {
-      float delta = waveform_peak_scaled_raw - waveform_peak_scaled;
+#if K1_AFE2_V1
+    // AFE2: the envelope keeps its own level-free state ("what"). The published
+    // waveform_peak_scaled is that state, times how_much when the exposure is enabled.
+    float& k1_peak_env = k1_afe2_peak_env;
+#else
+    float& k1_peak_env = waveform_peak_scaled;
+#endif
+    if (waveform_peak_scaled_raw > k1_peak_env) {
+      float delta = waveform_peak_scaled_raw - k1_peak_env;
       // ATTACK SNAP (2026-06-11): asymmetric envelope when K1_PEAK_ASYM_ENV.
       // Alphas are dt-derived when K1_AGC_DT_CLOCK_V1 so wall-clock stays put.
-      waveform_peak_scaled += delta * peak_attack_a;
-    } else if (waveform_peak_scaled_raw < waveform_peak_scaled) {
-      float delta = waveform_peak_scaled - waveform_peak_scaled_raw;
-      waveform_peak_scaled -= delta * peak_release_a;
+      k1_peak_env += delta * peak_attack_a;
+    } else if (waveform_peak_scaled_raw < k1_peak_env) {
+      float delta = k1_peak_env - waveform_peak_scaled_raw;
+      k1_peak_env -= delta * peak_release_a;
     }
+#if K1_AFE2_V1
+    if (k1_afe2_ready) {
+      waveform_peak_scaled = k1_afe2_level_enabled ? (k1_afe2_peak_env * k1_afe2.how_much) : k1_afe2_peak_env;
+    } else {
+      waveform_peak_scaled = k1_afe2_peak_env;   // no meter on this microphone path yet
+    }
+#endif
 
     // Use the maximum amplitude of the captured frame to set
     // the Sweet Spot state. Think of this like a coordinate
@@ -1479,6 +1509,9 @@ void acquire_sample_chunk(uint32_t t_now) {
     if (silence) {
       max_waveform_val = 0.0f;
       waveform_peak_scaled = 0.0f;
+#if K1_AFE2_V1
+      k1_afe2_peak_env = 0.0f;
+#endif
     }
 #endif
 
@@ -1686,6 +1719,14 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_spec_sat_fraction,
       k1_loud_guard_mode,
       (unsigned)CONFIG.LIGHTSHOW_MODE);
+#endif
+#if K1_AFE2_V1
+    // afe = exposure applied (1) or measured only (0); how = how_much; env = level-free beat
+    // envelope; sec / anc = section and anchor level in raw counts rms; fast = re-anchoring.
+    USBSerial.printf(" | afe=%d afe_level=%d how=%.3f env=%.3f sec=%.1f anc=%.1f fast=%d gamma=%.2f floor=%.2f",
+      (k1_afe2_ready && k1_afe2_enabled) ? 1 : 0, (k1_afe2_ready && k1_afe2_level_enabled) ? 1 : 0,
+      k1_afe2.how_much, k1_afe2_peak_env,
+      sqrtf(k1_afe2.section), sqrtf(k1_afe2.anchor), k1_afe2.fast ? 1 : 0, k1_afe2_gamma, k1_afe2_floor);
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     USBSerial.printf(" | i2s_wait_us=%u i2s_seq=%u",

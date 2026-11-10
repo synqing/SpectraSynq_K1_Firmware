@@ -17,6 +17,8 @@
       k1_parse_edge_uniform. Pure leaves: strcmp + K1EdgeMixer* enums only.
 */
 
+#include "k1_afe2.h"
+#include "serial_typed_dispatch.h"
 #include <Arduino.h>
 #ifdef K1_SERIAL_REPLAY_HOST
 #ifndef ESP_RST_UNKNOWN
@@ -3641,6 +3643,24 @@ void parse_command(char* command_buf) {
     // STANDBY_DIMMING STRUCK 2026-08-09 — legacy A/B toggle removed from available options.
     // Validate before committing: atof/atol turned text into 0 (or NaN), which
     // silently changed the silence classifier that also gates automatic saves.
+#if K1_AFE2_V1
+    // k1_afe / k1_afe_gamma / k1_afe_floor — AFE2 exposure controls (audio/k1_afe2.*).
+    // GATE-MATCHED: rows in serial_typed_cmd_table.def, handlers in serial_typed_dispatch.cpp,
+    // and this call-site. Without this hop the commands compile and answer Bad command.
+    else if (strcmp(command_type, "k1_afe") == 0) {
+      serial_typed_k1_afe(command_type, command_data);
+    }
+    else if (strcmp(command_type, "k1_afe_level") == 0) {
+      serial_typed_k1_afe_level(command_type, command_data);
+    }
+    else if (strcmp(command_type, "k1_afe_gamma") == 0) {
+      serial_typed_k1_afe_gamma(command_type, command_data);
+    }
+    else if (strcmp(command_type, "k1_afe_floor") == 0) {
+      serial_typed_k1_afe_floor(command_type, command_data);
+    }
+#endif
+
     else if (strcmp(command_type, "silence_enter") == 0) {
       float value = 0.0f;
       if (!vp_parse_float(command_data, &value)) {

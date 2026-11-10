@@ -1,3 +1,4 @@
+#include "k1_afe2.h"
 #include <stdint.h>
 #include <USB.h> // For USBSerial
 #include <FastLED.h>
@@ -531,6 +532,9 @@ void init_system() {
   max_waveform_val = 0.0f;
   max_waveform_val_raw = 0.0f;
   waveform_peak_scaled = 0.0f;
+#if K1_AFE2_V1
+  k1_afe2_peak_env = 0.0f;
+#endif
   max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed the division denominator
 
   // PDM cal persistence: scrub removed SPH-file-derived state; restore last

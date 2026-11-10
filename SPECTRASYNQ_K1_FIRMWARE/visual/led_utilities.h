@@ -2,6 +2,7 @@
 #define LED_UTILITIES_H
 
 #include <Arduino.h>
+#include "k1_afe2.h"
 #include <FastLED.h>
 #include <FixedPoints.h>
 #include <FixedPointsCommon.h>
@@ -612,6 +613,11 @@ inline void apply_brightness() {
   // with drop_cut_scale by multiplication at the same application point — never
   // replaces or reorders the existing brightness factors. 1.0 when idle.
   brightness *= SQ15x16(k1_queue_transition_scale_primary);
+#if K1_AFE2_V1
+  // AFE2 exposure: section loudness against the slow anchor ("how much"). Live microphone
+  // only: a prepared show carries its own level.
+  if (!k1_authored_suppresses_live_update()) brightness *= SQ15x16(k1_afe2_brightness_scale());
+#endif
 
   if (debug_mode && (millis() % 5000 == 0)) {
     USBSerial.print("DEBUG: Brightness components - MASTER_BRIGHTNESS: ");
@@ -3041,6 +3047,9 @@ inline void apply_brightness_secondary() {
   // SECONDARY channel's independent dip, composed by multiplication at the
   // same application point as drop_cut_scale. 1.0 when idle.
   bright_val *= k1_queue_transition_scale_secondary;
+#if K1_AFE2_V1
+  if (!k1_authored_suppresses_live_update()) bright_val *= k1_afe2_brightness_scale();
+#endif
 
   if (debug_mode && (millis() % 5000 == 0)) {
     USBSerial.print("DEBUG: Secondary brightness curve = f(PHOTONS=");

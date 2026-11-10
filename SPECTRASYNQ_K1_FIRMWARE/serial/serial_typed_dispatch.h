@@ -103,6 +103,12 @@ bool serial_typed_get_mode_name(const char* command_type, char* command_data);
 bool serial_typed_k1_loud_guard(const char* command_type, char* command_data);
 #endif
 bool serial_typed_standby_dimming(const char* command_type, char* command_data);
+#if K1_AFE2_V1
+bool serial_typed_k1_afe(const char* command_type, char* command_data);
+bool serial_typed_k1_afe_level(const char* command_type, char* command_data);
+bool serial_typed_k1_afe_gamma(const char* command_type, char* command_data);
+bool serial_typed_k1_afe_floor(const char* command_type, char* command_data);
+#endif
 bool serial_typed_silence_enter(const char* command_type, char* command_data);
 bool serial_typed_silence_exit(const char* command_type, char* command_data);
 bool serial_typed_silence_dwell(const char* command_type, char* command_data);
