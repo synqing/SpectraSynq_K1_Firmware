@@ -1,0 +1,3 @@
+$ /opt/homebrew/opt/python@3.13/bin/python3.13 /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-b/audit_prsm_bytes.py projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm --guard 30 --json raw/f10_audit_fixture_post_edit.json
+BENCH-ELIGIBLE projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm frames=360/360 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=64B guard=30B
+exit 0

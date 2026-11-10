@@ -1,0 +1,4 @@
+$ /opt/homebrew/opt/python@3.13/bin/python3.13 tools/make_stream.py --run projects/loreen/out/post_edit/run-a --project projects/loreen/composition.json --asset-json projects/loreen/inputs/asset.json --out projects/loreen/stream/loreen_post_edit_120hz.prsm
+STREAM: wrote projects/loreen/stream/loreen_post_edit_120hz.prsm frames=26870 sha256=116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3
+SIDECAR_SHA256=424ac52ad1f357e1b463af58ad0e3efb59b901fe735169c4ba024b333bb95d20
+exit 0

@@ -1,0 +1,297 @@
+--- ed0aa984:SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp
++++ src-ed0aa984/SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp
+@@ -18,6 +18,7 @@
+ #endif
+ #include "globals.h"
+ #include "../control/k1_show_state.h"
++#include "k1_authored_source.h"
+ 
+ extern void parse_command(char* command_buf);
+ extern void check_serial(uint32_t t_now);
+@@ -81,7 +82,10 @@
+   uint32_t blob_bytes;
+   uint32_t payload_crc32;
+   uint64_t declared_epoch_us;
+-  uint8_t reserved[124];
++  // PROTOTYPE ADAPTER (lane-c-emu, not product tooling): raw USB-serial RX records.
++  uint32_t rx_offset;
++  uint32_t rx_count;
++  uint8_t reserved[116];
+   uint32_t header_crc32;
+ };
+ static_assert(sizeof(BlobHeader) == kHeaderBytes, "scenario header is 256 bytes");
+@@ -117,6 +121,22 @@
+ const char* s_invalid = nullptr;
+ bool s_client = false;         // client transport: trace on UART1
+ 
++// ---- PROTOTYPE ADAPTER (lane-c-emu): raw bytes into the production receive loop ----
++// Each 136-byte record is {u32 hop, u32 len, u8 bytes[128]}, ordered by hop. Before hop h is
++// processed, every record for h is queued; the production check_serial() of the same loop
++// iteration reads the queue ahead of USBSerial, so the bytes take the product's own
++// PRSM scanner / hotkey / ':' command path at a deterministic replay coordinate.
++constexpr uint32_t kRxRecordBytes = 136;
++constexpr uint32_t kRxRecordData = 128;
++constexpr uint32_t kRxFifo = 1024;
++uint32_t s_rx_offset = 0;
++uint32_t s_rx_count = 0;
++uint32_t s_rx_next = 0;
++uint8_t s_rx_fifo[kRxFifo];
++uint32_t s_rx_head = 0, s_rx_tail = 0;
++uint32_t s_rx_queued = 0, s_rx_consumed = 0, s_rx_records_done = 0;
++int s_auth_last = -1;
++
+ // ---- Progression ----
+ bool s_started = false;
+ bool s_finished = false;
+@@ -384,9 +404,56 @@
+   s_stall_ms = h.stall_ms != 0 ? h.stall_ms : 20000;
+   s_pcm_offset = h.pcm_offset;
+   s_cmd_count = h.command_count;
++  s_rx_offset = h.rx_offset;
++  s_rx_count = h.rx_count;
++  if (s_rx_count != 0 && (s_rx_offset < kHeaderBytes ||
++                          s_rx_offset + s_rx_count * kRxRecordBytes > h.blob_bytes)) {
++    return fail_scenario("rx_layout");
++  }
+   s_valid = true;
+ }
+ 
++[[noreturn]] void finish(const char* reason, const char* where);
++
++void rx_queue_hop(uint32_t hop) {
++  if (s_rx_head != s_rx_tail) finish("rx_backlog", "stage");
++  uint32_t records = 0, bytes = 0;
++  while (s_rx_next < s_rx_count) {
++    uint8_t raw[kRxRecordBytes];
++    if (esp_partition_read(s_part, s_rx_offset + s_rx_next * kRxRecordBytes, raw, sizeof(raw)) != ESP_OK) {
++      finish("read_error", "rx");
++    }
++    uint32_t rh, len;
++    memcpy(&rh, raw, 4);
++    memcpy(&len, raw + 4, 4);
++    if (rh < hop || len > kRxRecordData) finish("rx_record", "stage");
++    if (rh > hop) break;
++    for (uint32_t i = 0; i < len; i++) {
++      const uint32_t nxt = (s_rx_head + 1) % kRxFifo;
++      if (nxt == s_rx_tail) finish("rx_overflow", "stage");
++      s_rx_fifo[s_rx_head] = raw[8 + i];
++      s_rx_head = nxt;
++    }
++    s_rx_next++;
++    s_rx_records_done++;
++    records++;
++    bytes += len;
++  }
++  s_rx_queued += bytes;
++  if (records) {
++    K1_EMU_LOG.printf("EMU_RX hop=%lu records=%lu bytes=%lu\n", (unsigned long)hop,
++                      (unsigned long)records, (unsigned long)bytes);
++  }
++}
++
++void report_authored_state(uint32_t hop) {
++  const int st = (int)k1_authored_state();
++  if (st != s_auth_last) {
++    K1_EMU_LOG.printf("EMU_AUTH after_hop=%ld state=%d\n", (long)hop - 1, st);
++    s_auth_last = st;
++  }
++}
++
+ void print_show_state(uint32_t generation, const char* when, uint32_t hop, bool only_if_changed) {
+   uint8_t buf[128];
+   const size_t n = k1_show_state_encode(k1_show_state_capture_live(), buf, sizeof(buf));
+@@ -488,6 +555,9 @@
+     }
+   }
+ #endif
++  K1_EMU_LOG.printf("EMU_RX_END records=%lu/%lu queued=%lu consumed=%lu auth_state=%d\n",
++                    (unsigned long)s_rx_records_done, (unsigned long)s_rx_count, (unsigned long)s_rx_queued,
++                    (unsigned long)s_rx_consumed, (int)k1_authored_state());
+   print_counters(reason, where);
+   char dump_arg[] = "1";
+   k1_render_trace_dispatch("rtrace_dump", dump_arg);
+@@ -533,6 +603,8 @@
+                       epoch_policy(), (unsigned long long)s_epoch_us,
+                       (unsigned long long)boot_us, (unsigned long)s_pre_audio_shows);
+   }
++  report_authored_state(hop);
++  rx_queue_hop(hop);
+   memset(s_stage_buf, 0, sizeof(s_stage_buf));
+   const uint64_t first = (uint64_t)hop * kHop;
+   uint32_t real = 0;
+@@ -617,6 +689,15 @@
+ #ifdef K1_EMU_UART0
+ HardwareSerial& k1_emu_log_port(void) { return s_client ? Serial1 : Serial0; }
+ #endif
++
++bool k1_emu_fixture_rx_available(void) { return s_rx_head != s_rx_tail; }
++uint8_t k1_emu_fixture_rx_read(void) {
++  if (s_rx_head == s_rx_tail) return 0;
++  const uint8_t b = s_rx_fifo[s_rx_tail];
++  s_rx_tail = (s_rx_tail + 1) % kRxFifo;
++  s_rx_consumed++;
++  return b;
++}
+ 
+ void k1_emu_fixture_begin(void) {
+   s_cap = (CapRecord*)ps_malloc(sizeof(CapRecord) * kMaxSidecar);
+--- ed0aa984:SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.h
++++ src-ed0aa984/SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.h
+@@ -87,6 +87,11 @@
+ void k1_emu_fixture_host_command_begin(const char* text);
+ void k1_emu_fixture_host_command_end(void);
+ 
++// PROTOTYPE ADAPTER (lane-c-emu, not product tooling): raw bytes the scenario delivers
++// into the production receive loop ahead of USBSerial at a declared replay hop.
++bool k1_emu_fixture_rx_available(void);
++uint8_t k1_emu_fixture_rx_read(void);
++
+ // Application clock. Before the first hop it stays at the epoch (0); afterwards
+ // it is processed_samples * 1e6 / sample_rate with a 64-bit intermediate.
+ // C linkage so a fixture build can redirect Arduino millis/micros here.
+--- ed0aa984:SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp
++++ src-ed0aa984/SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp
+@@ -4132,8 +4132,14 @@
+    * cap starves the stream. Magic scanner MUST run before hotkeys: PRSM is
+    * 'P''R''S''M' and P/R/S are immediate hotkeys. */
+     uint8_t bytes_processed = 0;
++#ifdef K1_EMU_FIXTURE
++    // PROTOTYPE ADAPTER (lane-c-emu): scenario RX bytes first, then the real USBSerial.
++    while ((k1_emu_fixture_rx_available() || USBSerial.available()) && bytes_processed < 128) {
++      uint8_t byte = k1_emu_fixture_rx_available() ? k1_emu_fixture_rx_read() : USBSerial.read();
++#else
+     while (USBSerial.available() && bytes_processed < 128) {
+       uint8_t byte = USBSerial.read();
++#endif
+       bytes_processed++;
+ 
+ #ifdef K1_LOOK_LIB_V1
+--- ed0aa984:tools/esp_emulator/emu_blob.py
++++ src-ed0aa984/tools/esp_emulator/emu_blob.py
+@@ -9,7 +9,7 @@
+ 
+ import struct
+ import zlib
+-from dataclasses import dataclass
++from dataclasses import dataclass, field
+ 
+ MAGIC = b"K1EMUSC2"
+ VERSION = 2
+@@ -25,6 +25,10 @@
+ CMD_SCHEDULED = 0                # the fixture runs the text through parse_command
+ CMD_CLIENT = 1                   # a client sends the text; the fixture holds the hop for it
+ EPOCH_POLICIES = ("zero", "boot_monotonic", "declared")
++# PROTOTYPE ADAPTER (lane-c-emu, not product tooling): raw USB-serial RX records,
++# {u32 hop, u32 len, u8 bytes[128]}, queued before hop h into the production check_serial().
++RX_RECORD_BYTES = 136
++RX_RECORD_DATA = 128
+ 
+ FLASH_SIZE = 16 * 1024 * 1024
+ BOOTLOADER_AT = 0x0
+@@ -54,6 +58,7 @@
+     declared_epoch_us: int = 0
+     novelty_trace: bool = False
+     client_transport: bool = False
++    rx_records: bytes = b""       # PROTOTYPE ADAPTER: packed RX records, hop-ordered
+ 
+ 
+ def _epoch_flag(spec: BlobSpec) -> int:
+@@ -91,12 +96,20 @@
+     pcm_offset = command_offset + len(cmd_blob)
+     pcm_offset += (-pcm_offset) % 4
+     payload = bytes(cmd_blob) + b"\0" * (pcm_offset - command_offset - len(cmd_blob)) + pcm_padded
++    rx_offset = rx_count = 0
++    if spec.rx_records:
++        if len(spec.rx_records) % RX_RECORD_BYTES:
++            raise ValueError("rx_records is not a whole number of RX records")
++        payload += b"\0" * ((-(HEADER_BYTES + len(payload))) % 4)
++        rx_offset = HEADER_BYTES + len(payload)
++        rx_count = len(spec.rx_records) // RX_RECORD_BYTES
++        payload += spec.rx_records
+     blob_bytes = HEADER_BYTES + len(payload)
+     if blob_bytes > SCENARIO_SIZE:
+         raise ValueError(f"scenario blob {blob_bytes} bytes exceeds the ota_1 partition")
+     payload_crc = zlib.crc32(payload) & 0xFFFFFFFF
+     head = struct.pack(
+-        "<8sII48s14IQ124s",
++        "<8sII48s14IQII116s",
+         MAGIC, VERSION, HEADER_BYTES, spec.run_id.encode().ljust(48, b"\0"),
+         spec.sample_rate, spec.hop_samples, real_samples, spec.pad_samples,
+         spec.capture_start_hop, spec.capture_end_hop, spec.capture_every,
+@@ -104,7 +117,7 @@
+         | (FLAG_NOVELTY_TRACE if spec.novelty_trace else 0)
+         | (FLAG_CLIENT_TRANSPORT if spec.client_transport else 0),
+         len(spec.commands), command_offset,
+-        pcm_offset, spec.stall_ms, blob_bytes, payload_crc, spec.declared_epoch_us, b"\0" * 124,
++        pcm_offset, spec.stall_ms, blob_bytes, payload_crc, spec.declared_epoch_us, rx_offset, rx_count, b"\0" * 116,
+     )
+     assert len(head) == HEADER_BYTES - 4
+     head += struct.pack("<I", zlib.crc32(head) & 0xFFFFFFFF)
+--- ed0aa984:tools/esp_emulator/run.py
++++ src-ed0aa984/tools/esp_emulator/run.py
+@@ -81,7 +81,8 @@
+               "samples", "origin", "qualification", "segments", "note", "source_sha256"}
+ CASE_KEYS = {"purpose", "pcm", "tail_hops", "partial_hop", "epoch", "capture", "commands",
+              "composition", "flash", "save_state", "stall_ms", "expect", "semantic", "trace_novelty",
+-             "client"}
++             "client", "rx_stream"}
++RX_KEYS = {"schedule", "sha256", "note"}   # PROTOTYPE ADAPTER (lane-c-emu)
+ CAPTURE_KEYS = {"start_hop", "end_hop", "every"}
+ COMMAND_KEYS = {"hop", "text", "expect"}
+ FLASH_KEYS = {"from", "recovery"}
+@@ -209,6 +210,8 @@
+         if fl["from"] != "blank" and not sc["cases"][fl["from"]].get("save_state"):
+             raise ScenarioError(f"{where}.flash: source case {fl['from']!r} does not save state")
+         _check_keys(case.get("expect", {}), EXPECT_KEYS, f"{where}.expect")
++        if "rx_stream" in case:
++            _check_keys(case["rx_stream"], RX_KEYS, f"{where}.rx_stream")
+     for comp in sc.get("comparisons", []):
+         _check_keys(comp, COMPARISON_KEYS, "comparisons")
+         if comp.get("kind") == "recovery_state" and "before_case" not in comp:
+@@ -565,6 +568,24 @@
+     blob_cmds = [(c["hop"], c["text"]) for c in cmds] + [(c["hop"], c["text"], emu_blob.CMD_CLIENT)
+                                                         for c in client_lines]
+     blob_cmds.sort(key=lambda e: e[0])
++    rx_records = b""
++    if case.get("rx_stream"):
++        # PROTOTYPE ADAPTER (lane-c-emu, not product tooling): hop-tagged raw RX bytes.
++        rxs = case["rx_stream"]
++        sched = Path(rxs["schedule"])
++        rx_records = sched.read_bytes()
++        rec["rx_stream"] = {"schedule": str(sched), "sha256": sha256_bytes(rx_records),
++                            "records": len(rx_records) // emu_blob.RX_RECORD_BYTES}
++        if rxs.get("sha256") and rxs["sha256"] != rec["rx_stream"]["sha256"]:
++            rec.update(status="FAIL", reasons=["rx schedule sha256 differs from the declared value"])
++            return rec
++        last = 0
++        for k in range(0, len(rx_records), emu_blob.RX_RECORD_BYTES):
++            h = int.from_bytes(rx_records[k:k + 4], "little")
++            if h < last or h >= total_hops:
++                rec.update(status="FAIL", reasons=[f"rx record {k // emu_blob.RX_RECORD_BYTES} hop {h} out of order or beyond {total_hops} hops"])
++                return rec
++            last = h
+     ep = case.get("epoch", {"policy": "boot_monotonic"})
+     flash_spec = case.get("flash", {"from": "blank", "recovery": False})
+     run_id = uuid.uuid4().hex
+@@ -575,7 +596,7 @@
+                              stall_ms=case.get("stall_ms", 20000), epoch_policy=ep["policy"],
+                              declared_epoch_us=ep.get("us", 0),
+                              novelty_trace=bool(case.get("trace_novelty")),
+-                             client_transport=bool(client_lines))
++                             client_transport=bool(client_lines), rx_records=rx_records)
+     blob, payload_crc = emu_blob.build_blob(spec)
+     boot = (build_dir / "bootloader.bin").read_bytes()
+     parts = (build_dir / "partitions.bin").read_bytes()
+--- ed0aa984:platformio.ini
++++ src-ed0aa984/platformio.ini
+@@ -745,6 +745,10 @@
+     -DK1_EMU_FE_MIC_ONLY
+     -DK1_EMU_ONSET_TRACE
+     -DK1_EMU_SPECTRUM_TRACE
++    ; lane-c-emu PROTOTYPE: bench k1_fe_bench_b489 audio/render flags (resident device build ed0aa984)
++    -DK1_AP_SUBSONIC_HPF_V1
++    -DK1_TEMPO_CONSUMER_BANDS_V1
++    -DK1_FX_BATTERY=1
+ build_src_flags =
+     -include k1_emu_clock_force.h
+ 

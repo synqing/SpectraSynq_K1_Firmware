@@ -1,0 +1,11 @@
+$ /opt/homebrew/bin/node tools/compose.mjs compile --project projects/ci_click_3s/composition.json --out projects/ci_click_3s/out/post_edit --record
+RECORD: saved outputs into /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/ci_click_3s/composition.json
+COMPILE: PASS
+SHOWBUNDLE_SHA256=648c052ac0451415bab69229e6751d5e75fd0d6e9ba7069a05d0f656029f4e84
+TRACE_SHA256=23439c6c9cc0a7448ee35c90c6807b725a179b17631dcf3f72dbd5e1abeaaeb9
+MAPPING_COVERAGE_SHA256=4161152a76c5a4d51fb74b289dd4835ac77411f529daca8f9837782194238ca4
+COMPILE_MANIFEST_SHA256=51d0cf182b1bcb2e5123797d7c21d54fb7a2168c1575f0b9203fb6f550d4ae9e
+BUILD_MANIFEST_SHA256=4258ef04900051f1c3c561d1dcfa35d3ca1ac086021c54f725fee80cec830220
+HZ=120
+DURATION_US=3000000
+exit 0

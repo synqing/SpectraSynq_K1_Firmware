@@ -1,0 +1,21 @@
+{
+  "view": "full",
+  "prism_root": "/Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio",
+  "prism_head": "07eb8227f1bc4570351fc00459dfc5b5353e5a0d",
+  "profile": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/mapping/prim8_natural_v1.json",
+  "profile_sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd",
+  "schema_sha256_pinned": "3d521f5d0f9c06ab3e46222f74b92600c802d217324d2ac45a14d9772a8b43fd",
+  "inputs": {
+    "contract_sha256": "18581f4c34cd59db80fa79ecda2dfb81172f13087111de96f2e54f62e396fe56",
+    "stem_features_sha256": "9053c7ad7e62e92b88b684b5daff07818039f46fdc46b0623a9ce60d31386052"
+  },
+  "adapter": {
+    "result": "FAIL",
+    "error": "structure.segments[14] times must lie within [0, track.duration_sec]"
+  },
+  "compiler_cli": {
+    "exit": 1,
+    "result": "FAIL",
+    "stderr_head": "file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_contract_adapter_v1.js:18\n  throw new Error(msg);\n        ^\n\nError: structure.segments[14] times must lie within [0, track.duration_sec]\n    at die (file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_contract_adapter_v1.js:18:9)\n    at validateContract (file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_contract_adapter_v1.js:112:7)\n    at adaptTrinityContract (file:///Users/spectrasynq/Workspace_Management/Software/"
+  }
+}

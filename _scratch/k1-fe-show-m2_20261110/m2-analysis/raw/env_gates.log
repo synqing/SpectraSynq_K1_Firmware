@@ -1,0 +1,32 @@
+## patch_natten_cpu
+NATTEN patch applied to the following files:
+  - /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/venv/lib/python3.11/site-packages/natten/functional.py
+exit=0
+## guard_deps
+Checking dependency versions (metadata-based, no imports)...
+
+✓ torch version OK: 2.2.2
+Traceback (most recent call last):
+  File "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/vendor/allin1/guard_deps.py", line 164, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/vendor/allin1/guard_deps.py", line 150, in main
+    torch_ok, torch_normalized = torch_result
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 2)
+exit=1
+## check_versions
+=== Trinity v0.1 Version Check ===
+
+Installed versions:
+  ✗ allin1       unknown         (expected: >=0.7.0)
+    beat_this    0.1             (expected: N/A)
+  ✓ natten       0.15.1          (expected: 0.15.1)
+  ✗ torch        2.2.2           (expected: >=2.0.0,<2.7.0)
+
+Errors:
+  ✗ torch: 2.2.2 not in range >=2.0.0,<2.7.0 (Cannot parse version: 2.2.2)
+  ✗ allin1: unknown < >=0.7.0 (Cannot parse version: unknown)
+
+✗ Version check failed
+exit=1

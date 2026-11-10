@@ -1,0 +1,15 @@
+{
+  "schema": "m2a-corrections/0",
+  "base_contract_sha256": "18581f4c34cd59db80fa79ecda2dfb81172f13087111de96f2e54f62e396fe56",
+  "stem_features": "unchanged: use ../stem_features.json",
+  "corrections": [
+    {
+      "path": "structure.segments[14].end",
+      "from": 223.92,
+      "to": 223.91002267573697,
+      "delta_s": 0.009977324263019227,
+      "reason": "allin1 boundary on 10 ms grid exceeds decoded duration; adapter requires <= track.duration_sec"
+    }
+  ],
+  "corrected_contract_sha256": "f17a0c052f6ba03b51d6820a596df6f55a06ce3f42e1e59e7cf06a705909e793"
+}

@@ -1,0 +1,101 @@
+{
+  "schema": "k1-prim8-stream/0",
+  "asset": {
+    "sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+    "sample_rate": 44100,
+    "sample_count": 9874432,
+    "channels": 2,
+    "path_hint": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+    "decoded_sha256": "b3fafd3392ed5a293181d0259f47f5b52bfcb50172814664a8c737e9bb011415",
+    "decoded_path_hint": "m2-analysis/cache/trinity/9876b2538cfc5697c89fa6e8043a70f9caf94f0c21d7509e4af80778c70311ca/audio/track.wav (ffmpeg s16le 44100 Hz stereo; m2-analysis/out/loreen/identity.json)"
+  },
+  "timebase": {
+    "origin": "asset sample 0 == ShowBundle t_us 0 == Trinity contract t=0.0 s",
+    "tick_time_us": "(i*1000000 + hz//2) // hz  (PRISM.studio src/vm.js:140-145)",
+    "sample_to_us": "(2*n*1000000 + R) // (2*R)  (round half up)",
+    "us_to_sample": "(2*t_us*R + 1000000) // 2000000  (round half up)",
+    "device_note": "device ignores t_us for scheduling; uses arrival time (k1_authored_source.cpp:48-50)"
+  },
+  "passage_start_sample": 0,
+  "hz": 120,
+  "frame_len": 34,
+  "frame_count": 26870,
+  "trailing_bytes": 0,
+  "epoch_id": "e0",
+  "epochs": [
+    {
+      "epoch_id": "e0",
+      "first_frame": 0,
+      "kind": "start"
+    }
+  ],
+  "stream_sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+  "prim8": [
+    {
+      "index": 0,
+      "name": "pressure",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "vu_level, peak_scaled, spectral_energy (also silence term)"
+    },
+    {
+      "index": 1,
+      "name": "impact",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "novelty (also silence term)"
+    },
+    {
+      "index": 2,
+      "name": "mass",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "low_energy (also silence term)"
+    },
+    {
+      "index": 3,
+      "name": "momentum",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "mid_energy"
+    },
+    {
+      "index": 4,
+      "name": "heat",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    },
+    {
+      "index": 5,
+      "name": "space",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    },
+    {
+      "index": 6,
+      "name": "texture",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "high_energy"
+    },
+    {
+      "index": 7,
+      "name": "gravity",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    }
+  ],
+  "edge_addressing": "none: one stream drives both edges (no per-edge field in PRSM v1)",
+  "source": {
+    "chain": "composition -> PRISM compiler 0.3.1 (cc00556d) -> ShowBundle 0.3 -> src/vm.js replayToJsonl via tools/showbundle_replay.js --hz 120 -> lane-b prim8_stream.build_frames",
+    "showbundle_sha256": "90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b",
+    "compile_manifest_sha256": "d98a48f9b337545e3eaca638d5d91d89ed7fa9f4936223724d488bf313133f37",
+    "intent_trace_sha256": "8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde",
+    "device_profile": "none",
+    "composition_inputs_sha256": "85f4036863592f64949184df1996c3d38c8136574805e219d5e5bdc32891b477"
+  },
+  "notes": "Prim8 heat/space/gravity are AUTHORED constants (0) in the profile; unconsumed by FE firmware, not repurposed."
+}

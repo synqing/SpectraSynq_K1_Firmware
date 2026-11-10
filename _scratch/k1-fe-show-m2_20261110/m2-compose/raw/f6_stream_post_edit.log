@@ -1,0 +1,4 @@
+$ /opt/homebrew/opt/python@3.13/bin/python3.13 tools/make_stream.py --run projects/ci_click_3s/out/post_edit/run-a --project projects/ci_click_3s/composition.json --wav projects/ci_click_3s/inputs/mix.wav --out projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm
+STREAM: wrote projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm frames=360 sha256=ee4577aa6cab6bc9f66837eb80cf11b86f4fe2121346db1534b337608b0e55d8
+SIDECAR_SHA256=7af72b57e707eaf1e838fe1d6e912e7576b7e9da44a391aa55e0c6c5c3b1cd6e
+exit 0

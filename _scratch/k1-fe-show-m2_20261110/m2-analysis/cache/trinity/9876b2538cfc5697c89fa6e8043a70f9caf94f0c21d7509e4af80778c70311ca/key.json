@@ -1,0 +1,79 @@
+{
+  "analyze_args": [
+    "--demix-source",
+    "demucs",
+    "--demucs-model",
+    "htdemucs",
+    "--demucs-shifts",
+    "0",
+    "--demucs-overlap",
+    "0.25",
+    "--rhythm-device",
+    "cpu",
+    "--structure-device",
+    "cpu",
+    "--model",
+    "harmonix-all",
+    "--keep-byproducts"
+  ],
+  "asset_sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+  "binaries": {
+    "libomp": "363a5a476fda527920fd9919ac34490331e5b667239108e691d5b3ea1aeec531",
+    "libtorch_cpu": "43c2d10b0cd51effe10bc440e909e6bf6adff3b4d288706db870863bc70be33a",
+    "natten_lib": "901598b21ae9a0700969a27f6346d95a2cb17386e34e014c2c9232e1a24edf3b"
+  },
+  "decoder": {
+    "args": [
+      "-nostdin",
+      "-v",
+      "error",
+      "-i",
+      "{src}",
+      "-map",
+      "0:a:0",
+      "-vn",
+      "-acodec",
+      "pcm_s16le",
+      "-ar",
+      "44100",
+      "-ac",
+      "2",
+      "-f",
+      "wav",
+      "{dst}"
+    ],
+    "tool": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "export_tier": "k1-lite",
+  "models": {
+    "allin1_harmonix-fold0": "0db596dfb0995f41d62f6267d76a9d54c046f1649bd35e1dbeca0c5f9a7b8acd",
+    "allin1_harmonix-fold1": "607b4864eaabccd4f6951410d5ea6676666ad1cfa6ce2e18bc99f3824b77c3b7",
+    "allin1_harmonix-fold2": "67c28ec7ca612d365e5fcb152f6530eb53e34c4303940afb30fd17a295c958a4",
+    "allin1_harmonix-fold3": "446d05672b2669cdb7d9b8bbbc228a4f3592484335a7995cca89a744e3950ddc",
+    "allin1_harmonix-fold4": "96327222ab9b33c005388b788ba602f529aa03cc4dde1c859c011f1004490493",
+    "allin1_harmonix-fold5": "c87f162a1090290bcbb863688746784919cf912c56744fb3d81a1a7dba3b114e",
+    "allin1_harmonix-fold6": "13e7e639bf30fcd3fa049ad863088773a4e57b06d7c68581385b3ef625c60688",
+    "allin1_harmonix-fold7": "b888b7fba95efa3d5a37ca013fe7efe2741621ea9ca335e6b2723e4fd0fade57",
+    "beat_this_final0": "8c328b45f59d8dd3dff219253ff6a8d6482be57d0133a29140e2febbf8eb8331",
+    "demucs_htdemucs_955717e8": "8726e21a993978c7ba086d3872e7608d7d5bfca646ca4aca459ffda844faa8b4"
+  },
+  "packages": {
+    "beat_this": "0.1",
+    "demucs": "4.0.1",
+    "huggingface_hub": "1.3.2",
+    "librosa": "0.11.0",
+    "natten": "0.15.1",
+    "numpy": "1.26.4",
+    "soundfile": "0.13.1",
+    "torch": "2.2.2",
+    "torchaudio": "2.2.2"
+  },
+  "stem_feature_cfg": {
+    "fps": 50,
+    "low_hz": 250.0,
+    "mid_hz": 4000.0,
+    "n_fft": 2048
+  },
+  "trinity_commit": "e271af39229e31c82d387932561ba89a8dd513c5",
+  "trinity_worktree_clean": true
+}

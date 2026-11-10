@@ -1,0 +1,105 @@
+{
+  "before": "projects/ci_click_3s/stream/ci_click_3s_pre_edit_120hz.prsm",
+  "after": "projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm",
+  "frames": 360,
+  "profile_leaf_diff": [
+    {
+      "path": "derived_from",
+      "before": null,
+      "after": {
+        "id": "prim8_natural_v1",
+        "version": "1.0.0",
+        "sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd"
+      }
+    },
+    {
+      "path": "edit_note",
+      "before": null,
+      "after": "Bar accent: off-downbeat beat pulses 48000->12000 so impact marks the bar; downbeats unchanged."
+    },
+    {
+      "path": "id",
+      "before": "prim8_natural_v1",
+      "after": "prim8_natural_v1_bar_accent"
+    },
+    {
+      "path": "prim8.impact.transform.beat_amp_u16",
+      "before": 48000,
+      "after": 12000
+    },
+    {
+      "path": "version",
+      "before": "1.0.0",
+      "after": "1.0.0-m2c.1"
+    }
+  ],
+  "changed_frames_per_channel": {
+    "pressure": 0,
+    "impact": 20,
+    "mass": 0,
+    "momentum": 0,
+    "heat": 0,
+    "space": 0,
+    "texture": 0,
+    "gravity": 0
+  },
+  "byte_offsets_differing": [
+    20,
+    21
+  ],
+  "impact_change_windows": [
+    {
+      "first_frame": 60,
+      "last_frame": 64,
+      "t_us_first": 500000,
+      "t_us_last": 533333,
+      "frames": 5,
+      "peak_before": 48000,
+      "peak_after": 12000
+    },
+    {
+      "first_frame": 120,
+      "last_frame": 124,
+      "t_us_first": 1000000,
+      "t_us_last": 1033333,
+      "frames": 5,
+      "peak_before": 48000,
+      "peak_after": 12000
+    },
+    {
+      "first_frame": 180,
+      "last_frame": 184,
+      "t_us_first": 1500000,
+      "t_us_last": 1533333,
+      "frames": 5,
+      "peak_before": 48000,
+      "peak_after": 12000
+    },
+    {
+      "first_frame": 300,
+      "last_frame": 304,
+      "t_us_first": 2500000,
+      "t_us_last": 2533333,
+      "frames": 5,
+      "peak_before": 48000,
+      "peak_after": 12000
+    }
+  ],
+  "impact_change_window_count": 4,
+  "non_downbeat_beats_inside_stream": 4,
+  "downbeats": 2,
+  "prediction_checks": {
+    "P1_only_impact_changed": true,
+    "P2_changes_only_in_non_downbeat_beat_windows": true,
+    "P3_new_equals_old_times_ratio_within_1": true,
+    "P4_frame_count_seq_t_us_unchanged": true,
+    "P4_only_impact_bytes_20_21_differ": true,
+    "impact_changed_at_all": true
+  },
+  "prediction_verdict": "MATCH",
+  "first_violations": {
+    "outside": [],
+    "ratio": [],
+    "other": {}
+  }
+}

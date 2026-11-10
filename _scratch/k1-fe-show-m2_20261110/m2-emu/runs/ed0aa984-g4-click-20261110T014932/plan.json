@@ -1,0 +1,37 @@
+{
+  "suite": [
+    "g4-m2",
+    "g4-twin"
+  ],
+  "cases": {
+    "g4-m2": {
+      "musical_offset_hops": 0,
+      "t0_s": 0.0,
+      "t_end_s": 3.0
+    },
+    "g4-twin": {
+      "musical_offset_hops": 0,
+      "t0_s": 0.0,
+      "t_end_s": 3.0
+    }
+  },
+  "schedules": {
+    "g4-m2": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/ed0aa984-g4-click-20261110T014932/schedules/g4-m2.rx",
+      "sha256": "601c8f70a0da157244049f68cb131c06aa8c0b158aeebe3dac61d534775c64c2",
+      "frames_sent": 359,
+      "frames_after_end_dropped": 1,
+      "records": 359,
+      "bytes": 23040
+    },
+    "g4-twin": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/ed0aa984-g4-click-20261110T014932/schedules/g4-twin.rx",
+      "sha256": "601c8f70a0da157244049f68cb131c06aa8c0b158aeebe3dac61d534775c64c2",
+      "frames_sent": 359,
+      "frames_after_end_dropped": 1,
+      "records": 359,
+      "bytes": 23040
+    }
+  },
+  "mode": 32
+}

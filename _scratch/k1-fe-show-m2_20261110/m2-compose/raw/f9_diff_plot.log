@@ -1,0 +1,31 @@
+$ env DYLD_LIBRARY_PATH=/opt/homebrew/opt/expat/lib /opt/homebrew/bin/python3 tools/diff_and_plot.py --before projects/ci_click_3s/stream/ci_click_3s_pre_edit_120hz.prsm --after projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm --contract projects/ci_click_3s/inputs/contract.json --profile-before projects/ci_click_3s/mapping/prim8_natural_v1.json --profile-after projects/ci_click_3s/mapping/prim8_natural_v1_bar_accent.json --out-json projects/ci_click_3s/diff/stream_diff.json --out-png projects/ci_click_3s/diff/stream_channels.png --window-s 0.4 1.1 --title ci_click_3s:\ bar-accent\ edit\ \(impact\ beat_amp\ 48000-\>12000\),\ Prim8\ before\ vs\ after
+{
+ "frames": 360,
+ "changed_frames_per_channel": {
+  "pressure": 0,
+  "impact": 20,
+  "mass": 0,
+  "momentum": 0,
+  "heat": 0,
+  "space": 0,
+  "texture": 0,
+  "gravity": 0
+ },
+ "byte_offsets_differing": [
+  20,
+  21
+ ],
+ "impact_change_window_count": 4,
+ "non_downbeat_beats_inside_stream": 4,
+ "prediction_checks": {
+  "P1_only_impact_changed": true,
+  "P2_changes_only_in_non_downbeat_beat_windows": true,
+  "P3_new_equals_old_times_ratio_within_1": true,
+  "P4_frame_count_seq_t_us_unchanged": true,
+  "P4_only_impact_bytes_20_21_differ": true,
+  "impact_changed_at_all": true
+ },
+ "prediction_verdict": "MATCH"
+}
+PLOT: projects/ci_click_3s/diff/stream_channels.png
+exit 0

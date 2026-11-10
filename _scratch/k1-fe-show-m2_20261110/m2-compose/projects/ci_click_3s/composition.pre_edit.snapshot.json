@@ -1,0 +1,28 @@
+{
+  "schema": "instrument_project_v1",
+  "version": "1.0.0",
+  "mapping_profile_id": "prim8_natural_v1",
+  "organs_lock_sha256": "4e57063c47045728ed5d2a90a232a326e6cc7b7a00a365a88061bf1897373fb5",
+  "inputs": {
+    "contract_path": "inputs/contract.json",
+    "contract_sha256": "80450e3f7632c72c2c931a8863b084eb730781e191e24f85a250cc1b00c98e37",
+    "stem_features_path": "inputs/stem_features.json",
+    "stem_features_sha256": "a2c3d817381b73f8710c46ebda954265d611dcb8321c007e2492637a779b32cf",
+    "contract_schema_sha256_path": "inputs/contract_schema.sha256",
+    "mapping_profile_path": "mapping/prim8_natural_v1.json",
+    "mapping_profile_sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd",
+    "asset_path": "inputs/mix.wav",
+    "asset_sha256": "dfcac3a3fec7289b94af747957581d7106260f77eef960c8c3ad097bac2598a8"
+  },
+  "stream": {
+    "hz": 120,
+    "device_profile": "none",
+    "passage_start_sample": 0
+  },
+  "edits": [],
+  "outputs": null,
+  "verification": {
+    "status": "UNVERIFIED",
+    "trace_sha256": null
+  }
+}

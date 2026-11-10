@@ -1,0 +1,4 @@
+$ /opt/homebrew/bin/node tools/compose.mjs edit --project projects/loreen/composition.json --set prim8.impact.transform.beat_amp_u16=12000 --id prim8_natural_v1_bar_accent --version 1.0.0-m2c.1 --note Bar\ accent:\ off-downbeat\ beat\ pulses\ 48000-\>12000\ so\ impact\ marks\ the\ bar\;\ downbeats\ unchanged. --out-profile mapping/prim8_natural_v1_bar_accent.json
+EDIT: saved /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/composition.json
+[{"path":"prim8.impact.transform.beat_amp_u16","before":48000,"after":12000}]
+exit 0

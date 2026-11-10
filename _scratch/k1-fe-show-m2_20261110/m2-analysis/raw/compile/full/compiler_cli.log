@@ -1,0 +1,22 @@
+cmd: node /Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_compile_showbundle_v0_3.js --in /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/out/loreen/contract.json --profile /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/mapping/prim8_natural_v1.json --stems /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/out/loreen/stem_features.json --out /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/raw/compile/full/showbundle.json --coverage-out /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/raw/compile/full/coverage.json --manifest-out /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/raw/compile/full/compile_manifest.json --compiler-commit 07eb8227f1bc4570351fc00459dfc5b5353e5a0d --schema-sha 3d521f5d0f9c06ab3e46222f74b92600c802d217324d2ac45a14d9772a8b43fd
+exit: 1
+--- stdout
+
+--- stderr
+file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_contract_adapter_v1.js:18
+  throw new Error(msg);
+        ^
+
+Error: structure.segments[14] times must lie within [0, track.duration_sec]
+    at die (file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_contract_adapter_v1.js:18:9)
+    at validateContract (file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_contract_adapter_v1.js:112:7)
+    at adaptTrinityContract (file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_contract_adapter_v1.js:182:3)
+    at compileContractToShowBundle (file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_compile_showbundle_v0_3.js:164:20)
+    at main (file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_compile_showbundle_v0_3.js:276:18)
+    at file:///Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio/tools/trinity_compile_showbundle_v0_3.js:304:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:569:25)
+    at async node:internal/modules/esm/loader:650:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v26.5.0
+

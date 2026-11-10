@@ -1,0 +1,42 @@
+{
+  "gates": [
+    "G1",
+    "G2",
+    "G3"
+  ],
+  "mode": 32,
+  "argv": [
+    "gates.py",
+    "--src",
+    "src-ed0aa984",
+    "--label",
+    "ed0aa984-base",
+    "--gates",
+    "G1,G2,G3"
+  ],
+  "started": "2026-11-10T00:42:15.728801",
+  "m1_stream": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+    "sha256": "eafb72aecbccedba880364930898420a727d284dbe21182f18c6bff3f1258fdd"
+  },
+  "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-171dd9e89e53",
+  "ident": {
+    "src": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/src-ed0aa984",
+    "src_tree_sha256": "171dd9e89e53b6094e9ebbf9118c1e7c7541a678a70f8f5f4ff7d0d438912d0f",
+    "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-171dd9e89e53",
+    "src_identity": {
+      "commit": "ed0aa984",
+      "commit_full": "ed0aa984445607f900fc59e4cf2d05de3dee2f57",
+      "branch": "lane/k1-fe-release",
+      "note": "m2-emu: git archive ed0aa984 + PROTOTYPE-ADAPTER-ed0aa984.diff (sha256 a253f2d9470dc22bdc43521d0763afdeddba4b26cd7bc6220ad97f3424697ef8) applied with patch -p1; diff -rq against lane-c-emu/src-ed0aa984 = identical except its identity file and c4 scenario"
+    },
+    "adapter": "present in source",
+    "adapter_diff_sha256": "a253f2d9470dc22bdc43521d0763afdeddba4b26cd7bc6220ad97f3424697ef8",
+    "bench_flags_in_k1_fe_emu": [
+      "K1_AP_SUBSONIC_HPF_V1",
+      "K1_TEMPO_CONSUMER_BANDS_V1",
+      "K1_FX_BATTERY"
+    ],
+    "work_tree_sha256": "171dd9e89e53b6094e9ebbf9118c1e7c7541a678a70f8f5f4ff7d0d438912d0f"
+  }
+}

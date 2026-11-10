@@ -1,0 +1,98 @@
+{
+  "gates": [
+    "G1",
+    "G2",
+    "G3",
+    "G4"
+  ],
+  "mode": 32,
+  "argv": [
+    "gates.py",
+    "--src",
+    "src-ed0aa984",
+    "--label",
+    "ed0aa984-all",
+    "--m2-stream",
+    "../m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm",
+    "--m2-twin",
+    "../m2-compose/projects/loreen/stream_reopen/loreen_post_edit_120hz.prsm"
+  ],
+  "started": "2026-11-10T01:51:36.289767",
+  "m1_stream": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+    "sha256": "eafb72aecbccedba880364930898420a727d284dbe21182f18c6bff3f1258fdd"
+  },
+  "m2": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm",
+    "sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+    "frames": 26870,
+    "hz": 120,
+    "t_first_s": 0.0,
+    "t_last_s": 223.908333,
+    "sidecar": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm.json",
+    "sidecar_sha256": "424ac52ad1f357e1b463af58ad0e3efb59b901fe735169c4ba024b333bb95d20",
+    "asset": {
+      "sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+      "sample_rate": 44100,
+      "sample_count": 9874432,
+      "channels": 2,
+      "path_hint": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+      "decoded_sha256": "b3fafd3392ed5a293181d0259f47f5b52bfcb50172814664a8c737e9bb011415",
+      "decoded_path_hint": "m2-analysis/cache/trinity/9876b2538cfc5697c89fa6e8043a70f9caf94f0c21d7509e4af80778c70311ca/audio/track.wav (ffmpeg s16le 44100 Hz stereo; m2-analysis/out/loreen/identity.json)"
+    },
+    "passage_start_sample": 0,
+    "epochs": [
+      {
+        "epoch_id": "e0",
+        "first_frame": 0,
+        "kind": "start"
+      }
+    ]
+  },
+  "m2_twin": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream_reopen/loreen_post_edit_120hz.prsm",
+    "sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+    "frames": 26870,
+    "hz": 120,
+    "t_first_s": 0.0,
+    "t_last_s": 223.908333,
+    "sidecar": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream_reopen/loreen_post_edit_120hz.prsm.json",
+    "sidecar_sha256": "424ac52ad1f357e1b463af58ad0e3efb59b901fe735169c4ba024b333bb95d20",
+    "asset": {
+      "sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+      "sample_rate": 44100,
+      "sample_count": 9874432,
+      "channels": 2,
+      "path_hint": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+      "decoded_sha256": "b3fafd3392ed5a293181d0259f47f5b52bfcb50172814664a8c737e9bb011415",
+      "decoded_path_hint": "m2-analysis/cache/trinity/9876b2538cfc5697c89fa6e8043a70f9caf94f0c21d7509e4af80778c70311ca/audio/track.wav (ffmpeg s16le 44100 Hz stereo; m2-analysis/out/loreen/identity.json)"
+    },
+    "passage_start_sample": 0,
+    "epochs": [
+      {
+        "epoch_id": "e0",
+        "first_frame": 0,
+        "kind": "start"
+      }
+    ]
+  },
+  "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-171dd9e89e53",
+  "ident": {
+    "src": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/src-ed0aa984",
+    "src_tree_sha256": "171dd9e89e53b6094e9ebbf9118c1e7c7541a678a70f8f5f4ff7d0d438912d0f",
+    "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-171dd9e89e53",
+    "src_identity": {
+      "commit": "ed0aa984",
+      "commit_full": "ed0aa984445607f900fc59e4cf2d05de3dee2f57",
+      "branch": "lane/k1-fe-release",
+      "note": "m2-emu: git archive ed0aa984 + PROTOTYPE-ADAPTER-ed0aa984.diff (sha256 a253f2d9470dc22bdc43521d0763afdeddba4b26cd7bc6220ad97f3424697ef8) applied with patch -p1; diff -rq against lane-c-emu/src-ed0aa984 = identical except its identity file and c4 scenario"
+    },
+    "adapter": "present in source",
+    "bench_flags_in_k1_fe_emu": [
+      "K1_AP_SUBSONIC_HPF_V1",
+      "K1_TEMPO_CONSUMER_BANDS_V1",
+      "K1_FX_BATTERY"
+    ],
+    "work_tree_sha256": "acd554268878342c5a3f114fcaedbaa2bf8d3ee326d8e6ebb54503bb51081647"
+  }
+}

@@ -1,0 +1,3 @@
+$ /opt/homebrew/bin/node tools/crosscheck_cdc.mjs projects/ci_click_3s/out/post_edit/run-a/trace_120hz.jsonl projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm 120
+CDC_CROSSCHECK: PASS 360 frames byte-identical to cdc.js makePrsmPacket
+exit 0

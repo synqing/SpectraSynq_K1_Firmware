@@ -1,0 +1,113 @@
+{
+  "schema": "m2a-evidence-semantics/0",
+  "time_axis": "asset sample n at 44100 Hz; contract times are float seconds n/44100 from track.wav sample 0; stem feature frame i covers samples [i*882, i*882+2048) of the stem WAV (hop 882 = floor(44100/50), n_fft 2048); the PRISM adapter places frame i at round(i*1e6/50) us, i.e. at the frame's START sample, so a feature describes audio up to 46.4 ms (2048 samples) AFTER its timestamp (centre at +23.2 ms). Flag for M2-compose: no delay compensation is applied anywhere; do not add one twice.",
+  "fps_note": "hop 882 samples at 44.1 kHz = exactly 50.000 fps (20.000 ms); integer, no drift",
+  "features": {
+    "rhythm.beats": {
+      "source": "Beat This! final0 on full mix, dbn=False",
+      "units": "seconds",
+      "range": "[0, 223.91002267573697]",
+      "resolution": "model frame 20 ms (50 fps), peak-picked",
+      "normalisation": "n/a",
+      "smoothing": "minimal postprocessing (peak dedupe)",
+      "delay": "none (offline, non-causal)"
+    },
+    "rhythm.downbeats": {
+      "source": "Beat This! final0, snapped onto beats",
+      "units": "seconds",
+      "range": "subset of beats",
+      "resolution": "20 ms",
+      "normalisation": "n/a",
+      "smoothing": "as beats",
+      "delay": "none"
+    },
+    "rhythm.beat_positions": {
+      "source": "Trinity rhythm_provider (counts beats since last downbeat, 70 ms tolerance)",
+      "units": "integer 1..16",
+      "range": "1..max",
+      "resolution": "per beat",
+      "normalisation": "n/a",
+      "smoothing": "none",
+      "delay": "none"
+    },
+    "rhythm.bpm": {
+      "source": "60 / median inter-beat interval",
+      "units": "beats per minute",
+      "range": "30..300 (schema)",
+      "resolution": "whole track, single value",
+      "normalisation": "n/a",
+      "smoothing": "median",
+      "delay": "none",
+      "note": "global; tempo changes are not represented"
+    },
+    "rhythm.time_signature": {
+      "source": "export_contract: numerator = max(beat_positions), denominator fixed 4",
+      "units": "meter",
+      "note": "inferred, not measured; denominator is a constant"
+    },
+    "structure.segments": {
+      "source": "allin1-trinity harmonix-all 8-fold ensemble on Demucs stems",
+      "units": "seconds + label from Harmonix vocabulary",
+      "range": "[0, duration]",
+      "resolution": "model 100 fps boundaries",
+      "normalisation": "n/a",
+      "smoothing": "allin1 postprocessing",
+      "delay": "none",
+      "quality": "labels are model inferences (Harmonix taxonomy), not ground truth; no per-segment confidence is emitted"
+    },
+    "stems.<stem>.rms": {
+      "source": "Demucs htdemucs stem (int16 WAV), mono = mean(L,R)",
+      "units": "linear RMS of PCM float in [-1,1] (not dB)",
+      "range": "[1e-6, ~1]; 1e-6 floor from +1e-12 inside sqrt",
+      "resolution": "50 fps, 2048-sample rectangular frame",
+      "normalisation": "none (absolute, comparable across stems)",
+      "smoothing": "none beyond frame",
+      "delay": "frame starts at timestamp (see time_axis)"
+    },
+    "stems.<stem>.onset_strength": {
+      "source": "positive spectral flux of Hann-windowed |rfft|",
+      "units": "dimensionless",
+      "range": "[0, 1]",
+      "resolution": "50 fps",
+      "normalisation": "PER STEM, PER WHOLE TRACK: divided by that stem's 99th percentile, clipped at 1. A passage slice keeps the whole-track scale.",
+      "smoothing": "none",
+      "delay": "frame starts at timestamp; frame 0 is 0.0 by construction (no previous frame)"
+    },
+    "stems.<stem>.band_energy_low": {
+      "source": "mean |rfft| (Hann, n_fft 2048) over bins < 250 Hz",
+      "units": "linear magnitude (unnormalised FFT sum scale, not dB, not 0-1)",
+      "range": "[0, unbounded)",
+      "resolution": "50 fps; 21.5 Hz bins",
+      "normalisation": "none",
+      "smoothing": "none",
+      "delay": "as rms"
+    },
+    "stems.<stem>.band_energy_mid": {
+      "source": "mean |rfft| over 250-4000 Hz",
+      "units": "as band_energy_low",
+      "range": "[0, unbounded)",
+      "resolution": "50 fps",
+      "normalisation": "none",
+      "smoothing": "none",
+      "delay": "as rms"
+    },
+    "stems.<stem>.band_energy_high": {
+      "source": "mean |rfft| over >= 4000 Hz",
+      "units": "as band_energy_low",
+      "range": "[0, unbounded)",
+      "resolution": "50 fps",
+      "normalisation": "none",
+      "smoothing": "none",
+      "delay": "as rms"
+    }
+  },
+  "not_emitted": {
+    "per-feature validity/confidence": "NOT PRODUCED by Trinity k1-lite; absent, not zero",
+    "blobs (macros/activations/embeddings/spectrogram)": "null by design at k1-lite (organs.lock note: derive_macros_from_activations returns None)",
+    "tonal / notes / chords": "NOT RUN (analyze_track --tonal not requested; BasicPitch not part of locked path)",
+    "per-beat aggregates (rms_per_beat etc.)": "NOT PRODUCED (write_stem_features passes no beat_frames)",
+    "full-mix stem_features": "NOT PRODUCED (Trinity stem pack covers the four Demucs stems only)",
+    "vocal activity / phrase detection": "NOT PRODUCED; vocals.rms is energy of a separated stem, which contains bleed"
+  },
+  "separator_caveats": "Demucs stems are estimates with bleed, not isolated instruments. Written as int16 WAV. Demucs clip-mode 'rescale' divided vocals, drums and other by an UNRECORDED factor (their peaks are exactly 1/1.01 = 0.9901; raw/stem_check.json), so absolute rms/band_energy levels are NOT comparable across those stems or to bass; per-stem relative shape is intact. Demucs ran with one unseeded random shift (Trinity drops --demucs-shifts 0), so stems are not reproducible from source; this cache is the reference copy."
+}

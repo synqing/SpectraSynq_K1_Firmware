@@ -1,0 +1,95 @@
+{
+  "schema_file": "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/contract_schema.json",
+  "schema_sha256": "3d521f5d0f9c06ab3e46222f74b92600c802d217324d2ac45a14d9772a8b43fd",
+  "checks": {
+    "contract_json_schema": {
+      "result": "PASS",
+      "errors": []
+    },
+    "contract_facts": {
+      "result": "FAIL",
+      "beats_strictly_increasing": true,
+      "downbeats_strictly_increasing": true,
+      "downbeats_subset_of_beats_exact": true,
+      "beat_positions_len_equals_beats": true,
+      "times_within_duration": true,
+      "segments_ordered_non_overlapping": true,
+      "segments_within_duration": false,
+      "duration_equals_frames_over_rate": true,
+      "note": "segments_within_duration FAIL is a real Trinity/allin1 output defect, reported upstream; consumer/ carries the disclosed clamp"
+    },
+    "stem_features_shape": {
+      "result": "PASS",
+      "schema": true,
+      "fps_integer_50": true,
+      "equal_lengths": true,
+      "frame_count": 11194,
+      "expected_frames_floor_formula": 11194,
+      "all_finite_non_negative": true,
+      "duration_within_one_frame_of_contract": true,
+      "frame_count_matches_formula": true
+    },
+    "passage_contract_json_schema": {
+      "result": "PASS",
+      "errors": [],
+      "beats": 169,
+      "downbeats": 42,
+      "segments": [
+        [
+          0.0,
+          0.93,
+          "chorus"
+        ],
+        [
+          0.93,
+          16.04,
+          "verse"
+        ],
+        [
+          16.04,
+          31.16,
+          "verse"
+        ],
+        [
+          31.16,
+          46.28,
+          "chorus"
+        ],
+        [
+          46.28,
+          61.39,
+          "chorus"
+        ],
+        [
+          61.39,
+          76.51,
+          "bridge"
+        ],
+        [
+          76.51,
+          80.0,
+          "bridge"
+        ]
+      ],
+      "frames": 4000,
+      "downbeats_subset_exact": true
+    },
+    "consumer_contract_json_schema": {
+      "result": "PASS",
+      "errors": [],
+      "corrections": 1,
+      "segments_within_duration": true
+    }
+  },
+  "artefact_sha256": {
+    "analysis.json": "85373cbb317bd05e793b620c080787148f4decf60c63d707b21a45d29e78e0a3",
+    "consumer/contract.json": "f17a0c052f6ba03b51d6820a596df6f55a06ce3f42e1e59e7cf06a705909e793",
+    "consumer/corrections.json": "818e6ba8a93c8c7d81db692e459bc317629f0a15d2f2bbd395b3f96c25617304",
+    "contract.json": "18581f4c34cd59db80fa79ecda2dfb81172f13087111de96f2e54f62e396fe56",
+    "evidence_semantics.json": "190eb425b982ed7ee7b86e9731d1cef256e3e75d2459ac6930f86d808ef97189",
+    "identity.json": "7696d4b4ee16dd1f11a6a48587c3a19ab2f8d14c252bae9d022d00fa6c76771c",
+    "passage_75_155/contract.json": "c15659a743ffd58f9101ff91c72e11f31a91f5fa2ee140bacf57dd41e0803e6f",
+    "passage_75_155/stem_features.json": "65880f75407130734af2e88bde6834ae398511ce4d28a0c68f118e9eb5bbd8b2",
+    "stem_features.json": "4c5e23d978e74c1b853d2456ce5a8153f30e1fa5df1b345e8400d3f60a4fdca6"
+  }
+}

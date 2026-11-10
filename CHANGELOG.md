@@ -6,6 +6,14 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ## [Unreleased]
 
+### Added — 2026-11-10 (lane/k1-fe-show-m2, no firmware source change)
+
+- K1-FE-SHOW M2 evidence under `_scratch/k1-fe-show-m2_20261110/`: Trinity analysis of a real
+  recording with a retained cache, a PRISM composition compiled by the locked compiler, an authored
+  edit saved, reopened and reproduced byte for byte, the resulting Prim8 stream, and emulator gates
+  G1-G4 (`m2-emu/gates.py`) that judge the firmware change requests. Handover for the next lead:
+  `_scratch/k1-fe-show-m2_20261110/HANDOVER-K1-FE-SHOW-2026-11-10.md`.
+
 ### Added — 2026-11-09 (lane/k1-fe-show-m1, no firmware source change)
 
 - K1-FE-SHOW-M1 Rev 2 evidence under `_scratch/k1-fe-show-m1_20261109/`: prepared

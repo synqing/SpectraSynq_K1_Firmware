@@ -1,0 +1,47 @@
+{
+  "run_dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/ed0aa984-all-20261110T015136",
+  "source": {
+    "src": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/src-ed0aa984",
+    "src_tree_sha256": "171dd9e89e53b6094e9ebbf9118c1e7c7541a678a70f8f5f4ff7d0d438912d0f",
+    "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-171dd9e89e53",
+    "src_identity": {
+      "commit": "ed0aa984",
+      "commit_full": "ed0aa984445607f900fc59e4cf2d05de3dee2f57",
+      "branch": "lane/k1-fe-release",
+      "note": "m2-emu: git archive ed0aa984 + PROTOTYPE-ADAPTER-ed0aa984.diff (sha256 a253f2d9470dc22bdc43521d0763afdeddba4b26cd7bc6220ad97f3424697ef8) applied with patch -p1; diff -rq against lane-c-emu/src-ed0aa984 = identical except its identity file and c4 scenario"
+    },
+    "adapter": "present in source",
+    "bench_flags_in_k1_fe_emu": [
+      "K1_AP_SUBSONIC_HPF_V1",
+      "K1_TEMPO_CONSUMER_BANDS_V1",
+      "K1_FX_BATTERY"
+    ],
+    "work_tree_sha256": "acd554268878342c5a3f114fcaedbaa2bf8d3ee326d8e6ebb54503bb51081647"
+  },
+  "expected_today": {
+    "G1": "PASS (M1 C4: three authored repeats byte-identical on ed0aa984)",
+    "G2": "FAIL (M1 C4: authored over zero PCM differed on 1778/1778 frames; live peak is OR-ed in, light_mode_waveform_hybrid_k1.cpp:116)",
+    "G3": "FAIL (no seek reconstruction; bench S5 colour changed and stayed after a backward seek)",
+    "G4": "PASS if the twin is byte-identical and the stream is accepted (determinism, G1)"
+  },
+  "gates": {
+    "G1": {
+      "verdict": "BLOCKED",
+      "why": "emulator run produced no result.json (see run log)"
+    },
+    "G2": {
+      "verdict": "BLOCKED",
+      "why": "emulator run produced no result.json (see run log)"
+    },
+    "G3": {
+      "verdict": "BLOCKED",
+      "why": "emulator run produced no result.json (see run log)"
+    },
+    "G4": {
+      "verdict": "BLOCKED",
+      "why": "emulator run produced no result.json (see run log)"
+    }
+  },
+  "cases": {},
+  "plot": null
+}

@@ -1,0 +1,54 @@
+{
+  "mix_frames": 9874432,
+  "mix_rate": 44100,
+  "stems": {
+    "vocals": {
+      "frames": 9874432,
+      "rate": 44100,
+      "channels": 2,
+      "peak": 0.9901123046875,
+      "frames_equal_mix": true
+    },
+    "drums": {
+      "frames": 9874432,
+      "rate": 44100,
+      "channels": 2,
+      "peak": 0.9901123046875,
+      "frames_equal_mix": true
+    },
+    "bass": {
+      "frames": 9874432,
+      "rate": 44100,
+      "channels": 2,
+      "peak": 0.500946044921875,
+      "frames_equal_mix": true
+    },
+    "other": {
+      "frames": 9874432,
+      "rate": 44100,
+      "channels": 2,
+      "peak": 0.990081787109375,
+      "frames_equal_mix": true
+    }
+  },
+  "reconstruction": {
+    "mix_rms": 0.30205468241512545,
+    "sum_of_stems_rms": 0.2808691553725291,
+    "residual_rms": 0.024921984065687623,
+    "residual_db_rel_mix": -21.67005916977127,
+    "gain_ratio_sum_over_mix": 0.9289178206873978
+  },
+  "best_lag_samples": 0,
+  "lstsq_gain_estimate": {
+    "vocals": 1.023410632163482,
+    "drums": 1.112877779418221,
+    "bass": 1.0210993163945066,
+    "other": 1.0714706860383394
+  },
+  "rescale_signature": {
+    "vocals": true,
+    "drums": true,
+    "bass": false,
+    "other": true
+  }
+}

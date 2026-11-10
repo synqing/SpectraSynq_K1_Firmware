@@ -1,0 +1,18 @@
+$ /opt/homebrew/opt/python@3.13/bin/python3.13 tools/editor_probe.py
+GET /api/state 200 {
+  "bundlePath": "../projects/ci_click_3s/out/pre_edit/run-a/showbundle.json",
+  "exists": true,
+  "port": 7791
+}
+POST /api/replay 200 sha256 bcdd0c229d4cb77512e0415969b4302afc24c80b46403a03b46cf6ebb51ae2b8 bytes 21000
+POST /api/instrument/profile (edited id) 400 {
+  "error": "unsupported profile"
+}
+POST /api/instrument/profile (v1) 200 {
+  "profile_id": "prim8_natural_v1"
+}
+POST /api/instrument/compile (editor payload shape) 500 {
+  "error": "compile failed",
+  "detail": "[compile:trinity:v0.3] ERROR: Usage: node tools/trinity_compile_showbundle_v0_3.js --in <contract.json> --profile <profile.json> --stems <stem_features.json> --out <bundle.json> --coverage-out <coverage.json> --manifest-out <manifest.json> --compiler-commit <40hex> --schema-sha <64hex>\n"
+}
+exit 0

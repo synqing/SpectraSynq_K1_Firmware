@@ -1,0 +1,133 @@
+{
+  "suite": [
+    "g1-a1",
+    "g1-a2",
+    "g2-zero",
+    "g2-other",
+    "g3-cont",
+    "g3-fwd",
+    "g3-back",
+    "g4-m2",
+    "g4-twin"
+  ],
+  "cases": {
+    "g1-a1": {
+      "musical_offset_hops": 0
+    },
+    "g1-a2": {
+      "musical_offset_hops": 0
+    },
+    "g2-zero": {
+      "musical_offset_hops": 0
+    },
+    "g2-other": {
+      "musical_offset_hops": 0
+    },
+    "g3-cont": {
+      "musical_offset_hops": 0,
+      "landing_run_hop": 4000,
+      "segments_s": [
+        [
+          75.0,
+          75.0,
+          40.004999999999995
+        ]
+      ]
+    },
+    "g3-fwd": {
+      "musical_offset_hops": 2660,
+      "landing_run_hop": 1340,
+      "segments_s": [
+        [
+          75.0,
+          75.0,
+          10.05
+        ],
+        [
+          85.05,
+          105.0,
+          10.004999999999995
+        ]
+      ]
+    },
+    "g3-back": {
+      "musical_offset_hops": -2670,
+      "landing_run_hop": 6670,
+      "segments_s": [
+        [
+          75.0,
+          75.0,
+          50.025
+        ],
+        [
+          125.025,
+          105.0,
+          10.004999999999995
+        ]
+      ]
+    },
+    "g4-m2": {
+      "musical_offset_hops": 0,
+      "t0_s": 75.0,
+      "t_end_s": 155.0,
+      "first_frame_seq_sent": 9000
+    },
+    "g4-twin": {
+      "musical_offset_hops": 0,
+      "t0_s": 75.0,
+      "t_end_s": 155.0,
+      "first_frame_seq_sent": 9000
+    }
+  },
+  "schedules": {
+    "m1_full": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fe-ed0aa984-m32-20261110T031959/schedules/m1_full.rx",
+      "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+      "frames_sent": 9600,
+      "frames_after_end_dropped": 0,
+      "records": 9600,
+      "bytes": 614464
+    },
+    "g3-cont": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fe-ed0aa984-m32-20261110T031959/schedules/g3-cont.rx",
+      "sha256": "b52e79de56011cf67ec3c9847227b97ca1b1d8068ed89457faef9d29e69236db",
+      "frames_sent": 4801,
+      "frames_after_end_dropped": 0,
+      "records": 4801,
+      "bytes": 307328
+    },
+    "g3-fwd": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fe-ed0aa984-m32-20261110T031959/schedules/g3-fwd.rx",
+      "sha256": "bc98a12318ea9c62aa764f99a1ad12662e5a9657e8ed3c6db156f83d3e27b132",
+      "frames_sent": 2407,
+      "frames_after_end_dropped": 0,
+      "records": 2407,
+      "bytes": 154176
+    },
+    "g3-back": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fe-ed0aa984-m32-20261110T031959/schedules/g3-back.rx",
+      "sha256": "c188482777233eef2bf5ccd74494c25ba2f3f1e43c992cceb8da2d323952e519",
+      "frames_sent": 7204,
+      "frames_after_end_dropped": 0,
+      "records": 7204,
+      "bytes": 461184
+    },
+    "g4-m2": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fe-ed0aa984-m32-20261110T031959/schedules/g4-m2.rx",
+      "sha256": "0be5a4a67cead4bb5351d3274f5992b7288655a4cb235e64fa1bdeb6ecf2a398",
+      "frames_sent": 9599,
+      "frames_after_end_dropped": 1,
+      "records": 9599,
+      "bytes": 614400
+    },
+    "g4-twin": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fe-ed0aa984-m32-20261110T031959/schedules/g4-twin.rx",
+      "sha256": "0be5a4a67cead4bb5351d3274f5992b7288655a4cb235e64fa1bdeb6ecf2a398",
+      "frames_sent": 9599,
+      "frames_after_end_dropped": 1,
+      "records": 9599,
+      "bytes": 614400
+    }
+  },
+  "mode": 32
+}

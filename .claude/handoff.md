@@ -1,3 +1,7 @@
+<!-- K1-FE-SHOW lead handover, 10 Nov 2026 (lane/k1-fe-show-m1, lane/k1-fe-show-m2): _scratch/k1-fe-show-m2_20261110/HANDOVER-K1-FE-SHOW-2026-11-10.md -->
+
+**K1-FE-SHOW (PRISM prepared show on the FE firmware), 10 Nov 2026:** read `_scratch/k1-fe-show-m2_20261110/HANDOVER-K1-FE-SHOW-2026-11-10.md` first. M1 PARTIAL (firmware fixes pending, change requests in `_scratch/k1-fe-show-m1_20261109/CHANGE-REQUESTS-FW-LEAD.md`); M2 host loop proven; emulator gates `_scratch/k1-fe-show-m2_20261110/m2-emu/gates.py`. No flash go given.
+
 <!-- Current scoped Captain assignment,13October2026: docs/handover/HANDOVER_2026-10-13_B489_WS2816_REFERENCE.md on fix/b489-ws2816-reference-capture. Historical assignments below remain preserved. -->
 
 # ACTIVE LANE POINTER

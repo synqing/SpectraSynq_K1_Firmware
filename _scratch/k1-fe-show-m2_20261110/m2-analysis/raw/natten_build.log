@@ -1,0 +1,319 @@
+cmd: venv/bin/pip install --no-binary natten --no-build-isolation natten==0.15.1 (started 2026-11-09T16:36:00Z)
+Using pip 24.0 from /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/venv/lib/python3.11/site-packages/pip (python 3.11)
+Collecting natten==0.15.1
+  Downloading natten-0.15.1.tar.gz (1.9 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 2.5 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Running command python setup.py egg_info
+  Building NATTEN for CPU ONLY.
+  Number of workers: 3
+  running egg_info
+  creating /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info
+  writing /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info/PKG-INFO
+  writing dependency_links to /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info/dependency_links.txt
+  writing requirements to /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info/requires.txt
+  writing top-level names to /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info/top_level.txt
+  writing manifest file '/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info/SOURCES.txt'
+  reading manifest file '/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info/SOURCES.txt'
+  reading manifest template 'MANIFEST.in'
+  warning: no files found matching '*.cc' under directory 'csrc'
+  warning: no files found matching '*.cpp' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.cuh' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.cu' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.txt' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.cc' under directory 'third_party/cutlass/include'
+  no previously-included directories found matching 'webpage'
+  no previously-included directories found matching 'tools'
+  no previously-included directories found matching 'scripts'
+  no previously-included directories found matching 'tests'
+  adding license file 'LICENSE'
+  writing manifest file '/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-pip-egg-info-30o23tbe/natten.egg-info/SOURCES.txt'
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: packaging in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from natten==0.15.1) (25.0)
+Requirement already satisfied: cmake==3.20.3 in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from natten==0.15.1) (3.20.3)
+Requirement already satisfied: torch>=2.0.0 in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from natten==0.15.1) (2.2.2)
+Requirement already satisfied: filelock in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from torch>=2.0.0->natten==0.15.1) (3.20.3)
+Requirement already satisfied: typing-extensions>=4.8.0 in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from torch>=2.0.0->natten==0.15.1) (4.15.0)
+Requirement already satisfied: sympy in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from torch>=2.0.0->natten==0.15.1) (1.14.0)
+Requirement already satisfied: networkx in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from torch>=2.0.0->natten==0.15.1) (3.6.1)
+Requirement already satisfied: jinja2 in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from torch>=2.0.0->natten==0.15.1) (3.1.6)
+Requirement already satisfied: fsspec in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from torch>=2.0.0->natten==0.15.1) (2026.1.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from jinja2->torch>=2.0.0->natten==0.15.1) (3.0.3)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages (from sympy->torch>=2.0.0->natten==0.15.1) (1.3.0)
+Building wheels for collected packages: natten
+  Building wheel for natten (setup.py): started
+  Running command python setup.py bdist_wheel
+  Building NATTEN for CPU ONLY.
+  Number of workers: 3
+  running bdist_wheel
+  running build
+  running build_py
+  creating build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/natten1d.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/natten3d.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/natten2d.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/__init__.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/ops.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/flops.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/functional.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  copying src/natten/nested.py -> build/lib.macosx-11.0-arm64-cpython-311/natten
+  creating build/lib.macosx-11.0-arm64-cpython-311/natten/utils
+  copying src/natten/utils/__init__.py -> build/lib.macosx-11.0-arm64-cpython-311/natten/utils
+  copying src/natten/utils/tensor.py -> build/lib.macosx-11.0-arm64-cpython-311/natten/utils
+  copying src/natten/utils/typing.py -> build/lib.macosx-11.0-arm64-cpython-311/natten/utils
+  copying src/natten/utils/testing.py -> build/lib.macosx-11.0-arm64-cpython-311/natten/utils
+  running build_ext
+  -- The CXX compiler identification is AppleClang 17.0.0.17000603
+  -- Detecting CXX compiler ABI info
+  -- Detecting CXX compiler ABI info - done
+  -- Check for working CXX compiler: /usr/bin/c++ - skipped
+  -- Detecting CXX compile features
+  -- Detecting CXX compile features - done
+  Python: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/venv/bin/python
+  CMake Warning at /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:22 (message):
+    static library kineto_LIBRARY-NOTFOUND not found.
+  Call Stack (most recent call first):
+    /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:127 (append_torchlib_if_found)
+    CMakeLists.txt:56 (find_package)
+
+
+  -- Found Torch: /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/lib/libtorch.dylib
+  Building NATTEN on MacOS.
+  CMAKE_CUDA_FLAGS_RELEASE:  -Xcompiler -O3 --use_fast_math
+  -- Configuring done (3.0s)
+  -- Generating done (0.0s)
+  CMake Warning:
+    Manually-specified variables were not used by the project:
+
+      NATTEN_CUDA_ARCH_LIST
+      NATTEN_IS_WINDOWS
+
+
+  -- Build files have been written to: /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311
+  /opt/homebrew/bin/cmake -S/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc -B/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311 --check-build-system CMakeFiles/Makefile.cmake 0
+  /opt/homebrew/bin/cmake -E cmake_progress_start /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311//CMakeFiles/progress.marks
+  /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/Makefile2 all
+  /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/natten.dir/build.make CMakeFiles/natten.dir/depend
+  cd /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311 && /opt/homebrew/bin/cmake -E cmake_depends "Unix Makefiles" /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311 /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311 /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/DependInfo.cmake "--color="
+  /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/natten.dir/build.make CMakeFiles/natten.dir/build
+  [ 27%] Building CXX object CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o
+  [ 27%] Building CXX object CMakeFiles/natten.dir/natten.cpp.o
+  [ 27%] Building CXX object CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o -MF CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o.d -o CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/autogen/src/cpu/naive/source_1.cpp
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o -MF CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o.d -o CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/autogen/src/cpu/naive/source_0.cpp
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/natten.cpp.o -MF CMakeFiles/natten.dir/natten.cpp.o.d -o CMakeFiles/natten.dir/natten.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/natten.cpp
+  [ 36%] Building CXX object CMakeFiles/natten.dir/src/config.cpp.o
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/src/config.cpp.o -MF CMakeFiles/natten.dir/src/config.cpp.o.d -o CMakeFiles/natten.dir/src/config.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/src/config.cpp
+  [ 45%] Building CXX object CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o -MF CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o.d -o CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/src/pytorch/cpu/na1d.cpp
+  [ 54%] Building CXX object CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o -MF CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o.d -o CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/src/pytorch/cpu/na2d.cpp
+  [ 63%] Building CXX object CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o -MF CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o.d -o CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/src/pytorch/cpu/na3d.cpp
+  [ 81%] Building CXX object CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o
+  [ 81%] Building CXX object CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o
+  [ 90%] Building CXX object CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o -MF CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o.d -o CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/src/pytorch/na1d.cpp
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o -MF CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o.d -o CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/src/pytorch/na3d.cpp
+  /usr/bin/c++ -DAVX_INT -DTORCH_API_INCLUDE_EXTENSION_H -DTORCH_EXTENSION_NAME=libnatten -D_GLIBCXX_USE_CXX11_ABI=0 -Dnatten_EXPORTS -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/include/python3.11 -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include -I/Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages/torch/include/torch/csrc/api/include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./include -I/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/./autogen/include -std=c++17 -std=gnu++17 -arch arm64 -fPIC -MD -MT CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o -MF CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o.d -o CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o -c /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/csrc/src/pytorch/na2d.cpp
+  [100%] Linking CXX shared library natten/libnatten.cpython-311-darwin.so
+  /opt/homebrew/bin/cmake -E cmake_link_script CMakeFiles/natten.dir/link.txt --verbose=0
+  [100%] Built target natten
+  /opt/homebrew/bin/cmake -E cmake_progress_start /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-install-ffy136cd/natten_3d5cf396d7654df79c0d936fe84c3d38/build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles 0
+  /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/venv/lib/python3.11/site-packages/setuptools/_distutils/cmd.py:90: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+  !!
+
+          ********************************************************************************
+          Please avoid running ``setup.py`` directly.
+          Instead, use pypa/build, pypa/installer or other
+          standards-based tools.
+
+          See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+          ********************************************************************************
+
+  !!
+    self.initialize_options()
+  installing to build/bdist.macosx-11.0-arm64/wheel
+  running install
+  running install_lib
+  creating build/bdist.macosx-11.0-arm64/wheel
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/4.1.2
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/4.1.2/CMakeDetermineCompilerABI_CXX.bin -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/4.1.2
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/4.1.2/CompilerIdCXX
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/4.1.2/CompilerIdCXX/a.out -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/4.1.2/CompilerIdCXX
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/4.1.2/CompilerIdCXX/CMakeCXXCompilerId.cpp -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/4.1.2/CompilerIdCXX
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/4.1.2/CompilerIdCXX/apple-sdk.cpp -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/4.1.2/CompilerIdCXX
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/4.1.2/CompilerIdCXX/tmp
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/4.1.2/CMakeCXXCompiler.cmake -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/4.1.2
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/4.1.2/CMakeSystem.cmake -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/4.1.2
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/DependInfo.cmake -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/compiler_depend.ts -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/compiler_depend.make -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/depend.make -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/cmake_clean.cmake -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/link.txt -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/progress.make -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/natten.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/natten.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/build.make -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/flags.make -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir/autogen
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir/autogen/src
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir/autogen/src/cpu
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir/autogen/src/cpu/naive
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/autogen/src/cpu/naive
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/autogen/src/cpu/naive
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/autogen/src/cpu/naive
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/autogen/src/cpu/naive
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir/src
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/config.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/config.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir/src/pytorch
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/natten.dir/src/pytorch/cpu
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch/cpu
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch/cpu
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch/cpu
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch/cpu
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch/cpu
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch/cpu
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o.d -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles/natten.dir/src/pytorch
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/cmake.check_cache -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/CMakeConfigureLog.yaml -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/CMakeScratch
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/Makefile.cmake -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/InstallScripts.json -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  creating build/bdist.macosx-11.0-arm64/wheel/CMakeFiles/pkgRedirects
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/progress.marks -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/TargetDirectories.txt -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/CMakeDirectoryInformation.cmake -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeFiles/Makefile2 -> build/bdist.macosx-11.0-arm64/wheel/./CMakeFiles
+  copying build/lib.macosx-11.0-arm64-cpython-311/Makefile -> build/bdist.macosx-11.0-arm64/wheel/.
+  copying build/lib.macosx-11.0-arm64-cpython-311/cmake_install.cmake -> build/bdist.macosx-11.0-arm64/wheel/.
+  creating build/bdist.macosx-11.0-arm64/wheel/natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/natten1d.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/natten3d.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/natten2d.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  creating build/bdist.macosx-11.0-arm64/wheel/natten/utils
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/utils/__init__.py -> build/bdist.macosx-11.0-arm64/wheel/./natten/utils
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/utils/tensor.py -> build/bdist.macosx-11.0-arm64/wheel/./natten/utils
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/utils/typing.py -> build/bdist.macosx-11.0-arm64/wheel/./natten/utils
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/utils/testing.py -> build/bdist.macosx-11.0-arm64/wheel/./natten/utils
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/libnatten.cpython-311-darwin.so -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/ops.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/flops.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/functional.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/natten/nested.py -> build/bdist.macosx-11.0-arm64/wheel/./natten
+  copying build/lib.macosx-11.0-arm64-cpython-311/CMakeCache.txt -> build/bdist.macosx-11.0-arm64/wheel/.
+  running install_egg_info
+  running egg_info
+  writing src/natten.egg-info/PKG-INFO
+  writing dependency_links to src/natten.egg-info/dependency_links.txt
+  writing requirements to src/natten.egg-info/requires.txt
+  writing top-level names to src/natten.egg-info/top_level.txt
+  reading manifest file 'src/natten.egg-info/SOURCES.txt'
+  reading manifest template 'MANIFEST.in'
+  warning: no files found matching '*.cc' under directory 'csrc'
+  warning: no files found matching '*.cpp' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.cuh' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.cu' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.txt' under directory 'third_party/cutlass/include'
+  warning: no files found matching '*.cc' under directory 'third_party/cutlass/include'
+  no previously-included directories found matching 'webpage'
+  no previously-included directories found matching 'tools'
+  no previously-included directories found matching 'scripts'
+  no previously-included directories found matching 'tests'
+  adding license file 'LICENSE'
+  writing manifest file 'src/natten.egg-info/SOURCES.txt'
+  Copying src/natten.egg-info to build/bdist.macosx-11.0-arm64/wheel/./natten-0.15.1-py3.11.egg-info
+  running install_scripts
+  [WARNING] This wheel needs a higher macOS version than the version your Python interpreter is compiled against.  To silence this warning, set MACOSX_DEPLOYMENT_TARGET to at least 26_0 or recreate these files with lower MACOSX_DEPLOYMENT_TARGET:
+  build/bdist.macosx-11.0-arm64/wheel/natten/libnatten.cpython-311-darwin.so[WARNING] This wheel needs a higher macOS version than the version your Python interpreter is compiled against.  To silence this warning, set MACOSX_DEPLOYMENT_TARGET to at least 26_0 or recreate these files with lower MACOSX_DEPLOYMENT_TARGET:
+  build/bdist.macosx-11.0-arm64/wheel/natten/libnatten.cpython-311-darwin.socreating build/bdist.macosx-11.0-arm64/wheel/natten-0.15.1.dist-info/WHEEL
+  creating '/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pip-wheel-43zlzqsn/natten-0.15.1-cp311-cp311-macosx_26_0_arm64.whl' and adding 'build/bdist.macosx-11.0-arm64/wheel' to it
+  adding 'CMakeCache.txt'
+  adding 'Makefile'
+  adding 'cmake_install.cmake'
+  adding 'CMakeFiles/CMakeConfigureLog.yaml'
+  adding 'CMakeFiles/CMakeDirectoryInformation.cmake'
+  adding 'CMakeFiles/InstallScripts.json'
+  adding 'CMakeFiles/Makefile.cmake'
+  adding 'CMakeFiles/Makefile2'
+  adding 'CMakeFiles/TargetDirectories.txt'
+  adding 'CMakeFiles/cmake.check_cache'
+  adding 'CMakeFiles/progress.marks'
+  adding 'CMakeFiles/4.1.2/CMakeCXXCompiler.cmake'
+  adding 'CMakeFiles/4.1.2/CMakeDetermineCompilerABI_CXX.bin'
+  adding 'CMakeFiles/4.1.2/CMakeSystem.cmake'
+  adding 'CMakeFiles/4.1.2/CompilerIdCXX/CMakeCXXCompilerId.cpp'
+  adding 'CMakeFiles/4.1.2/CompilerIdCXX/a.out'
+  adding 'CMakeFiles/4.1.2/CompilerIdCXX/apple-sdk.cpp'
+  adding 'CMakeFiles/natten.dir/DependInfo.cmake'
+  adding 'CMakeFiles/natten.dir/build.make'
+  adding 'CMakeFiles/natten.dir/cmake_clean.cmake'
+  adding 'CMakeFiles/natten.dir/compiler_depend.make'
+  adding 'CMakeFiles/natten.dir/compiler_depend.ts'
+  adding 'CMakeFiles/natten.dir/depend.make'
+  adding 'CMakeFiles/natten.dir/flags.make'
+  adding 'CMakeFiles/natten.dir/link.txt'
+  adding 'CMakeFiles/natten.dir/natten.cpp.o'
+  adding 'CMakeFiles/natten.dir/natten.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/progress.make'
+  adding 'CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o'
+  adding 'CMakeFiles/natten.dir/autogen/src/cpu/naive/source_0.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o'
+  adding 'CMakeFiles/natten.dir/autogen/src/cpu/naive/source_1.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/src/config.cpp.o'
+  adding 'CMakeFiles/natten.dir/src/config.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o'
+  adding 'CMakeFiles/natten.dir/src/pytorch/na1d.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o'
+  adding 'CMakeFiles/natten.dir/src/pytorch/na2d.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o'
+  adding 'CMakeFiles/natten.dir/src/pytorch/na3d.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o'
+  adding 'CMakeFiles/natten.dir/src/pytorch/cpu/na1d.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o'
+  adding 'CMakeFiles/natten.dir/src/pytorch/cpu/na2d.cpp.o.d'
+  adding 'CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o'
+  adding 'CMakeFiles/natten.dir/src/pytorch/cpu/na3d.cpp.o.d'
+  adding 'natten/__init__.py'
+  adding 'natten/flops.py'
+  adding 'natten/functional.py'
+  adding 'natten/libnatten.cpython-311-darwin.so'
+  adding 'natten/natten1d.py'
+  adding 'natten/natten2d.py'
+  adding 'natten/natten3d.py'
+  adding 'natten/nested.py'
+  adding 'natten/ops.py'
+  adding 'natten/utils/__init__.py'
+  adding 'natten/utils/tensor.py'
+  adding 'natten/utils/testing.py'
+  adding 'natten/utils/typing.py'
+  adding 'natten-0.15.1.dist-info/licenses/LICENSE'
+  adding 'natten-0.15.1.dist-info/METADATA'
+  adding 'natten-0.15.1.dist-info/WHEEL'
+  adding 'natten-0.15.1.dist-info/top_level.txt'
+  adding 'natten-0.15.1.dist-info/RECORD'
+  removing build/bdist.macosx-11.0-arm64/wheel
+  Building wheel for natten (setup.py): finished with status 'done'
+  Created wheel for natten: filename=natten-0.15.1-cp311-cp311-macosx_26_0_arm64.whl size=834350 sha256=4f6800a1437fd15e9e8b6fa653d38d005d92caede668fde3532df73a408519bc
+  Stored in directory: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/cache/pip/wheels/7c/9b/12/c8ac11ae20f8c2d8cc0331c001b6bb6290ff85e69cce753eb9
+Successfully built natten
+Installing collected packages: natten
+  Attempting uninstall: natten
+    Found existing installation: NATTEN 0.21.7
+    Not uninstalling natten at /Users/spectrasynq/miniforge3/envs/trinity-music-intent-v0_1/lib/python3.11/site-packages, outside environment /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/venv
+    Can't uninstall 'NATTEN'. No files were found to uninstall.
+Successfully installed natten-0.15.1
+
+[notice] A new release of pip is available: 24.0 -> 26.3
+[notice] To update, run: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/venv/bin/python -m pip install --upgrade pip
+exit=0 end 2026-11-09T16:36:21Z

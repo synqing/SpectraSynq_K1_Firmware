@@ -1,0 +1,93 @@
+{
+  "gates": [
+    "G4"
+  ],
+  "mode": 32,
+  "argv": [
+    "gates.py",
+    "--src",
+    "src-ed0aa984",
+    "--label",
+    "ed0aa984-g4-click",
+    "--gates",
+    "G4",
+    "--m2-stream",
+    "../m2-compose/projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm",
+    "--m2-twin",
+    "../m2-compose/projects/ci_click_3s/stream_reopen/ci_click_3s_post_edit_120hz.prsm"
+  ],
+  "started": "2026-11-10T01:49:32.350052",
+  "m1_stream": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+    "sha256": "eafb72aecbccedba880364930898420a727d284dbe21182f18c6bff3f1258fdd"
+  },
+  "m2": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm",
+    "sha256": "ee4577aa6cab6bc9f66837eb80cf11b86f4fe2121346db1534b337608b0e55d8",
+    "frames": 360,
+    "hz": 120,
+    "t_first_s": 0.0,
+    "t_last_s": 2.991667,
+    "sidecar": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/ci_click_3s/stream/ci_click_3s_post_edit_120hz.prsm.json",
+    "sidecar_sha256": "7af72b57e707eaf1e838fe1d6e912e7576b7e9da44a391aa55e0c6c5c3b1cd6e",
+    "asset": {
+      "sha256": "dfcac3a3fec7289b94af747957581d7106260f77eef960c8c3ad097bac2598a8",
+      "sample_rate": 44100,
+      "sample_count": 132300,
+      "channels": 1,
+      "path_hint": "mix.wav"
+    },
+    "passage_start_sample": 0,
+    "epochs": [
+      {
+        "epoch_id": "e0",
+        "first_frame": 0,
+        "kind": "start"
+      }
+    ]
+  },
+  "m2_twin": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/ci_click_3s/stream_reopen/ci_click_3s_post_edit_120hz.prsm",
+    "sha256": "ee4577aa6cab6bc9f66837eb80cf11b86f4fe2121346db1534b337608b0e55d8",
+    "frames": 360,
+    "hz": 120,
+    "t_first_s": 0.0,
+    "t_last_s": 2.991667,
+    "sidecar": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/ci_click_3s/stream_reopen/ci_click_3s_post_edit_120hz.prsm.json",
+    "sidecar_sha256": "7af72b57e707eaf1e838fe1d6e912e7576b7e9da44a391aa55e0c6c5c3b1cd6e",
+    "asset": {
+      "sha256": "dfcac3a3fec7289b94af747957581d7106260f77eef960c8c3ad097bac2598a8",
+      "sample_rate": 44100,
+      "sample_count": 132300,
+      "channels": 1,
+      "path_hint": "mix.wav"
+    },
+    "passage_start_sample": 0,
+    "epochs": [
+      {
+        "epoch_id": "e0",
+        "first_frame": 0,
+        "kind": "start"
+      }
+    ]
+  },
+  "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/ed0aa984-g4-click-171dd9e89e53",
+  "ident": {
+    "src": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/src-ed0aa984",
+    "src_tree_sha256": "171dd9e89e53b6094e9ebbf9118c1e7c7541a678a70f8f5f4ff7d0d438912d0f",
+    "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/ed0aa984-g4-click-171dd9e89e53",
+    "src_identity": {
+      "commit": "ed0aa984",
+      "commit_full": "ed0aa984445607f900fc59e4cf2d05de3dee2f57",
+      "branch": "lane/k1-fe-release",
+      "note": "m2-emu: git archive ed0aa984 + PROTOTYPE-ADAPTER-ed0aa984.diff (sha256 a253f2d9470dc22bdc43521d0763afdeddba4b26cd7bc6220ad97f3424697ef8) applied with patch -p1; diff -rq against lane-c-emu/src-ed0aa984 = identical except its identity file and c4 scenario"
+    },
+    "adapter": "present in source",
+    "bench_flags_in_k1_fe_emu": [
+      "K1_AP_SUBSONIC_HPF_V1",
+      "K1_TEMPO_CONSUMER_BANDS_V1",
+      "K1_FX_BATTERY"
+    ],
+    "work_tree_sha256": "171dd9e89e53b6094e9ebbf9118c1e7c7541a678a70f8f5f4ff7d0d438912d0f"
+  }
+}

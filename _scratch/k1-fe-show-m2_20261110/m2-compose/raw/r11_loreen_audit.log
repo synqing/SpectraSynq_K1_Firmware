@@ -1,0 +1,3 @@
+$ /opt/homebrew/opt/python@3.13/bin/python3.13 /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-b/audit_prsm_bytes.py projects/loreen/stream/loreen_post_edit_120hz.prsm --guard 30 --json raw/r11_loreen_audit.json
+BENCH-ELIGIBLE projects/loreen/stream/loreen_post_edit_120hz.prsm frames=26870/26870 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=64B guard=30B
+exit 0

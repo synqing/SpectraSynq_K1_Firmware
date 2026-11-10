@@ -1,0 +1,975 @@
+{
+  "run_dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959",
+  "source": {
+    "src": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/src-ed0aa984-rpl",
+    "src_tree_sha256": "c25d2b6d7936f58b10e8dd10f01d19380fbe2a0520c50ac9e9c2cd94d240d705",
+    "work": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-c25d2b6d7936",
+    "src_identity": {
+      "commit": "ed0aa984",
+      "commit_full": "ed0aa984445607f900fc59e4cf2d05de3dee2f57",
+      "branch": "lane/k1-fe-release",
+      "note": "m2-emu RPL PROXY: git archive ed0aa984 + PROTOTYPE-ADAPTER-ed0aa984-noflags.diff (RX adapter only, no B489 bench flags), run with the k1_main_rpl_emu profile. Stands in for the resident Main RPL build 2a620f7e (68a684dc lineage), which has no R3 replay stack."
+    },
+    "adapter": "present in source",
+    "profile": "scenario",
+    "emu_env": "k1_main_rpl_emu",
+    "bench_flags_in_k1_fe_emu": [],
+    "work_tree_sha256": "c25d2b6d7936f58b10e8dd10f01d19380fbe2a0520c50ac9e9c2cd94d240d705"
+  },
+  "expected_today": {
+    "G1": "PASS (M1 C4: three authored repeats byte-identical on ed0aa984)",
+    "G2": "FAIL (M1 C4: authored over zero PCM differed on 1778/1778 frames; live peak is OR-ed in, light_mode_waveform_hybrid_k1.cpp:116)",
+    "G3": "FAIL (no seek reconstruction; bench S5 colour changed and stayed after a backward seek)",
+    "G4": "PASS if the twin is byte-identical and the stream is accepted (determinism, G1)"
+  },
+  "gates": {
+    "G1": {
+      "verdict": "PASS",
+      "pairs": {
+        "g1-a1 vs g1-a2": {
+          "compared_frames": 1778,
+          "musical_hops": [
+            0,
+            10662
+          ],
+          "A": {
+            "differing_frames": 0,
+            "share": 0.0,
+            "first_diff_hop": null,
+            "last_diff_hop": null,
+            "identical": true
+          },
+          "B": {
+            "differing_frames": 0,
+            "share": 0.0,
+            "first_diff_hop": null,
+            "last_diff_hop": null,
+            "identical": true
+          },
+          "identical_both_edges": true
+        },
+        "g1-a1 vs g3-cont (shared input prefix, hops 4000-5332 at every 6th)": {
+          "compared_frames": 222,
+          "musical_hops": [
+            4002,
+            5328
+          ],
+          "A": {
+            "differing_frames": 0,
+            "share": 0.0,
+            "first_diff_hop": null,
+            "last_diff_hop": null,
+            "identical": true
+          },
+          "B": {
+            "differing_frames": 0,
+            "share": 0.0,
+            "first_diff_hop": null,
+            "last_diff_hop": null,
+            "identical": true
+          },
+          "identical_both_edges": true
+        }
+      }
+    },
+    "G2": {
+      "verdict": "FAIL",
+      "pairs": {
+        "passage vs zero": {
+          "compared_frames": 1778,
+          "musical_hops": [
+            0,
+            10662
+          ],
+          "A": {
+            "differing_frames": 1778,
+            "share": 1.0,
+            "first_diff_hop": 0,
+            "last_diff_hop": 10662,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 72,
+              "a_rgb16": [
+                0,
+                0,
+                7
+              ],
+              "b_rgb16": [
+                0,
+                0,
+                5
+              ]
+            }
+          },
+          "B": {
+            "differing_frames": 1778,
+            "share": 1.0,
+            "first_diff_hop": 0,
+            "last_diff_hop": 10662,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 72,
+              "a_rgb16": [
+                77,
+                0,
+                1789
+              ],
+              "b_rgb16": [
+                66,
+                0,
+                1542
+              ]
+            }
+          },
+          "identical_both_edges": false
+        },
+        "passage vs other-music": {
+          "compared_frames": 1778,
+          "musical_hops": [
+            0,
+            10662
+          ],
+          "A": {
+            "differing_frames": 1773,
+            "share": 0.9972,
+            "first_diff_hop": 30,
+            "last_diff_hop": 10662,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 2,
+              "a_rgb16": [
+                1409,
+                482,
+                635
+              ],
+              "b_rgb16": [
+                1408,
+                483,
+                634
+              ]
+            }
+          },
+          "B": {
+            "differing_frames": 1773,
+            "share": 0.9972,
+            "first_diff_hop": 30,
+            "last_diff_hop": 10662,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 2,
+              "a_rgb16": [
+                1447,
+                0,
+                18372
+              ],
+              "b_rgb16": [
+                1445,
+                0,
+                18358
+              ]
+            }
+          },
+          "identical_both_edges": false
+        },
+        "zero vs other-music": {
+          "compared_frames": 1778,
+          "musical_hops": [
+            0,
+            10662
+          ],
+          "A": {
+            "differing_frames": 1778,
+            "share": 1.0,
+            "first_diff_hop": 0,
+            "last_diff_hop": 10662,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 72,
+              "a_rgb16": [
+                0,
+                0,
+                5
+              ],
+              "b_rgb16": [
+                0,
+                0,
+                7
+              ]
+            }
+          },
+          "B": {
+            "differing_frames": 1778,
+            "share": 1.0,
+            "first_diff_hop": 0,
+            "last_diff_hop": 10662,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 72,
+              "a_rgb16": [
+                66,
+                0,
+                1542
+              ],
+              "b_rgb16": [
+                77,
+                0,
+                1789
+              ]
+            }
+          },
+          "identical_both_edges": false
+        }
+      }
+    },
+    "G3": {
+      "verdict": "FAIL",
+      "declared": {
+        "landing_s": 105.0,
+        "landing_musical_hop": 4000,
+        "reconstruction_hops": 667,
+        "reconstruction_s": 5.0025,
+        "judged_musical_hops": [
+          4667,
+          5333
+        ],
+        "seeks": {
+          "forward": "run 10.05 s: 85.05 -> 105.0 s",
+          "backward": "run 50.025 s: 125.025 -> 105.0 s"
+        }
+      },
+      "after_reconstruction": {
+        "continuous vs forward": {
+          "compared_frames": 667,
+          "musical_hops": [
+            4667,
+            5333
+          ],
+          "A": {
+            "differing_frames": 602,
+            "share": 0.9025,
+            "first_diff_hop": 4667,
+            "last_diff_hop": 5332,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                429,
+                0,
+                6950
+              ],
+              "b_rgb16": [
+                429,
+                0,
+                6981
+              ]
+            }
+          },
+          "B": {
+            "differing_frames": 602,
+            "share": 0.9025,
+            "first_diff_hop": 4667,
+            "last_diff_hop": 5332,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                1996,
+                0,
+                6783
+              ],
+              "b_rgb16": [
+                2002,
+                0,
+                6813
+              ]
+            }
+          },
+          "identical_both_edges": false
+        },
+        "continuous vs backward": {
+          "compared_frames": 667,
+          "musical_hops": [
+            4667,
+            5333
+          ],
+          "A": {
+            "differing_frames": 667,
+            "share": 1.0,
+            "first_diff_hop": 4667,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                429,
+                0,
+                6950
+              ],
+              "b_rgb16": [
+                429,
+                0,
+                6952
+              ]
+            }
+          },
+          "B": {
+            "differing_frames": 667,
+            "share": 1.0,
+            "first_diff_hop": 4667,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                1996,
+                0,
+                6783
+              ],
+              "b_rgb16": [
+                1997,
+                0,
+                6786
+              ]
+            }
+          },
+          "identical_both_edges": false
+        },
+        "forward vs backward": {
+          "compared_frames": 667,
+          "musical_hops": [
+            4667,
+            5333
+          ],
+          "A": {
+            "differing_frames": 667,
+            "share": 1.0,
+            "first_diff_hop": 4667,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                429,
+                0,
+                6981
+              ],
+              "b_rgb16": [
+                429,
+                0,
+                6952
+              ]
+            }
+          },
+          "B": {
+            "differing_frames": 667,
+            "share": 1.0,
+            "first_diff_hop": 4667,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                2002,
+                0,
+                6813
+              ],
+              "b_rgb16": [
+                1997,
+                0,
+                6786
+              ]
+            }
+          },
+          "identical_both_edges": false
+        }
+      },
+      "whole_landing_window": {
+        "continuous vs forward": {
+          "compared_frames": 1334,
+          "musical_hops": [
+            4000,
+            5333
+          ],
+          "A": {
+            "differing_frames": 1269,
+            "share": 0.9513,
+            "first_diff_hop": 4000,
+            "last_diff_hop": 5332,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                3976,
+                0,
+                57621
+              ],
+              "b_rgb16": [
+                996,
+                0,
+                16216
+              ]
+            },
+            "agrees_from_hop": 5333,
+            "differs_for_s": 9.9975
+          },
+          "B": {
+            "differing_frames": 1269,
+            "share": 0.9513,
+            "first_diff_hop": 4000,
+            "last_diff_hop": 5332,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                17212,
+                0,
+                57037
+              ],
+              "b_rgb16": [
+                4649,
+                0,
+                15825
+              ]
+            },
+            "agrees_from_hop": 5333,
+            "differs_for_s": 9.9975
+          },
+          "identical_both_edges": false
+        },
+        "continuous vs backward": {
+          "compared_frames": 1334,
+          "musical_hops": [
+            4000,
+            5333
+          ],
+          "A": {
+            "differing_frames": 1334,
+            "share": 1.0,
+            "first_diff_hop": 4000,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                3976,
+                0,
+                57621
+              ],
+              "b_rgb16": [
+                192,
+                0,
+                3021
+              ]
+            },
+            "agrees_from_hop": "never in window",
+            "differs_for_s": 10.005
+          },
+          "B": {
+            "differing_frames": 1334,
+            "share": 1.0,
+            "first_diff_hop": 4000,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                17212,
+                0,
+                57037
+              ],
+              "b_rgb16": [
+                873,
+                0,
+                2949
+              ]
+            },
+            "agrees_from_hop": "never in window",
+            "differs_for_s": 10.005
+          },
+          "identical_both_edges": false
+        },
+        "forward vs backward": {
+          "compared_frames": 1334,
+          "musical_hops": [
+            4000,
+            5333
+          ],
+          "A": {
+            "differing_frames": 1334,
+            "share": 1.0,
+            "first_diff_hop": 4000,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                996,
+                0,
+                16216
+              ],
+              "b_rgb16": [
+                192,
+                0,
+                3021
+              ]
+            },
+            "agrees_from_hop": "never in window",
+            "differs_for_s": 10.005
+          },
+          "B": {
+            "differing_frames": 1334,
+            "share": 1.0,
+            "first_diff_hop": 4000,
+            "last_diff_hop": 5333,
+            "identical": false,
+            "first_diff_pixel": {
+              "pixel": 0,
+              "a_rgb16": [
+                4649,
+                0,
+                15825
+              ],
+              "b_rgb16": [
+                873,
+                0,
+                2949
+              ]
+            },
+            "agrees_from_hop": "never in window",
+            "differs_for_s": 10.005
+          },
+          "identical_both_edges": false
+        }
+      },
+      "auth_transitions": {
+        "g3-fwd": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        "g3-back": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            2
+          ]
+        ]
+      }
+    },
+    "G4": {
+      "verdict": "PASS",
+      "why": null,
+      "streams": {
+        "m2": {
+          "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm",
+          "sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+          "frames": 26870,
+          "hz": 120,
+          "t_first_s": 0.0,
+          "t_last_s": 223.908333,
+          "sidecar": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm.json",
+          "sidecar_sha256": "424ac52ad1f357e1b463af58ad0e3efb59b901fe735169c4ba024b333bb95d20",
+          "asset": {
+            "sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+            "sample_rate": 44100,
+            "sample_count": 9874432,
+            "channels": 2,
+            "path_hint": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+            "decoded_sha256": "b3fafd3392ed5a293181d0259f47f5b52bfcb50172814664a8c737e9bb011415",
+            "decoded_path_hint": "m2-analysis/cache/trinity/9876b2538cfc5697c89fa6e8043a70f9caf94f0c21d7509e4af80778c70311ca/audio/track.wav (ffmpeg s16le 44100 Hz stereo; m2-analysis/out/loreen/identity.json)"
+          },
+          "passage_start_sample": 0,
+          "epochs": [
+            {
+              "epoch_id": "e0",
+              "first_frame": 0,
+              "kind": "start"
+            }
+          ]
+        },
+        "twin": {
+          "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream_reopen/loreen_post_edit_120hz.prsm",
+          "sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+          "frames": 26870,
+          "hz": 120,
+          "t_first_s": 0.0,
+          "t_last_s": 223.908333,
+          "sidecar": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream_reopen/loreen_post_edit_120hz.prsm.json",
+          "sidecar_sha256": "424ac52ad1f357e1b463af58ad0e3efb59b901fe735169c4ba024b333bb95d20",
+          "asset": {
+            "sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+            "sample_rate": 44100,
+            "sample_count": 9874432,
+            "channels": 2,
+            "path_hint": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+            "decoded_sha256": "b3fafd3392ed5a293181d0259f47f5b52bfcb50172814664a8c737e9bb011415",
+            "decoded_path_hint": "m2-analysis/cache/trinity/9876b2538cfc5697c89fa6e8043a70f9caf94f0c21d7509e4af80778c70311ca/audio/track.wav (ffmpeg s16le 44100 Hz stereo; m2-analysis/out/loreen/identity.json)"
+          },
+          "passage_start_sample": 0,
+          "epochs": [
+            {
+              "epoch_id": "e0",
+              "first_frame": 0,
+              "kind": "start"
+            }
+          ]
+        }
+      },
+      "streams_byte_identical": true,
+      "checks": {
+        "g4-m2": {
+          "reached_AUTHORED": true,
+          "rx_all_consumed": true,
+          "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2",
+          "hotkey_state_changes": 0
+        },
+        "g4-twin": {
+          "reached_AUTHORED": true,
+          "rx_all_consumed": true,
+          "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2",
+          "hotkey_state_changes": 0
+        }
+      },
+      "twin_compare": {
+        "compared_frames": 1778,
+        "musical_hops": [
+          0,
+          10662
+        ],
+        "A": {
+          "differing_frames": 0,
+          "share": 0.0,
+          "first_diff_hop": null,
+          "last_diff_hop": null,
+          "identical": true
+        },
+        "B": {
+          "differing_frames": 0,
+          "share": 0.0,
+          "first_diff_hop": null,
+          "last_diff_hop": null,
+          "identical": true
+        },
+        "identical_both_edges": true
+      }
+    }
+  },
+  "cases": {
+    "g1-a1": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g1-a1",
+      "pcm_sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/m1_full.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "payload_sha256": "a04e1b0706baad958d19baa8617bb89b2defd2b7427e39af2c63c666fa51158e",
+      "edge_sha256": {
+        "A": "94b83c05934f327cafc4e23849d9d3d13040d4fb8ad33ac7bf807f26c1865da9",
+        "B": "9a79f63a544d970b7e38a32a6aadb8401d92f98e95ba4e34d44ea05207d3572e"
+      },
+      "n_frames": 1778,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=9600/9600 queued=614464 consumed=614464 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g1-a2": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g1-a2",
+      "pcm_sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/m1_full.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "payload_sha256": "a04e1b0706baad958d19baa8617bb89b2defd2b7427e39af2c63c666fa51158e",
+      "edge_sha256": {
+        "A": "94b83c05934f327cafc4e23849d9d3d13040d4fb8ad33ac7bf807f26c1865da9",
+        "B": "9a79f63a544d970b7e38a32a6aadb8401d92f98e95ba4e34d44ea05207d3572e"
+      },
+      "n_frames": 1778,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=9600/9600 queued=614464 consumed=614464 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g2-zero": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g2-zero",
+      "pcm_sha256": "e09534d59390e996d03db62710722cd319f787613231ec0ab6b4d53b0837c94f",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/m1_full.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "payload_sha256": "71cc286274efcbe4bf2c4226b9b68409e7372c9bb1a7adcedd56365f9d95f549",
+      "edge_sha256": {
+        "A": "72be8ecd55616d9107a9b26190b96b13dc10f53d29ced296067ca28045f429e7",
+        "B": "efb54b08e7db2cfdf1d05739dae66d693589b968bf9867ae09529d6cdb434da5"
+      },
+      "n_frames": 1778,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=9600/9600 queued=614464 consumed=614464 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g2-other": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g2-other",
+      "pcm_sha256": "155c8d6b492a6fa13885ed7616a5f0d1ba8101cf982477db025fa494bdd81b1f",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/m1_full.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "payload_sha256": "c3b33d55d31b248bca95db7630a242205b50f0f5f040584149969233d05172fc",
+      "edge_sha256": {
+        "A": "ec60f0728a5e98e50fb43485ea1710c0aa4b5aaf59a37c2f1af40ace0c89036d",
+        "B": "b17c2a7017e1c53c64337b6e8a8c066bff97d9af5111d0ddb2f81fb4f266c4ad"
+      },
+      "n_frames": 1778,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=9600/9600 queued=614464 consumed=614464 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g3-cont": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g3-cont",
+      "pcm_sha256": "8502846afe9dd5770959d063260ce19087b69a08fc3040cc36bc1f430f9e3db0",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/g3-cont.rx",
+        "sha256": "b52e79de56011cf67ec3c9847227b97ca1b1d8068ed89457faef9d29e69236db",
+        "records": 4801
+      },
+      "payload_sha256": "3b5ad0925c41567cee611c7b25a54f3d5956b5ab981423eea8fac9b2df4c7ecb",
+      "edge_sha256": {
+        "A": "d4fde3cb5ec1e51a3b42defb35311fdf31d2a37b20e9784bc0f055ad8ed66c5e",
+        "B": "5f952aac0dac2fbb01a3edece8bcbc0c010b506eb37ca8b6b8ce01ed50378171"
+      },
+      "n_frames": 1334,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=4801/4801 queued=307328 consumed=307328 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g3-fwd": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g3-fwd",
+      "pcm_sha256": "459b7e10325babcfdcfdc7f3c46656c0ca938bc5c5886190336eb42cc3b22f6f",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/g3-fwd.rx",
+        "sha256": "bc98a12318ea9c62aa764f99a1ad12662e5a9657e8ed3c6db156f83d3e27b132",
+        "records": 2407
+      },
+      "payload_sha256": "9930a2d2e3044c6afbe0676c2dfc13314ca55127b15ed312fafc9f54eba82c08",
+      "edge_sha256": {
+        "A": "e93428c0a1c8fdc67d342fd5074b82226b002efcf8ac01242c5040c2ab361b7a",
+        "B": "cf18188b5ff5b187d136ea2399de9e228a80994649b1b66edeac76873f2e8f95"
+      },
+      "n_frames": 1334,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=2407/2407 queued=154176 consumed=154176 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g3-back": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g3-back",
+      "pcm_sha256": "e8a846a17eedc0ac765e391251fdab311d84b385a6ad9dd23b3804b80982ef06",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/g3-back.rx",
+        "sha256": "c188482777233eef2bf5ccd74494c25ba2f3f1e43c992cceb8da2d323952e519",
+        "records": 7204
+      },
+      "payload_sha256": "3b9a13b9341e3aac70aa58338eb166da919908f1a5cc784128efb666843aa55c",
+      "edge_sha256": {
+        "A": "21e3992faf04010fc564895d68148cd5db1aaa7bcd22881a400a97cc2096c4f4",
+        "B": "e8e845488504c2dc0c9905fdc3a1bc6dcb0ec1d699ed6a9e38b3b595b3edbcf0"
+      },
+      "n_frames": 1334,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=7204/7204 queued=461184 consumed=461184 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g4-m2": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g4-m2",
+      "pcm_sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/g4-m2.rx",
+        "sha256": "0be5a4a67cead4bb5351d3274f5992b7288655a4cb235e64fa1bdeb6ecf2a398",
+        "records": 9599
+      },
+      "payload_sha256": "835b9630347deae954d58579e06ea2cfef31417929ff2ee31c0626be03636369",
+      "edge_sha256": {
+        "A": "f20c43f0547266c2758d2bf299247563518a3bd173ec95810b048ea74bdcdc57",
+        "B": "e4738db40beef79f6b0849344c9844d1ce7cf55253c0b73d8dd0e234c75fc6c7"
+      },
+      "n_frames": 1778,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    },
+    "g4-twin": {
+      "status": "PASS",
+      "reasons": [],
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/g4-twin",
+      "pcm_sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf",
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/schedules/g4-twin.rx",
+        "sha256": "0be5a4a67cead4bb5351d3274f5992b7288655a4cb235e64fa1bdeb6ecf2a398",
+        "records": 9599
+      },
+      "payload_sha256": "835b9630347deae954d58579e06ea2cfef31417929ff2ee31c0626be03636369",
+      "edge_sha256": {
+        "A": "f20c43f0547266c2758d2bf299247563518a3bd173ec95810b048ea74bdcdc57",
+        "B": "e4738db40beef79f6b0849344c9844d1ce7cf55253c0b73d8dd0e234c75fc6c7"
+      },
+      "n_frames": 1778,
+      "auth": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2",
+      "show_state_changes_after_hop1": 0
+    }
+  },
+  "emu": {
+    "invocation_id": "2d6bd3df65484a449a9ac07d5023972d",
+    "build": {
+      "env": "k1_main_rpl_emu",
+      "exit_code": 0,
+      "seconds": 43.1,
+      "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/emu/build-emu.log",
+      "command": "bash scripts/agent/pio-build.sh k1_main_rpl_emu",
+      "firmware.elf_sha256": "954c13cd1be26fac888f0a43e8301c7e7b2e3a93f66e8b9668a9a91a0a17feda",
+      "firmware.bin_sha256": "9a1e1d3d465980d04927ad7532acc8c91b07677226dd53af9e2b114364432159",
+      "bootloader.bin_sha256": "12c9a10fef2d95a3f6d74dc6089fa8fedc51a77a487be834c9207b8c687b8761",
+      "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+    },
+    "source": {
+      "repository": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-c25d2b6d7936",
+      "kind": "export",
+      "head": "ed0aa984",
+      "branch": "lane/k1-fe-release",
+      "dirty_paths": [],
+      "dirty_inputs_sha256": "12ce21e0f3300aa13910416648626fcf1930903b84cbb8e365aae494ab48ce4e",
+      "export_tree_sha256": "12ce21e0f3300aa13910416648626fcf1930903b84cbb8e365aae494ab48ce4e",
+      "identity_paths": [
+        "SPECTRASYNQ_K1_FIRMWARE",
+        "platformio.ini",
+        "tools/esp_emulator",
+        "scripts/platformio",
+        "tests/test_esp_emulator_acceptance.py",
+        "tests/test_esp_emulator_report.py"
+      ]
+    },
+    "tool": {
+      "lock": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-c25d2b6d7936/tools/esp_emulator/tool-lock.json",
+      "lock_sha256": "dab17a5f75959c7a2c908ba65c496e3f5a052e5967550f90be43f5e782c92212",
+      "executable": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/tools/esp-emu-pin/bin/esp-emu",
+      "executable_sha256": "dea564e36990fcea727eb11e33c5430eccdfe673fc5462c0604e0001d25d84a0",
+      "version": "0.49.0",
+      "rejected_candidates": []
+    },
+    "scenario": {
+      "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-c25d2b6d7936/tools/esp_emulator/m2_gates_scenario.json",
+      "sha256": "71f7f39b04e6f664fe285c7f73b5ea7cb74b7d5435a2b53e0046cb319d1b0482",
+      "source_sha256": "71f7f39b04e6f664fe285c7f73b5ea7cb74b7d5435a2b53e0046cb319d1b0482",
+      "profile_selection": "scenario",
+      "name": "k1-fe-show-m2-emu-gates"
+    }
+  },
+  "plot": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/rplproxy-ed0aa984-m32-20261110T031959/gates-diff.png"
+}

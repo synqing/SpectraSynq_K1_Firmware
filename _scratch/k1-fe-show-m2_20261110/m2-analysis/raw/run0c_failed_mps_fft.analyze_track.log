@@ -1,0 +1,72 @@
+cmd: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/bin/python /Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/analyze_track.py /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/cache/trinity/c7e71809e44ec52d3e92a3b62da53f40a7bb032c5812d25ccb32bf7fb40dcadb/audio/track.wav --out /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/cache/trinity/c7e71809e44ec52d3e92a3b62da53f40a7bb032c5812d25ccb32bf7fb40dcadb/analysis.json --demix-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/cache/trinity/c7e71809e44ec52d3e92a3b62da53f40a7bb032c5812d25ccb32bf7fb40dcadb/demix --spec-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/cache/trinity/c7e71809e44ec52d3e92a3b62da53f40a7bb032c5812d25ccb32bf7fb40dcadb/spec --demix-source demucs --demucs-model htdemucs --demucs-shifts 0 --demucs-overlap 0.25 --rhythm-device mps --structure-device cpu --model harmonix-all --keep-byproducts --debug
+Selected model is a bag of 1 models. You will see that many progress bars per track.
+Separated tracks will be stored in /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/cache/trinity/c7e71809e44ec52d3e92a3b62da53f40a7bb032c5812d25ccb32bf7fb40dcadb/demix/_demucs_runs/htdemucs
+Separating track /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/cache/trinity/c7e71809e44ec52d3e92a3b62da53f40a7bb032c5812d25ccb32bf7fb40dcadb/audio/track.wav
+  0%|                                                                     | 0.0/228.14999999999998 [00:00<?, ?seconds/s]  3%|█▌                                                          | 5.85/228.14999999999998 [00:02<01:45,  2.10seconds/s]  5%|███                                                         | 11.7/228.14999999999998 [00:04<01:28,  2.45seconds/s]  8%|███▌                                          | 17.549999999999997/228.14999999999998 [00:06<01:20,  2.62seconds/s] 10%|██████▏                                                     | 23.4/228.14999999999998 [00:09<01:17,  2.65seconds/s] 13%|███████▌                                                   | 29.25/228.14999999999998 [00:11<01:13,  2.70seconds/s] 15%|███████                                       | 35.099999999999994/228.14999999999998 [00:13<01:13,  2.62seconds/s] 18%|████████▎                                     | 40.949999999999996/228.14999999999998 [00:15<01:11,  2.61seconds/s] 21%|████████████▎                                               | 46.8/228.14999999999998 [00:17<01:07,  2.67seconds/s] 23%|█████████████▌                                             | 52.65/228.14999999999998 [00:20<01:04,  2.70seconds/s] 26%|███████████████▍                                            | 58.5/228.14999999999998 [00:22<01:05,  2.57seconds/s] 28%|████████████████▋                                          | 64.35/228.14999999999998 [00:24<01:03,  2.56seconds/s] 31%|██████████████▍                                | 70.19999999999999/228.14999999999998 [00:26<01:00,  2.63seconds/s] 33%|███████████████████▋                                       | 76.05/228.14999999999998 [00:29<00:57,  2.63seconds/s] 36%|████████████████▊                              | 81.89999999999999/228.14999999999998 [00:31<00:55,  2.64seconds/s] 38%|██████████████████████▋                                    | 87.75/228.14999999999998 [00:33<00:53,  2.60seconds/s] 41%|████████████████████████▌                                   | 93.6/228.14999999999998 [00:35<00:52,  2.58seconds/s] 44%|████████████████████▍                          | 99.44999999999999/228.14999999999998 [00:38<00:50,  2.57seconds/s] 46%|███████████████████████████▏                               | 105.3/228.14999999999998 [00:40<00:48,  2.55seconds/s] 49%|██████████████████████▍                       | 111.14999999999999/228.14999999999998 [00:42<00:44,  2.62seconds/s] 51%|██████████████████████████████▎                            | 117.0/228.14999999999998 [00:44<00:41,  2.66seconds/s] 54%|███████████████████████████████▏                          | 122.85/228.14999999999998 [00:46<00:38,  2.71seconds/s] 56%|█████████████████████████████████▎                         | 128.7/228.14999999999998 [00:49<00:36,  2.70seconds/s] 59%|███████████████████████████▏                  | 134.54999999999998/228.14999999999998 [00:52<00:41,  2.28seconds/s] 62%|████████████████████████████▎                 | 140.39999999999998/228.14999999999998 [00:54<00:36,  2.41seconds/s] 64%|█████████████████████████████████████▏                    | 146.25/228.14999999999998 [00:56<00:32,  2.52seconds/s] 67%|███████████████████████████████████████▎                   | 152.1/228.14999999999998 [00:58<00:29,  2.59seconds/s] 69%|████████████████████████████████████████▏                 | 157.95/228.14999999999998 [01:00<00:26,  2.63seconds/s] 72%|█████████████████████████████████             | 163.79999999999998/228.14999999999998 [01:03<00:24,  2.65seconds/s] 74%|██████████████████████████████████▏           | 169.64999999999998/228.14999999999998 [01:05<00:22,  2.66seconds/s] 77%|█████████████████████████████████████████████▍             | 175.5/228.14999999999998 [01:07<00:20,  2.61seconds/s] 79%|██████████████████████████████████████████████            | 181.35/228.14999999999998 [01:09<00:18,  2.59seconds/s] 82%|████████████████████████████████████████████████▍          | 187.2/228.14999999999998 [01:13<00:18,  2.21seconds/s] 85%|██████████████████████████████████████▉       | 193.04999999999998/228.14999999999998 [01:16<00:15,  2.22seconds/s] 87%|████████████████████████████████████████      | 198.89999999999998/228.14999999999998 [01:18<00:13,  2.24seconds/s] 90%|████████████████████████████████████████████████████      | 204.75/228.14999999999998 [01:21<00:10,  2.27seconds/s] 92%|██████████████████████████████████████████████████████▍    | 210.6/228.14999999999998 [01:23<00:07,  2.35seconds/s] 95%|███████████████████████████████████████████████████████   | 216.45/228.14999999999998 [01:25<00:04,  2.42seconds/s] 97%|████████████████████████████████████████████▊ | 222.29999999999998/228.14999999999998 [01:27<00:02,  2.47seconds/s]100%|██████████████████████████████████████████████| 228.14999999999998/228.14999999999998 [01:30<00:00,  2.54seconds/s]100%|██████████████████████████████████████████████| 228.14999999999998/228.14999999999998 [01:30<00:00,  2.53seconds/s]
+Extracting rhythm with Beat This! (device: mps)...
+Error: Beat This! extraction failed: The operator 'aten::_fft_r2c' is not currently implemented for the MPS device. If you want this op to be added in priority during the prototype phase of this feature, please comment on https://github.com/pytorch/pytorch/issues/77764. As a temporary fix, you can set the environment variable `PYTORCH_ENABLE_MPS_FALLBACK=1` to use the CPU as a fallback for this op. WARNING: this will be slower than running natively on MPS.
+
+Full traceback:
+Traceback (most recent call last):
+  File "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/rhythm_provider_beat_this.py", line 59, in extract_rhythm
+    beats, downbeats = tracker(audio_path)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/beat_this/inference.py", line 311, in __call__
+    return super().__call__(signal, sr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/beat_this/inference.py", line 304, in __call__
+    beat_logits, downbeat_logits = super().__call__(signal, sr)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/beat_this/inference.py", line 282, in __call__
+    spect = self.signal2spect(signal, sr)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/beat_this/inference.py", line 279, in signal2spect
+    return self.spect(signal)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/beat_this/preprocessing.py", line 59, in forward
+    return torch.log1p(self.log_multiplier * self.spect_class(x).T)
+                                             ^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torchaudio/transforms/_transforms.py", line 619, in forward
+    specgram = self.spectrogram(waveform)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torchaudio/transforms/_transforms.py", line 110, in forward
+    return F.spectrogram(
+           ^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torchaudio/functional/functional.py", line 126, in spectrogram
+    spec_f = torch.stft(
+             ^^^^^^^^^^^
+  File "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-analysis/conda-env/lib/python3.11/site-packages/torch/functional.py", line 660, in stft
+    return _VF.stft(input, n_fft, hop_length, win_length, window,  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NotImplementedError: The operator 'aten::_fft_r2c' is not currently implemented for the MPS device. If you want this op to be added in priority during the prototype phase of this feature, please comment on https://github.com/pytorch/pytorch/issues/77764. As a temporary fix, you can set the environment variable `PYTORCH_ENABLE_MPS_FALLBACK=1` to use the CPU as a fallback for this op. WARNING: this will be slower than running natively on MPS.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/analyze_track.py", line 609, in main
+    result = analyze_track(
+             ^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/analyze_track.py", line 377, in analyze_track
+    rhythm_data = extract_rhythm(audio_path, device=rhythm_device)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/rhythm_provider_beat_this.py", line 61, in extract_rhythm
+    raise RuntimeError(f"Beat This! extraction failed: {e}") from e
+RuntimeError: Beat This! extraction failed: The operator 'aten::_fft_r2c' is not currently implemented for the MPS device. If you want this op to be added in priority during the prototype phase of this feature, please comment on https://github.com/pytorch/pytorch/issues/77764. As a temporary fix, you can set the environment variable `PYTORCH_ENABLE_MPS_FALLBACK=1` to use the CPU as a fallback for this op. WARNING: this will be slower than running natively on MPS.
