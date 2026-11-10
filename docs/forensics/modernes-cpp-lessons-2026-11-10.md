@@ -177,20 +177,52 @@ compiled) — all SUCCESS. Oracle goldens: 12/12 reproduce.
   the committed tree wrote `host-pytest.log` = "REUSED validated host-pytest
   receipt … (not executed here) 2094 passed, 2 skipped"
   (`_scratch/esp-emulator/mcpp-next-phase-fe-5bb142bc/`).
-- FE replay: NOT COMPLETED. Stopped by me after the first cases because the
-  K1-FE-SHOW lead was measuring USB send timing on the live Main RPL and the
-  emulator loads this Mac's CPU. That partial directory is not evidence for
-  any criterion. Re-run after the bench session (next action below).
-- K1-FE-SHOW lead has `5bb142bc` queued for gates.py G1–G4 after its bench
-  session.
+- First FE replay attempt (21:08:47–21:10:07 AWST) stopped deliberately: the
+  K1-FE-SHOW lead was measuring USB timing on the live Main RPL. Not evidence.
+- FE replay, checkout `4e56c4dc` (= `5bb142bc` + this record), 21:30:50–21:33:29
+  AWST: `_scratch/esp-emulator/mcpp-next-phase-fe-5bb142bc-r2/`. 28/28 cases
+  PASS, all captures nonempty; host checks PASS via the REUSED receipt (2094
+  passed). Criteria: SW01–SW04, SW06–SW10, SW13 PASS; SW05 FAIL (one
+  comparison, `limit-coupling`); SW11 NOT RUN (needs clean export); SW12 N/A;
+  EX01/EX02 deferred.
+- Bisect of the SW05 failure — clean export of `a6bad318` (FW lead's commit,
+  my parent), same FE replay: `_scratch/esp-emulator/mcpp-bisect-export-a6bad318/`.
+  `limit-coupling` FAILS there identically ("shared submission scale changed
+  in 0 frames"). Every case's frame count and payload SHA-256 is IDENTICAL
+  between `a6bad318` and this candidate (28/28): these changes do not alter
+  the replayed LED output at all. Cause (not from this phase): since
+  `c44172fa`, `k1_fe` is the Gx board, which neutralises FastLED's shared
+  power limit (`setMaxPowerInMilliWatts(UINT32_MAX)`) and limits in its own
+  RGB16 limiter; the replay's `limit-coupling` check still measures the
+  FastLED scale, so it cannot pass on Gx. Owner: replay scenario / FE-show
+  lane (the check needs to read the Gx limiter scale for the FE profile).
+  Against `e28dd927` 15/28 cases are identical; the 13 that differ come from
+  commits between `e28dd927` and `a6bad318` (Gx retarget, FE-show fixes).
+- Clean export of `4e56c4dc`, FE replay:
+  `_scratch/esp-emulator/mcpp-next-phase-export-4e56c4dc/`. 28/28 cases
+  identical to the checkout run. Receipt correctly REJECTED there ("inputs
+  changed since the recorded run; different test selection"), so the host
+  suite executed in the export: 4 failed, 1856 passed — the SAME 4 fail in the
+  `a6bad318` export, all export-environment dependencies, not code defects:
+  `test_b489_legacy_power_host` needs `.pio/libdeps/.../FastLED` (absent in an
+  export); three `test_serial_cmd_persist_flags_static` cases (added in
+  `a6bad318`) cannot resolve typed handlers in an export. In the checkout all
+  pass (2094). These make SW07 and therefore SW11 FAIL in any clean export
+  until fixed by their owner (FE-show lane).
+- K1-FE-SHOW lead: gates.py G1–G4 on `5bb142bc` ALL PASS on three runs
+  (`--profile fe --mode 32`, `--profile scenario --mode 32`, `--profile
+  scenario --mode 18`); logs `_scratch/k1-fe-show-m2_20261110/fw-candidates/5bb142bc/`.
 
-Next action if resumed: when the K1-FE-SHOW lead reports its bench session
-finished, run `python3 tools/esp_emulator/run.py --profile fe --scenario
-tools/esp_emulator/s3_music_regression.json --output
-_scratch/esp-emulator/mcpp-next-phase-fe-5bb142bc-r2 --host-receipt
-.git/k1-host-pytest-receipt.json` (receipt valid only while the tree content is
-unchanged), compare case names / frame counts / output hashes with
-`mcpp-final-export-e28dd927` (expected differences: none in the 28 music
-cases — no change here alters rendering of the replayed scenario), record the
-result here, commit docs-only.
+Open after this phase (no software repair of mine outstanding):
+1. Hardware: nothing here is proven on a device. Gx board (`k1_fe`) not
+   available; B489 cannot exercise the FE look library (`K1_LOOK_LIB_V1` off).
+   Owner: FE bench owner when a Gx unit is registered (G5). Evidence that
+   closes it: `:identify` flashes twice and prints `IDENTIFY: done` while audio
+   keeps updating; `:look_load`/`:look_clear` on slots 8–15 during a running
+   show with no fault; an old CONFIG/show file with NaN boots to finite values;
+   `:vp_probe=all` on `k1_hardware_harness` completes without `event=invalid`.
+2. Replay: `limit-coupling` must read the Gx limiter scale for the FE profile;
+   the four export-only host tests need export-safe inputs. Owner: FE-show lane.
+3. Merge: `mcpp/next-phase-fixes` sits on `a6bad318`; merging into the FE release
+   lane is the FE-show lead's / Captain's call after its own acceptance.
 
