@@ -1,0 +1,14 @@
+# Edge brightness of the same shows across builds (tools/level_stats.py; emulator, Main RPL profile; 16-bit units)
+# g1-a1 = M1 stream 75-155 s; g4-m2 = M2 stream 75-155 s. 8b202f46 = before isolation (live microphone music mixed in); a6bad318 = isolated; 245ed510 = this commit.
+rplproxy-8b202f46-m32-20261110T160813 g1-a1 frames 1778 | edge A: mean 3075.4  brightest-pixel mean 58285.0  max 65534  lit px mean 41.1 | edge B: mean 3544.5  brightest-pixel mean 61102.7  max 65534  lit px mean 41.1
+rplproxy-8b202f46-m32-20261110T160813 g4-m2 frames 1778 | edge A: mean 3010.9  brightest-pixel mean 53722.7  max 65534  lit px mean 44.4 | edge B: mean 3454.5  brightest-pixel mean 59289.3  max 65534  lit px mean 44.5
+scenario-a6bad318-m32-20261110T203102 g1-a1 frames 1778 | edge A: mean 2094.5  brightest-pixel mean 25024.2  max 43143  lit px mean 49.1 | edge B: mean 2460.2  brightest-pixel mean 47972.5  max 65534  lit px mean 49.1
+scenario-a6bad318-m32-20261110T203102 g4-m2 frames 1778 | edge A: mean 1316.4  brightest-pixel mean 15039.8  max 56976  lit px mean 72.5 | edge B: mean 1522.9  brightest-pixel mean 24210.1  max 65534  lit px mean 72.5
+fwlead-245ed510-scenario-m32-20261110T231032 g1-a1 frames 1778 | edge A: mean 2989.3  brightest-pixel mean 35234.7  max 55219  lit px mean 49.1 | edge B: mean 3378.6  brightest-pixel mean 58394.0  max 65534  lit px mean 49.1
+fwlead-245ed510-scenario-m32-20261110T231032 g4-m2 frames 1778 | edge A: mean 2587.1  brightest-pixel mean 29055.3  max 63396  lit px mean 72.6 | edge B: mean 2979.7  brightest-pixel mean 42443.8  max 65534  lit px mean 72.6
+rplproxy-8b202f46-m18-20261110T161818 g1-a1 frames 1778 | edge A: mean 589.9  brightest-pixel mean 14347.3  max 35185  lit px mean 25.3 | edge B: mean 715.0  brightest-pixel mean 30664.3  max 65534  lit px mean 25.3
+rplproxy-8b202f46-m18-20261110T161818 g4-m2 frames 1778 | edge A: mean 708.9  brightest-pixel mean 13667.6  max 35185  lit px mean 42.0 | edge B: mean 853.0  brightest-pixel mean 28803.3  max 65534  lit px mean 42.0
+scenario-a6bad318-m18-20261110T203955 g1-a1 frames 1778 | edge A: mean 162.7  brightest-pixel mean 3881.5  max 24186  lit px mean 36.5 | edge B: mean 180.6  brightest-pixel mean 7032.7  max 21350  lit px mean 36.5
+scenario-a6bad318-m18-20261110T203955 g4-m2 frames 1778 | edge A: mean 309.3  brightest-pixel mean 7215.9  max 24626  lit px mean 78.4 | edge B: mean 323.8  brightest-pixel mean 7699.8  max 21738  lit px mean 78.4
+fwlead-245ed510-scenario-m18-20261110T231946 g1-a1 frames 1778 | edge A: mean 1376.0  brightest-pixel mean 37102.2  max 50633  lit px mean 40.0 | edge B: mean 1517.7  brightest-pixel mean 60459.9  max 65534  lit px mean 40.0
+fwlead-245ed510-scenario-m18-20261110T231946 g4-m2 frames 1778 | edge A: mean 1958.8  brightest-pixel mean 25624.5  max 49766  lit px mean 88.2 | edge B: mean 2231.0  brightest-pixel mean 41368.0  max 65534  lit px mean 88.2

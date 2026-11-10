@@ -1,0 +1,77 @@
+# Receiver host test on the production receive path, built from git archive a6bad318
+# c++ -std=c++17 -O2 -Wall -Wextra -Werror -I<audio> tests/k1_prsm_rx_host.cpp audio/k1_prsm.cpp audio/k1_prsm_rx.cpp audio/k1_authored_source.cpp
+
+## stream _scratch/k1-fe-show-m1_20261109/lane-c-emu/stream/loreen_75_155_120hz.prsm
+## sha256 ea4b8f4523f6e46e4b92f8c5aaa9319aa7406c19d565da8fd9d1fa6c7a7855af
+loss_v1_synthetic_events 20400
+loss_v1_synthetic_hotkeys 0
+loss_v1_synthetic_commands 0
+loss_v1_synthetic_corrupt_frames 0
+loss_v1_synthetic_whole_frames_lost_total 0
+loss_v1_synthetic_whole_frames_lost_max_per_event 0
+loss_v2_synthetic_events 23400
+loss_v2_synthetic_hotkeys 0
+loss_v2_synthetic_commands 0
+loss_v2_synthetic_corrupt_frames 0
+loss_v2_synthetic_whole_frames_lost_total 19765
+loss_v2_synthetic_whole_frames_lost_max_per_event 1
+stream_file_frames 9600
+loss_stream_file_events 326400
+loss_stream_file_hotkeys 0
+loss_stream_file_commands 0
+loss_stream_file_corrupt_frames 0
+loss_stream_file_whole_frames_lost_total 0
+loss_stream_file_whole_frames_lost_max_per_event 0
+garbage_bytes 52377
+PASS k1_prsm_rx
+exit=0
+
+## stream _scratch/k1-fe-show-m1_20261109/lane-c-emu/stream/loreen_75_155_120hz_v2.prsm
+## sha256 eafb72aecbccedba880364930898420a727d284dbe21182f18c6bff3f1258fdd
+loss_v1_synthetic_events 20400
+loss_v1_synthetic_hotkeys 0
+loss_v1_synthetic_commands 0
+loss_v1_synthetic_corrupt_frames 0
+loss_v1_synthetic_whole_frames_lost_total 0
+loss_v1_synthetic_whole_frames_lost_max_per_event 0
+loss_v2_synthetic_events 23400
+loss_v2_synthetic_hotkeys 0
+loss_v2_synthetic_commands 0
+loss_v2_synthetic_corrupt_frames 0
+loss_v2_synthetic_whole_frames_lost_total 19765
+loss_v2_synthetic_whole_frames_lost_max_per_event 1
+stream_file_frames 9600
+loss_stream_file_events 326400
+loss_stream_file_hotkeys 0
+loss_stream_file_commands 0
+loss_stream_file_corrupt_frames 0
+loss_stream_file_whole_frames_lost_total 0
+loss_stream_file_whole_frames_lost_max_per_event 0
+garbage_bytes 52377
+PASS k1_prsm_rx
+exit=0
+
+## stream _scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm
+## sha256 116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3
+loss_v1_synthetic_events 20400
+loss_v1_synthetic_hotkeys 0
+loss_v1_synthetic_commands 0
+loss_v1_synthetic_corrupt_frames 0
+loss_v1_synthetic_whole_frames_lost_total 0
+loss_v1_synthetic_whole_frames_lost_max_per_event 0
+loss_v2_synthetic_events 23400
+loss_v2_synthetic_hotkeys 0
+loss_v2_synthetic_commands 0
+loss_v2_synthetic_corrupt_frames 0
+loss_v2_synthetic_whole_frames_lost_total 19765
+loss_v2_synthetic_whole_frames_lost_max_per_event 1
+stream_file_frames 26870
+loss_stream_file_events 913580
+loss_stream_file_hotkeys 0
+loss_stream_file_commands 0
+loss_stream_file_corrupt_frames 0
+loss_stream_file_whole_frames_lost_total 0
+loss_stream_file_whole_frames_lost_max_per_event 0
+garbage_bytes 52377
+PASS k1_prsm_rx
+exit=0

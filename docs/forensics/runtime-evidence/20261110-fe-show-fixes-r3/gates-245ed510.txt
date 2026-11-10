@@ -1,0 +1,43 @@
+# gates.py on one clean git archive of 245ed510, three invocations one after another
+gates fe m32 exit 0
+gates scenario m32 exit 0
+gates scenario m18 exit 0
+
+## /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fwlead-245ed510-fe-m32-20261110T225925 (exit 0); gates.json /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fwlead-245ed510-fe-m32-20261110T225925/gates.json
+| Gate | Verdict | Edge A | Edge B | Detail |
+|---|---|---|---|---|
+| G1 g1-a1 vs g1-a2 | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G1 g1-a1 vs g3-cont (shared input prefix, hops 4000-5332 at every 6th) | PASS | 0/222 differ; first hop None | 0/222 differ; first hop None | |
+| G2 passage vs zero | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 passage vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 zero vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G3 continuous vs forward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4158 | 0/667 differ after R; first m-hop None; window agrees from 4157 | R=667 hops |
+| G3 continuous vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4158 | 0/667 differ after R; first m-hop None; window agrees from 4157 | R=667 hops |
+| G3 forward vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from None | 0/667 differ after R; first m-hop None; window agrees from None | R=667 hops |
+| G4 m2 vs twin | PASS | 0/1778 differ | 0/1778 differ | {"g4-m2": {"reached_AUTHORED": true, "rx_all_consumed": true, "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2", "hotkey_state_changes":  |
+
+## /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fwlead-245ed510-scenario-m18-20261110T231946 (exit 0); gates.json /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fwlead-245ed510-scenario-m18-20261110T231946/gates.json
+| Gate | Verdict | Edge A | Edge B | Detail |
+|---|---|---|---|---|
+| G1 g1-a1 vs g1-a2 | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G1 g1-a1 vs g3-cont (shared input prefix, hops 4000-5332 at every 6th) | PASS | 0/222 differ; first hop None | 0/222 differ; first hop None | |
+| G2 passage vs zero | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 passage vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 zero vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G3 continuous vs forward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4132 | 0/667 differ after R; first m-hop None; window agrees from 4132 | R=667 hops |
+| G3 continuous vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4132 | 0/667 differ after R; first m-hop None; window agrees from 4132 | R=667 hops |
+| G3 forward vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from None | 0/667 differ after R; first m-hop None; window agrees from None | R=667 hops |
+| G4 m2 vs twin | PASS | 0/1778 differ | 0/1778 differ | {"g4-m2": {"reached_AUTHORED": true, "rx_all_consumed": true, "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2", "hotkey_state_changes":  |
+
+## /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fwlead-245ed510-scenario-m32-20261110T231032 (exit 0); gates.json /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/fwlead-245ed510-scenario-m32-20261110T231032/gates.json
+| Gate | Verdict | Edge A | Edge B | Detail |
+|---|---|---|---|---|
+| G1 g1-a1 vs g1-a2 | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G1 g1-a1 vs g3-cont (shared input prefix, hops 4000-5332 at every 6th) | PASS | 0/222 differ; first hop None | 0/222 differ; first hop None | |
+| G2 passage vs zero | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 passage vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 zero vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G3 continuous vs forward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4158 | 0/667 differ after R; first m-hop None; window agrees from 4157 | R=667 hops |
+| G3 continuous vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4158 | 0/667 differ after R; first m-hop None; window agrees from 4157 | R=667 hops |
+| G3 forward vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from None | 0/667 differ after R; first m-hop None; window agrees from None | R=667 hops |
+| G4 m2 vs twin | PASS | 0/1778 differ | 0/1778 differ | {"g4-m2": {"reached_AUTHORED": true, "rx_all_consumed": true, "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2", "hotkey_state_changes":  |

@@ -1,0 +1,44 @@
+# Commit gate and builds on a clean git archive of 245ed510 (private git dir, stamp 245ed510)
+# pytest run 1 (before any build): 4 failed, all for missing build libraries in a fresh export (.pio/libdeps FastLED / FixedPoints); the 4 passed once the libraries were present. Run 2 below is the gate result.
+2074 passed, 9 skipped in 373.51s (0:06:13)
+
+pytest exit 1
+build k1_hardware exit 0
+build k1_fe exit 0
+build k1_main_rpl_im69d exit 0
+build k1_main_rpl_show_bench exit 0
+done
+pytest run 2 exit 0
+
+
+# env bytes sha256(firmware.bin)
+k1_hardware 723600 c7e20695d546516fbbe38a10411783a38b55691445f8a9e7ce6bce800c81dc75
+k1_fe 768480 d21e6ed37ceeed753276e166a5ffc05e05b1a3ba47c15b99488cbb08485a95dc
+k1_main_rpl_im69d 733168 1f5e537ce8f64428bc0b28b96b132f3fb8c1ae828031f7d1cf5ad08af59ff17e
+k1_main_rpl_show_bench 737120 cf78708b4a98eded17acc7c297bf2522bac2ce8084586fab9d4966ebeb94f2e3
+
+
+## k1_hardware
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:70:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+RAM:   [====      ]  36.7% (used 120152 bytes from 327680 bytes)
+Flash: [=         ]  11.0% (used 723202 bytes from 6553600 bytes)
+========================= [SUCCESS] Took 28.56 seconds =========================
+k1_hardware    SUCCESS   00:00:28.556
+## k1_fe
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:70:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+RAM:   [=====     ]  45.4% (used 148888 bytes from 327680 bytes)
+Flash: [=         ]  11.7% (used 768082 bytes from 6553600 bytes)
+========================= [SUCCESS] Took 27.50 seconds =========================
+k1_fe          SUCCESS   00:00:27.500
+## k1_main_rpl_im69d
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:70:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+RAM:   [====      ]  36.5% (used 119600 bytes from 327680 bytes)
+Flash: [=         ]  11.2% (used 732774 bytes from 6553600 bytes)
+========================= [SUCCESS] Took 28.39 seconds =========================
+k1_main_rpl_im69d  SUCCESS   00:00:28.394
+## k1_main_rpl_show_bench
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:70:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+RAM:   [====      ]  39.1% (used 128080 bytes from 327680 bytes)
+Flash: [=         ]  11.2% (used 736722 bytes from 6553600 bytes)
+========================= [SUCCESS] Took 31.00 seconds =========================
+k1_main_rpl_show_bench  SUCCESS   00:00:31.004

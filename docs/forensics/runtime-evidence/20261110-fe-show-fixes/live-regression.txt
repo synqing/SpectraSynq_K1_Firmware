@@ -1,0 +1,29 @@
+# Live output (no prepared stream), emulator, music_chorus PCM, both edges mode 32 and mode 18.
+# Tool: tools/live_regress.py (runs each tree's own tools/esp_emulator/run.py). sha256 over the concatenated native frame hex of each edge.
+# run.py exit 1 in every run is its R3 release-criteria verdict for a two-case suite (SW04/SW07/SW11/SW13 need the full suite); both cases are accepted (PASS) in each result.json.
+
+## live-base-rpl
+run.py exit 1
+live-m32 frames 1334 A 066d6442bb002df68bcf8d9c789caea9d7ab167d6bb2606fa6587cdbd79f5402 B 0075e90c7dd3588ad325846f7e5239da0f52d832706729cfa2da66c24d1fc9df
+live-m18 frames 1334 A efcbf322feab57dfd0388c0ead56e28e37b1ba42665a1261a357ea5653d126c5 B 16f06b926bd41d5cffec9b23fa70189180fd5f2773114fc974ac9bcaba49efb1
+
+
+## live-cand-rpl
+run.py exit 1
+live-m32 frames 1334 A 066d6442bb002df68bcf8d9c789caea9d7ab167d6bb2606fa6587cdbd79f5402 B 0075e90c7dd3588ad325846f7e5239da0f52d832706729cfa2da66c24d1fc9df
+live-m18 frames 1334 A efcbf322feab57dfd0388c0ead56e28e37b1ba42665a1261a357ea5653d126c5 B 16f06b926bd41d5cffec9b23fa70189180fd5f2773114fc974ac9bcaba49efb1
+
+
+## live-base-fe
+run.py exit 1
+live-m32 frames 1334 A 066d6442bb002df68bcf8d9c789caea9d7ab167d6bb2606fa6587cdbd79f5402 B 0075e90c7dd3588ad325846f7e5239da0f52d832706729cfa2da66c24d1fc9df
+live-m18 frames 1334 A efcbf322feab57dfd0388c0ead56e28e37b1ba42665a1261a357ea5653d126c5 B 16f06b926bd41d5cffec9b23fa70189180fd5f2773114fc974ac9bcaba49efb1
+
+
+## live-cand-fe
+run.py exit 1
+live-m32 frames 1334 A 066d6442bb002df68bcf8d9c789caea9d7ab167d6bb2606fa6587cdbd79f5402 B 0075e90c7dd3588ad325846f7e5239da0f52d832706729cfa2da66c24d1fc9df
+live-m18 frames 1334 A efcbf322feab57dfd0388c0ead56e28e37b1ba42665a1261a357ea5653d126c5 B 16f06b926bd41d5cffec9b23fa70189180fd5f2773114fc974ac9bcaba49efb1
+
+
+# base = git archive 8b202f46; cand = working-tree export at 17:10-17:19 AWST 10 Nov (same firmware sources as a6bad318 for the live path; a6bad318 itself is covered by the G1 baseline cases below only for prepared playback).

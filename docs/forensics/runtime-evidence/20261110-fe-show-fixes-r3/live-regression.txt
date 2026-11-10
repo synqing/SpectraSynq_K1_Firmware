@@ -1,0 +1,22 @@
+# Live modes 32 and 18, both edges, music_chorus PCM, no stream (20261110-fe-show-fixes/tools/live_regress.py) on a clean export of 245ed510.
+# Same hashes as 8b202f46 and a6bad318 in ../20261110-fe-show-fixes/live-regression.txt.
+run.py exit 1
+live-m32 frames 1334 A 066d6442bb002df68bcf8d9c789caea9d7ab167d6bb2606fa6587cdbd79f5402 B 0075e90c7dd3588ad325846f7e5239da0f52d832706729cfa2da66c24d1fc9df
+live-m18 frames 1334 A efcbf322feab57dfd0388c0ead56e28e37b1ba42665a1261a357ea5653d126c5 B 16f06b926bd41d5cffec9b23fa70189180fd5f2773114fc974ac9bcaba49efb1
+
+# run.py --suite default --profile scenario on 245ed510: criteria verdicts (same list as the a6bad318 reference run; SW07 and SW11 fail in both, in an export with no git)
+SW01 PASS
+SW02 PASS
+SW03 PASS
+SW04 PASS
+SW05 PASS
+SW06 PASS
+SW07 FAIL
+SW08 PASS
+SW09 PASS
+SW10 PASS
+SW11 FAIL
+SW12 NOT_APPLICABLE
+SW13 PASS
+EX01 DEFERRED_EXTERNAL
+EX02 DEFERRED_EXTERNAL
