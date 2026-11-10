@@ -4157,9 +4157,15 @@ void parse_command(char* command_buf) {
     // Do not fall through the whole typed table here: that would silently
     // re-route family-dispatcher commands (secondary_*, chroma, …) when a
     // dispatcher call-site is severed, and would activate dormant typed rows.
+    // look_load / look_clear (K1_LOOK_LIB_V1 rows) were in the table since
+    // 38428a82 but never routed here, so both answered "Bad command" on the
+    // device (found on Main RPL, 11 Nov 2026). Without the rows the lookup
+    // returns nullptr and they stay "Bad command".
     else if (strcmp(command_type, "look") == 0 ||
              strcmp(command_type, "look_status") == 0 ||
-             strcmp(command_type, "secondary_look") == 0) {
+             strcmp(command_type, "secondary_look") == 0 ||
+             strcmp(command_type, "look_load") == 0 ||
+             strcmp(command_type, "look_clear") == 0) {
       const serial_typed_cmd_row_t* typed = serial_typed_cmd_lookup(command_type);
       if (typed != nullptr) {
         (void)serial_dispatch_typed_setter(typed, command_type, command_data);
