@@ -900,6 +900,31 @@ static void k1_ap_cadence_capture_frame(uint32_t t_now,
 #endif
 
 // Loop, runs forever after setup() --------------------------------------------------
+// Prepared-show playback: the auto colour-shift phase follows the live
+// microphone, so it is parked at its defined rest value for the whole show and
+// the live phase is put back afterwards. Every show therefore starts, and
+// stays, on the same palette phase whatever the room did before. Called on the
+// audio core at the point the snapshot writer is chosen, before this hop's
+// frame is published, so the first prepared frame is already rendered parked.
+static void k1_prepared_colour_phase_hold(bool prepared) {
+  static bool parked = false;
+  static SQ15x16 live_hue_position = 0;
+  static SQ15x16 live_hue_shifting_mix = 0;
+  if (prepared) {
+    if (!parked) {
+      live_hue_position = hue_position;
+      live_hue_shifting_mix = hue_shifting_mix;
+      parked = true;
+    }
+    hue_position = 0;
+    hue_shifting_mix = -0.35;
+  } else if (parked) {
+    hue_position = live_hue_position;
+    hue_shifting_mix = live_hue_shifting_mix;
+    parked = false;
+  }
+}
+
 void loop() {
 #ifdef K1_AUDIO_FREEZE_GUARD_V1
   feedLoopWDT();  // N2: feed the audio-loop watchdog every iteration (~133 Hz << 5s)
@@ -1143,6 +1168,7 @@ void loop() {
     }
 #endif
     k1_authored_tick(t_now);
+    k1_prepared_colour_phase_hold(k1_authored_suppresses_live_update());
     if (k1_authored_suppresses_live_update()) {
       k1_authored_intent_t authored;
       if (k1_authored_intent(&authored)) {
@@ -1251,6 +1277,20 @@ void loop() {
 #ifdef K1_SEMANTIC_STATE
       audio_semantic_read(&producer_next.semantic);
 #endif
+      {
+        // Same decision that chose this hop's snapshot writer above.
+        k1_authored_status_t prepared_status;
+        k1_authored_status(&prepared_status);
+        if (k1_authored_suppresses_live_update()) {
+          producer_next.prepared.active = 1;
+          producer_next.prepared.epoch = prepared_status.epoch;
+          producer_next.prepared.seq = prepared_status.applied_seq;
+          producer_next.prepared.t_us_lo = (uint32_t)prepared_status.applied_t_us;
+          producer_next.prepared.t_us_hi = (uint32_t)(prepared_status.applied_t_us >> 32);
+          producer_next.prepared.applied_ms = prepared_status.applied_ms;
+          producer_next.prepared.hz = prepared_status.applied_hz;
+        }
+      }
       producer_next.ap_publish_us = (uint32_t)esp_timer_get_time();
 #ifdef K1_EMU_FIXTURE
       k1_emu_fixture_note_publication(producer_next);
@@ -1288,12 +1328,14 @@ void loop() {
 #endif
   }
 
-  if (CONFIG.AUTO_COLOR_SHIFT == true) {  // Automatically cycle colour or palette phase based on spectral changes
-    // Use the "novelty" findings of the above function to affect colour shifting when auto-colour shifts are enabled
-    process_color_shift();
-  } else {
-    hue_position = 0;
-    hue_shifting_mix = -0.35;
+  if (!k1_authored_suppresses_live_update()) {
+    if (CONFIG.AUTO_COLOR_SHIFT == true) {  // Automatically cycle colour or palette phase based on spectral changes
+      // Use the "novelty" findings of the above function to affect colour shifting when auto-colour shifts are enabled
+      process_color_shift();
+    } else {
+      hue_position = 0;
+      hue_shifting_mix = -0.35;
+    }
   }
 
   function_id = 8;
@@ -1366,6 +1408,46 @@ void loop() {
 }
 
 // Run the lights in their own thread! -------------------------------------------------------------
+// Prepared-show playback, render side. Called once per render frame after the
+// audio frame is acquired.
+//  - New epoch (playback start or seek): the admitted effects' state and both
+//    edges' trail history are cleared, so what follows depends only on the
+//    prepared frames from this point on, never on what was showing before.
+//  - Each time the applied frame's show time enters a new whole second, the
+//    sub-pixel scroll carries are zeroed. A carry is the one piece of effect
+//    state that never forgets on its own; pinning it to the show clock makes
+//    continuous play and a seek agree again within one second (cost: less than
+//    one pixel of scroll per second).
+void k1_prepared_render_begin_frame() {
+#ifdef K1_AUDIO_FRAME_V1
+  static bool was_active = false;
+  static uint32_t last_epoch = 0;
+  static uint64_t last_second = 0;
+  const K1PreparedPlayback& prepared = k1_vp_prepared();
+  if (!prepared.active) {
+    was_active = false;
+    return;
+  }
+  const uint64_t second = k1_prepared_t_us(prepared) / 1000000ULL;
+  if (!was_active || prepared.epoch != last_epoch) {
+    effect_state_primary = ChannelEffectState{0, 0, 0.01f, 0, 0, 0, 0, 0, 0};
+    effect_state_secondary = ChannelEffectState{0, 0, 0.01f, 0, 0, 0, 0, 0, 0};
+    memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
+    memset(leds_16_prev, 0, sizeof(leds_16_prev));
+    memset(leds_16_prev_secondary, 0, sizeof(leds_16_prev_secondary));
+    memset(leds_16_secondary, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
+  } else if (second != last_second) {
+    effect_state_primary.wfhyb_scroll_accum = 0.0f;
+    effect_state_secondary.wfhyb_scroll_accum = 0.0f;
+    effect_state_primary.tempo_scroll_accum = 0.0f;
+    effect_state_secondary.tempo_scroll_accum = 0.0f;
+  }
+  was_active = true;
+  last_epoch = prepared.epoch;
+  last_second = second;
+#endif
+}
+
 void led_thread(void* arg) {
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   k1_ap_cadence_vp_core_id = (int8_t)xPortGetCoreID();
@@ -1563,9 +1645,13 @@ void led_thread(void* arg) {
       vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
 #endif
-      if (k1_authored_suppresses_live_update()) {
-        /* AUTHORED: freeze Core-1 chroma/spectrum so Ember hue is palette-only. */
+      k1_prepared_render_begin_frame();
+      if (k1_vp_prepared_active()) {
+        /* Prepared show: no live chroma reaches colour. Both the gated chroma
+         * and the pre-gate copy the palette engine reads are held at zero
+         * (the pre-gate copy used to keep its last live value for the whole show). */
         memset(chromagram_smooth, 0, sizeof(chromagram_smooth));
+        memset(chromagram_pregate, 0, sizeof(chromagram_pregate));
       } else {
         get_smooth_spectrogram();
         make_smooth_chromagram();

@@ -468,10 +468,25 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define I2S_LRCLK_PIN 11
     #define I2S_DIN_PIN 14
 
-    #define LED_DATA_PIN 15
-    #define LED_CLOCK_PIN 16
-    #define SECONDARY_LED_DATA_PIN 17
-    #define SECONDARY_LED_CLOCK_PIN 18
+    #if defined(K1_MAIN_RPL_REWIRE_20261110)
+      // Main RPL unit 9087A500 as rewired by the Captain on 10 November 2026:
+      // primary DIN-A=GPIO2 / DIN-B=GPIO3, secondary DIN-A=GPIO5 / DIN-B=GPIO6.
+      // Microphone stays DATA=8 / CLK=9. Selected only by envs built for that
+      // unit. K1_MAIN_RPL_PINMAP_V1 on its own (which k1_fe / K1-FE-Gx inherit)
+      // keeps 15/16/17/18: one board's wiring must not ride a shared flag.
+      #if defined(K1_FE_BOARD_V1) || defined(K1_B489_WS2816_V1) || !defined(K1_MAIN_RPL_PINMAP_V1)
+      #error "K1_MAIN_RPL_REWIRE_20261110 is the wiring of Main RPL unit 9087A500 only"
+      #endif
+      #define LED_DATA_PIN 2
+      #define LED_CLOCK_PIN 3
+      #define SECONDARY_LED_DATA_PIN 5
+      #define SECONDARY_LED_CLOCK_PIN 6
+    #else
+      #define LED_DATA_PIN 15
+      #define LED_CLOCK_PIN 16
+      #define SECONDARY_LED_DATA_PIN 17
+      #define SECONDARY_LED_CLOCK_PIN 18
+    #endif
 
     #ifdef K1_MIC_IM69D_PDM_V1
       #if defined(K1_FE_BENCH_B489_V1)

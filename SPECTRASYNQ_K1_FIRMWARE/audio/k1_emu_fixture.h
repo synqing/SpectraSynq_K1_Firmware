@@ -87,6 +87,11 @@ void k1_emu_fixture_note_reject(const char* command_type);
 void k1_emu_fixture_host_command_begin(const char* text);
 void k1_emu_fixture_host_command_end(void);
 
+// RX-record adapter: raw bytes the scenario delivers
+// into the production receive loop ahead of USBSerial at a declared replay hop.
+bool k1_emu_fixture_rx_available(void);
+uint8_t k1_emu_fixture_rx_read(void);
+
 // Application clock. Before the first hop it stays at the epoch (0); afterwards
 // it is processed_samples * 1e6 / sample_rate with a 64-bit intermediate.
 // C linkage so a fixture build can redirect Arduino millis/micros here.

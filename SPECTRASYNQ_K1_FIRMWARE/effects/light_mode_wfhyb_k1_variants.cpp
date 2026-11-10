@@ -149,7 +149,9 @@ static void wfhyb_variant_render(WfhybVariant variant, CRGB16* leds_prev_buffer,
 
   // ---- audio snapshot + envelopes (chassis verbatim) ------------------------
   const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
-  const float peak = wfvar_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
+  // Not during prepared-show playback: there the snapshot is the only source.
+  const float live_peak = k1_vp_prepared_active() ? 0.0f : float(waveform_peak_scaled);
+  const float peak = wfvar_clamp01(fmaxf(snap.peak_scaled, live_peak));
   const bool  silence = snap.silence && (peak < WFVAR_PRESENCE_FLOOR);
 
   const float presence_target =

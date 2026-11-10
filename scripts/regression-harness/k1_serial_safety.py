@@ -22,14 +22,19 @@ Two X-macro tables, BOTH parsed (a guard that covers one table has a hole — th
 incident command lives in the typed table, while ``dump`` / ``start_noise_cal`` /
 ``factory_reset`` live in the bare table):
 
-  SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def
-      git blob e83abf9eee23099a2b9b0a034d355350bf8aa9ce   (154 rows)
-  SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def
-      git blob 9246b0702f40f796eb0877bda2f8b8c1515ec009   (36 rows)
+  SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def   (188 rows)
+  SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def         (38 rows)
 
-Verify with ``git hash-object <path>``.  ``tests/test_k1_serial_safety.py``
-re-parses both files and fails if the literals below have drifted, so an edit to
-a ``.def`` without regenerating this module is caught by the host gate.
+The blob each literal set was generated from is pinned in ``TYPED_DEF_BLOB_SHA``
+/ ``BARE_DEF_BLOB_SHA`` below; verify with ``git hash-object <path>``.
+``tests/test_k1_serial_safety.py`` re-parses both files and fails if the literals
+below have drifted, so an edit to a ``.def`` without regenerating this module is
+caught by the host gate.
+
+The ``CMD_PERSISTS`` column itself is checked against the handler code by
+``tests/test_serial_cmd_persist_flags_static.py``: a row carries it exactly when
+the code that runs for that name writes persistent storage (2026-11-10 audit,
+``docs/forensics/runtime-evidence/20261110-fe-show-fixes/serial-cmd-persist-audit.md``).
 
 Rows inside ``#if`` blocks are included unconditionally.  That is deliberate and
 conservative: a command that is compiled out simply does not exist on the device
@@ -39,8 +44,9 @@ dangerous name be classified as absent-and-therefore-fine.
 READ THIS BEFORE TRUSTING ``SAFE_READONLY_COMMANDS``
 ----------------------------------------------------
 "Flag-clean" is NOT the same as "read-only".  Many rows carry no flags yet still
-mutate volatile runtime state (``set_mode``, ``debug``, the ``vp_*`` / ``edge_*``
-/ ``smart_*`` tuning families) or drive the LEDs (``vp_out_test``, ``mp_flash``,
+mutate volatile runtime state (``secondary_mode``, ``debug``, the ``vp_*`` /
+``edge_*`` / ``smart_*`` / ``secondary_*`` / ``silence_*`` tuning families) or
+drive the LEDs (``vp_out_test``, ``mp_flash``,
 ``vpml``).  ``SAFE_READONLY_COMMANDS`` means *"cannot persist to flash, cannot
 reboot, cannot wipe calibration, does not assume silence"* — it does NOT promise
 the device is unchanged.  ``FLAG_CLEAN_COMMANDS`` is the raw predicate the flags
@@ -54,7 +60,8 @@ called "safe".
 Genuinely read-only witnesses for device state: ``dump``, ``chip_id``,
 ``version``, ``build``, ``runtime_id``, ``image_id``, ``reset_reason``,
 ``fps``, ``led_fps``, ``get_mode``, ``get_num_modes``, ``slot_list``,
-``vp_status``, ``smart_status``, ``edge_status``, ``event_status``.
+``vp_status``, ``smart_status``, ``edge_status``, ``event_status``,
+``authored_status``.
 ``dump`` prints ``CONFIG.LED_COUNT`` (``serial_menu.cpp`` ``dump_info()``), which
 is the correct way to read an LED count.
 """
@@ -78,8 +85,8 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "1036d29e3cf36282d883f54b8caca09a952ad079"
-BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
+TYPED_DEF_BLOB_SHA = "01b53783afa66e9eb99257d8e5bd63ef142fb969"
+BARE_DEF_BLOB_SHA = "ca8350134d4ff593e2aac3576c825ba469b5e1f6"
 
 # --------------------------------------------------------------------------
 # Literals generated from the two .def files (see module docstring).
@@ -105,8 +112,10 @@ DISRUPTIVE_COMMANDS = frozenset({
     "set_chroma_profile",
 })
 
-#: Rows whose flags contain CMD_PERSISTS — these write flash (save_config /
-#: show-state / preset slots) and survive a power cycle.
+#: Rows whose flags contain CMD_PERSISTS — these write or delete persistent
+#: storage (save_config / save_config_delayed / show-state / preset slots / look
+#: files / LittleFS deletes / the FE PD controller NVM), directly or by a write
+#: they schedule, and the effect survives a power cycle.
 PERSISTING_COMMANDS = frozenset({
     "auto_color_shift",
     "base_coat",
@@ -115,16 +124,18 @@ PERSISTING_COMMANDS = frozenset({
     "bulb_opacity",
     "chroma",
     "chromagram_range",
-    "commit_quantise",
+    "clear_noise_cal",
+    "commit",
+    "factory_reset",
     "incandescent_filter",
     "incandescent_mode",
-    "k1_loud_guard",
     "led_color_order",
     "led_count",
     "led_interpolation",
     "led_type",
     "look",
-    "tune_save",
+    "look_clear",
+    "look_load",
     "max_current_ma",
     "mirror_enabled",
     "mood",
@@ -135,47 +146,23 @@ PERSISTING_COMMANDS = frozenset({
     "photons",
     "preset",
     "prism_count",
-    "queue_mode",
-    "response_gain",
+    "restore_defaults",
     "reverse_order",
     "sample_rate",
     "samples_per_chunk",
     "saturation",
     "save_show",
-    "secondary_auto_color_shift",
-    "secondary_base_coat",
-    "secondary_chroma",
-    "secondary_control",
-    "secondary_enabled",
-    "secondary_incandescent_mode",
     "secondary_look",
-    "secondary_mirror_enabled",
-    "secondary_mood",
-    "secondary_palette_index",
-    "secondary_palette_mode",
-    "secondary_photons",
-    "secondary_prism_count",
-    "secondary_reverse_order",
-    "secondary_saturation",
     "sensitivity",
     "set_chroma_profile",
-    "silence_dwell",
-    "silence_enter",
-    "silence_exit",
-    "silence_rms_enter",
-    "silence_rms_exit",
-    "slot_arm",
+    "set_mode",
     "slot_load",
     "slot_save",
     "square_iter",
     "sweet_spot_max",
     "sweet_spot_min",
     "temporal_dithering",
-    "transition_dip_ms",
-    "transition_style",
-    "transition_xfade_ms",
-    "vp_all",
-    "vp_profile",
+    "tune_save",
 })
 
 #: Rows whose flags contain CMD_IRREVERSIBLE — destroy state that cannot be
@@ -201,6 +188,7 @@ ROW1_BARE_COMMANDS = frozenset({
     "H",
     "SB?",
     "V",
+    "authored_status",
     "bootloop_inject",
     "build",
     "chip_id",
@@ -255,13 +243,13 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "apcad_soak_status",
     "apcad_status",
     "apdbg",
+    "authored_status",
     "beat_director",
     "ble_stream",
     "build",
     "chip_id",
     "chromatic",
-    "clear_noise_cal",
-    "commit",
+    "commit_quantise",
     "debug",
     "diag",
     "dial_status",
@@ -294,14 +282,15 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "help",
     "identify",
     "image_id",
+    "k1_loud_guard",
     "k1_pin_evidence",
     "led_fps",
     "look_status",
+    "mic_health",
+    "mic_health_fault",
     "mp_flash",
     "mp_off",
     "mp_status",
-    "mic_health",
-    "mic_health_fault",
     "mp_step",
     "nov_capture",
     "nov_clear",
@@ -313,27 +302,48 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "paint_stops",
     "paint_sv",
     "paint_target",
-    "pd_status",
-    "pcmraw_arm",
-    "pcmraw_dump",
-    "pcmraw_status",
     "pcmpair_arm",
     "pcmpair_dump",
     "pcmpair_status",
+    "pcmraw_arm",
+    "pcmraw_dump",
+    "pcmraw_status",
+    "pd_status",
+    "queue_mode",
     "reset_reason",
+    "response_gain",
     "rtrace_arm",
     "rtrace_dump",
     "rtrace_status",
     "runtime_id",
-    "scheduling_trace",
-    "secondary_mode",
-    "secondary_status",
-    "set_mode",
-    "show_state",
-    "show_skip",
     "scap_arm",
     "scap_dump",
     "scap_status",
+    "scheduling_trace",
+    "secondary_auto_color_shift",
+    "secondary_base_coat",
+    "secondary_chroma",
+    "secondary_control",
+    "secondary_enabled",
+    "secondary_incandescent_mode",
+    "secondary_mirror_enabled",
+    "secondary_mode",
+    "secondary_mood",
+    "secondary_palette_index",
+    "secondary_palette_mode",
+    "secondary_photons",
+    "secondary_prism_count",
+    "secondary_reverse_order",
+    "secondary_saturation",
+    "secondary_status",
+    "show_skip",
+    "show_state",
+    "silence_dwell",
+    "silence_enter",
+    "silence_exit",
+    "silence_rms_enter",
+    "silence_rms_exit",
+    "slot_arm",
     "slot_list",
     "smart_assist",
     "smart_confidence_floor",
@@ -350,6 +360,9 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "stream_spectrogram",
     "tempo_stream",
     "trace",
+    "transition_dip_ms",
+    "transition_style",
+    "transition_xfade_ms",
     "tune_gain",
     "tune_gamma",
     "tune_reset",
@@ -362,6 +375,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "vivid_chroma",
     "vivid_level",
     "vp_agc_soft",
+    "vp_all",
     "vp_bloom_alpha",
     "vp_bloom_decay",
     "vp_bloom_force_sat",
@@ -377,6 +391,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "vp_perf",
     "vp_prism_off",
     "vp_probe",
+    "vp_profile",
     "vp_secondary_clean",
     "vp_status",
     "vp_stream",

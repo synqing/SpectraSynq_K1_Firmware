@@ -26,9 +26,19 @@ K1AudioSnapshot k1_vp_audio_snapshot_read();
 void k1_vp_audio_semantic_read(AudioSemanticState* out);
 #endif
 
+// Prepared-show playback as seen by this render frame (frozen with the frame).
+inline const K1PreparedPlayback& k1_vp_prepared() {
+  static const K1PreparedPlayback none = {};
+  return k1_vp_audio_frame_valid() ? k1_vp_audio_frame().prepared : none;
+}
+inline bool k1_vp_prepared_active() { return k1_vp_prepared().active != 0; }
+
 #else  // !K1_AUDIO_FRAME_V1
 
 #include "globals.h"
+#include "k1_authored_source.h"
+
+inline bool k1_vp_prepared_active() { return k1_authored_suppresses_live_update(); }
 
 #define k1_vp_spectrogram spectrogram
 

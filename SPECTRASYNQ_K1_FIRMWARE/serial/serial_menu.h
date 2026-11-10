@@ -518,6 +518,7 @@ void cmd_led_fps();
 void cmd_vp_status();
 
 void cmd_smart_status();
+void cmd_authored_status();
 
 void cmd_edge_status();
 

@@ -127,6 +127,7 @@ MODULE_CPPS = [
                                        # the golden must reproduce byte-for-byte (the
                                        # identity IS the S4 behaviour-preservation proof).
     "audio/k1_prsm.cpp",
+    "audio/k1_prsm_rx.cpp",
     "audio/k1_authored_source.cpp",
     "serial/serial_menu.cpp",          # M2.1 R1: out-of-line home for serial_menu.h's
                                        # non-inline defs (ODR-bomb kill). The driver

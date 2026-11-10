@@ -5,6 +5,8 @@ palette_manual_colour. Those files are no longer in FORBIDDEN.
 Waveform / bloom / framework stay frozen until a named rewrite.
 light_mode_waveform_hybrid_k1.cpp was unfrozen by the Captain on 2026-11-04
 ("Unfreeze waveform hybrid").
+light_mode_waveform_tempo.cpp carries two exact prepared-show edits approved by
+the Captain on 2026-11-10 ("All fixes now"); see PREPARED_SOURCE_EDITS.
 """
 
 from __future__ import annotations
@@ -50,6 +52,46 @@ def _approved_quiet_mirror_repair(path, before, after):
             and hashlib.sha256(after).hexdigest() == QUIET_MIRROR_AFTER)
 
 
+# Captain, 10 November 2026 ("All fixes now", K1-FE-SHOW change requests rev 2):
+# prepared-show playback must not depend on the live microphone or on the
+# device's own tempo estimate. Exactly two edits to this effect are permitted on
+# top of the quiet-mirror file, both inert unless k1_vp_prepared_active():
+# the live peak is not OR-ed in, and the scroll runs its unlocked branch.
+# Colour and live motion stay frozen: any other byte change fails.
+PREPARED_SOURCE_AFTER = "15940ebaade9ce1e69c045cac87d6d0dfdbf6338375c080df86fd78fa0d1b4b7"
+PREPARED_SOURCE_EDITS = (
+    (b"  // Not during prepared-show playback: there the snapshot is the only source.\n"
+     b"  const float live_peak = k1_vp_prepared_active() ? 0.0f : (float)waveform_peak_scaled;\n"
+     b"  const float peak = tempo_clamp01(fmaxf(snap.peak_scaled, live_peak));\n",
+     b"  const float peak =\n"
+     b"      tempo_clamp01(fmaxf(snap.peak_scaled, (float)waveform_peak_scaled));\n"),
+    (b"    a = k1_vp_audio_snapshot_read();\n"
+     b"    if (k1_vp_prepared_active()) {\n"
+     b"      // Prepared show: the stream carries no beat clock, and the device's own\n"
+     b"      // tempo estimate depends on everything it has heard since it locked, so\n"
+     b"      // the same show position would not always render the same. Run this\n"
+     b"      // mode's unlocked branch (steady scroll, halted in prepared silence).\n"
+     b"      t.confidence = 0.0f;\n"
+     b"      t.locked = false;\n"
+     b"    }\n",
+     b"    a = k1_vp_audio_snapshot_read();\n"),
+)
+
+
+def _without_prepared_source_edits(after):
+    """The file with the two permitted prepared-source edits taken back out."""
+    for new, old in PREPARED_SOURCE_EDITS:
+        assert after.count(new) == 1
+        after = after.replace(new, old, 1)
+    return after
+
+
+def _approved_prepared_source_isolation(path, before, after):
+    return (path == QUIET_MIRROR_PATH
+            and hashlib.sha256(before).hexdigest() == QUIET_MIRROR_AFTER
+            and hashlib.sha256(after).hexdigest() == PREPARED_SOURCE_AFTER)
+
+
 def test_waveform_fast_hsv_call_count_frozen():
     src = WAVEFORM_FAST.read_text(encoding="utf-8")
     calls = [
@@ -73,13 +115,19 @@ def test_forbidden_effect_files_untouched():
     for path in diff.splitlines():
         before = subprocess.check_output(["git", "show", f"HEAD:{path}"], cwd=ROOT)
         after = (ROOT / path).read_bytes()
-        if not _approved_quiet_mirror_repair(path, before, after):
+        if not (_approved_quiet_mirror_repair(path, before, after)
+                or _approved_prepared_source_isolation(path, before, after)):
             violations.append(path)
     assert not violations, f"E2 freeze violated; touched:\n{chr(10).join(violations)}"
 
 
 def test_quiet_mirror_allowance_rejects_other_edits_and_reversal():
-    after = (ROOT / QUIET_MIRROR_PATH).read_bytes()
+    current = (ROOT / QUIET_MIRROR_PATH).read_bytes()
+    assert hashlib.sha256(current).hexdigest() == PREPARED_SOURCE_AFTER
+    after = _without_prepared_source_edits(current)
+    assert _approved_prepared_source_isolation(QUIET_MIRROR_PATH, after, current)
+    assert not _approved_prepared_source_isolation(QUIET_MIRROR_PATH, after,
+                                                  current + b"\n// another edit\n")
     repair = (b"    // Scrolling can move the two halves apart even while draining. Preserve\n"
               b"    // the requested centre mirror before returning without a new colour seed.\n"
               b"    if (rp->MIRROR_ENABLED) mirror_image_downwards(leds_16);\n")

@@ -384,6 +384,37 @@ is the canonical inventory of the R3 session's failures (F1–F26), their
 causes, fixes and guards. The skill `k1-esp-emulator-replay` loads its
 must-follow rules.
 
+## Raw receive records (`rx_stream`)
+
+A case may carry raw bytes for the product's serial receive path, for example a
+prepared-show (PRSM) stream:
+
+```json
+"rx_stream": {"schedule": "<file>", "sha256": "<optional, checked>", "note": "<free text>"}
+```
+
+- **Schedule file.** Packed 136-byte records `{u32 hop, u32 len, u8 bytes[128]}`
+  (little-endian), ordered by hop. `run.py` rejects a record that is out of
+  order or beyond the run's last hop, records the file's SHA-256 in
+  `result.json`, and fails the case if a declared `sha256` differs.
+- **Where the bytes go.** The blob header carries `rx_offset` / `rx_count`.
+  Before hop `h` is staged the fixture queues every record for `h`
+  (`EMU_RX hop= records= bytes=`); the production `check_serial()` of that loop
+  iteration reads the queue ahead of USBSerial. The bytes therefore take the
+  product's own receiver (`audio/k1_prsm_rx.cpp`) and frame scanner. Nothing is
+  parsed in the fixture.
+- **Observation.** `EMU_AUTH after_hop= state=` on each change of the authored
+  source state, and `EMU_RX_END records=a/b queued= consumed= auth_state=`
+  before the counters at the end of the run. A run ends with `rx_backlog` if a
+  hop's bytes were not drained before the next hop, and `rx_overflow` if one
+  hop queues more than the 1,024-byte FIFO.
+- **Not modelled.** USB packet boundaries, packet loss and receive-queue
+  overflow. Bytes arrive whole at the declared hop.
+
+`EMU_HCMD ... text=` writes bytes outside printable ASCII, and the backslash,
+as `\xNN`, so a command line that contains binary is still one log line;
+`emu_capture.py` reverses it.
+
 ## Not covered (by design)
 
 Microphone wiring, PDM/I2S/DMA/GPIO/RMT wire timing, hardware scheduling,
@@ -396,3 +427,4 @@ audiovisual quality. No software trace here proves any of them.
 |---|---|---|
 | 2026-10-20 | agent:claude-code (R3 owner) | Replaced the R2 one-hop GDB contract with the PCM → production processing → paired-capture/control/persistence interface. |
 | 2026-10-20 | agent:claude-code (next phase) | Added the client transport: existing client → run-owned pty → USB-Serial/JTAG → production receive loop, trace on UART1, client gates, SW13 cases. |
+| 2026-11-10 | agent:claude (FW lead) | Adopted the RX-record adapter (`rx_stream`) from the K1-FE-SHOW lane into mainline tooling; `EMU_HCMD` text is hex-escaped. |

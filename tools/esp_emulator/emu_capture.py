@@ -33,6 +33,11 @@ class CaptureError(ValueError):
     """The UART text cannot be decoded as one capture."""
 
 
+def unescape_hcmd(text: str) -> str:
+    """Reverse the firmware's EMU_HCMD escaping (\\xNN for non-printable bytes and the backslash)."""
+    return re.sub(r"\\x([0-9A-Fa-f]{2})", lambda m: chr(int(m.group(1), 16)), text)
+
+
 def parse_fields(text: str, where: str) -> dict[str, str]:
     """key=value tokens; a repeated key is an error, never an overwrite."""
     out: dict[str, str] = {}
@@ -237,7 +242,7 @@ def decode(uart: str) -> Capture:
         elif line.startswith("EMU_HCMD "):
             head, _, text = line[len("EMU_HCMD "):].partition(" text=")
             entry = parse_fields(head, "EMU_HCMD")
-            entry["text"] = text
+            entry["text"] = unescape_hcmd(text)
             host_commands.append(entry)
         elif line.startswith("EMU_CLIENT_GATE_DONE "):
             gate_dones.append(parse_fields(line[len("EMU_CLIENT_GATE_DONE "):], "EMU_CLIENT_GATE_DONE"))

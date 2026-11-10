@@ -24,6 +24,10 @@
 //  Legacy single-edge marker/CRC stride and capacity 3000 remain unchanged.
 //  B489 dual capacity is 2000. The emulator fixture (K1_EMU_FIXTURE) uses the
 //  same dual layout, capacity and drain task for the normal Main RPL path.
+//  Builds with K1_AUDIO_FRAME_V1 append, after [RTRACE-END], a
+//  [RTRACE-PREPARED-BEGIN frames=N] ... [RTRACE-PREPARED-END] block when any
+//  captured frame was drawn from a prepared-show frame: one line per such frame,
+//  P,<capture index>,<capture millis>,<epoch>,<seq>,<t_us>,<applied millis>.
 //  B489 dump returns immediately and drains on a diagnostic task. Stop serial
 //  diagnostic streams before requesting it and send no commands until END;
 //  music processing/rendering continue. Arm is rejected while drain is busy.
@@ -38,7 +42,9 @@
 // Dual-edge storage: the B489 measurement image, and the emulator replay of
 // the normal Main RPL path (K1_EMU_FIXTURE). Every other env keeps the legacy
 // single-edge layout and capacity.
-#if defined(K1_B489_WS2816_V1) || defined(K1_EMU_FIXTURE)
+// K1_RTRACE_DUAL_V1 opts a bench capture env on the normal WS2816 path into
+// the same dual layout (Main RPL show env).
+#if defined(K1_B489_WS2816_V1) || defined(K1_EMU_FIXTURE) || defined(K1_RTRACE_DUAL_V1)
 #define K1_RTRACE_DUAL 1
 #endif
 

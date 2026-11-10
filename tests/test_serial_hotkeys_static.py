@@ -90,13 +90,21 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
         self.assertIn("NOISE_CAL: not armed", body)
 
     def test_check_serial_preserves_line_buffer_for_multi_byte_commands(self):
+        # The line buffer and the ':' / hotkey split live in audio/k1_prsm_rx.cpp
+        # (host-tested by tests/test_k1_prsm_rx_native.py); check_serial feeds every
+        # byte through it and acts only on the event it returns.
         body = self._function_body("check_serial")
-        self.assertIn("byte == ':'", body)
-        self.assertIn("command_mode = true", body)
-        self.assertIn("serial_hotkey_is_immediate", body)
-        self.assertIn("parse_command(command_buf)", body)
+        self.assertIn("k1_prsm_rx_push(&k1_serial_rx, byte, t_now, &rx_event)", body)
         self.assertNotIn("USBSerial.available() == 0", body)
-        self.assertIn("serial_handle_hotkey(char(byte))", body)
+        self.assertNotIn("serial_handle_hotkey", body)
+        self.assertNotIn("parse_command", body)
+        act = self._function_body("k1_serial_rx_act")
+        self.assertIn("serial_hotkey_is_immediate", act)
+        self.assertIn("serial_handle_hotkey(char(rx_event.byte))", act)
+        self.assertIn("parse_command(rx_event.line)", act)
+        rx = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" / "k1_prsm_rx.cpp").read_text(encoding="utf-8")
+        self.assertIn("byte == ':'", rx)
+        self.assertIn("rx->command_mode = true", rx)
 
     def test_edge_hotkeys_are_all_sc_safe_allowlisted(self):
         # Gate<->handler consistency (the 'y' dual-edge dead-hotkey bug,

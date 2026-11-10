@@ -137,16 +137,20 @@ def test_explicit_write_still_refused_by_classification():
 # ---------------------------------------------------------------------------
 
 def test_calibration_and_destructive_rows_are_not_safe():
-    """These carry neither CMD_DISRUPTIVE nor CMD_PERSISTS, so the naive
-    two-flag predicate would call them safe. The module removes them."""
+    """start_noise_cal carries neither CMD_DISRUPTIVE nor CMD_PERSISTS, so the
+    naive two-flag predicate would call it safe. The module removes it. The
+    destructive rows must never be safe either."""
     for name in ("start_noise_cal", "clear_noise_cal", "factory_reset",
                  "restore_defaults"):
         assert name not in SAFETY.SAFE_READONLY_COMMANDS
         with pytest.raises(RuntimeError):
             SAFETY.assert_read_only(name)
-    # Proof that the naive predicate really would have admitted the first two.
+    # Proof that the naive predicate really would have admitted start_noise_cal.
     assert "start_noise_cal" in SAFETY.FLAG_CLEAN_COMMANDS
-    assert "clear_noise_cal" in SAFETY.FLAG_CLEAN_COMMANDS
+    # clear_noise_cal writes flash (clear_noise_cal() -> save_config()), so since
+    # the 2026-11-10 persistence-flag audit it carries CMD_PERSISTS as well.
+    assert "clear_noise_cal" in SAFETY.PERSISTING_COMMANDS
+    assert "clear_noise_cal" in SAFETY.IRREVERSIBLE_COMMANDS
 
 
 # ---------------------------------------------------------------------------

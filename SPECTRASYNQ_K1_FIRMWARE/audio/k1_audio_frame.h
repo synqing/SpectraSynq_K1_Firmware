@@ -21,6 +21,25 @@ struct AudioSemanticState {
 #include "k1_semantic_state.h"
 #endif
 
+// Prepared-show playback as applied in this AP generation. `active` is the same
+// decision that replaced the live audio snapshot for this hop; `epoch` changes
+// at every playback start and seek; `seq`/`t_us` name the prepared frame the
+// snapshot was built from and `applied_ms` is the device time it arrived.
+// 32-bit members only, so the frame has no padding bytes (it is compared and
+// copied as raw bytes by the host interleave test).
+struct K1PreparedPlayback {
+  uint32_t t_us_lo;
+  uint32_t t_us_hi;
+  uint32_t epoch;
+  uint32_t seq;
+  uint32_t applied_ms;
+  uint16_t active;
+  uint16_t hz;
+};
+static inline uint64_t k1_prepared_t_us(const K1PreparedPlayback& p) {
+  return ((uint64_t)p.t_us_hi << 32) | (uint64_t)p.t_us_lo;
+}
+
 // One complete AP generation, published once per hop after every semantic stage
 // has finished. Trivially copyable so both the shared publication and the
 // VP-local acquisition are plain value copies inside a short critical section.
@@ -50,6 +69,9 @@ struct K1AudioFrame {
   // --- saturation and coherence counters ------------------------------------
   uint32_t publish_overwrite_count;  // publications never consumed by VP
   uint32_t dropped_event_records;    // reserved; zero until an event ring exists
+
+  // --- prepared-show playback (all zero while the live microphone drives) ----
+  K1PreparedPlayback prepared;
 };
 
 static_assert(sizeof(K1AudioFrame) <= 512,

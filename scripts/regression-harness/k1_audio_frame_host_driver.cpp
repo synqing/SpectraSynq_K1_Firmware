@@ -42,6 +42,15 @@ static void stamp_frame(K1AudioFrame* f, uint32_t gen) {
   f->semantic.beat_phase01 = 0.25f;
   f->semantic.onset_strength = (float)gen * 0.1f;
   f->semantic.frame_ms = gen;
+  // Prepared-show block: stamped so a publish/acquire copy that forgets it is
+  // seen by every frames_equal() check below.
+  f->prepared.t_us_lo = 5000u + gen;
+  f->prepared.t_us_hi = gen;
+  f->prepared.epoch = 6000u + gen;
+  f->prepared.seq = 7000u + gen;
+  f->prepared.applied_ms = 8000u + gen;
+  f->prepared.active = 1;
+  f->prepared.hz = 120;
 }
 
 static int frames_equal(const K1AudioFrame* a, const K1AudioFrame* b) {

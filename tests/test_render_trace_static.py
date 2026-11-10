@@ -29,6 +29,7 @@ RTRACE_DIAG_ENVS = {
     "env:k1_fe_bench_b489]",
     "env:k1_b489_ws2816_reference_capture]",
     "env:k1_main_rpl_pcm_replay]",
+    "env:k1_main_rpl_show_bench]",  # 9087A500 prepared-show bench image (non-shippable)
     "env:k1_main_rpl_emu]",
     "env:k1_fe_emu]",
 }

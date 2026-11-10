@@ -603,6 +603,11 @@ inline void apply_brightness() {
 #else
   SQ15x16 brightness = MASTER_BRIGHTNESS * photons_curve * silent_scale;
 #endif
+  if (k1_authored_suppresses_live_update()) {
+    // Prepared show: the room-silence dim follows the live microphone and must
+    // not darken a show that is carrying its own level.
+    brightness = MASTER_BRIGHTNESS * photons_curve;
+  }
   // Effects-queue DIP transition scalar (control/k1_effect_queue.cpp): COMPOSES
   // with drop_cut_scale by multiplication at the same application point — never
   // replaces or reorders the existing brightness factors. 1.0 when idle.
@@ -1220,6 +1225,9 @@ inline void show_leds() {
     CRGB16 backdrop_color = { bottom_value_r, bottom_value_g, bottom_value_b };
 
     SQ15x16 base_coat_width_scaled = base_coat_width * silent_scale;
+    if (k1_authored_suppresses_live_update()) {
+      base_coat_width_scaled = base_coat_width;  // prepared show: no live silence dim
+    }
 
     if (base_coat_visible && base_coat_width_scaled > 0.01) {
       draw_line(leds_16, 0.5 - (base_coat_width_scaled * 0.5), 0.5 + (base_coat_width_scaled * 0.5), backdrop_color, 1.0);
@@ -1400,8 +1408,9 @@ inline void show_leds() {
                                     (const uint8_t*)ws2816_wire_secondary,
                                     CONFIG.LED_COUNT,
                                     (uint8_t)CONFIG.LIGHTSHOW_MODE);
-#elif defined(K1_EMU_FIXTURE)
-    // Emulator replay of the normal path: both packed edges, after the
+#elif defined(K1_EMU_FIXTURE) || defined(K1_RTRACE_DUAL_V1)
+    // Emulator replay of the normal path (and the Main RPL show bench env,
+    // K1_RTRACE_DUAL_V1): both packed edges, after the
     // secondary pack in show_secondary_leds() and the primary pack above,
     // before submission. The secondary buffer is the one submitted even when
     // ENABLE_SECONDARY_LEDS is off, so retain it as held.
@@ -3020,6 +3029,9 @@ inline void apply_brightness_secondary() {
   float photons_curve_s = sqrtf(SECONDARY_PHOTONS);                // sqrt (perceptual)
 #endif
   float bright_val = photons_curve_s * silent_scale;
+  if (k1_authored_suppresses_live_update()) {
+    bright_val = photons_curve_s;  // prepared show: no live silence dim (see apply_brightness)
+  }
 #ifdef K1_DROP_CUT_V1
   // Same musical-cut scaler as the primary channel (updated once per frame
   // in apply_brightness; primary always renders first in show_leds()).

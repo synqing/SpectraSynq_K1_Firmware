@@ -113,7 +113,10 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   // one-frame-stale snapshot cannot black the plate while AP peak_scaled is hot
   // (Bench Unit 2 2026-08-09: silence cleared, peak~0.7, glass still looked dead).
   const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
-  const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
+  // During prepared-show playback the snapshot is the only source: the live
+  // microphone peak must not move the dot or the colour walk.
+  const float live_peak = k1_vp_prepared_active() ? 0.0f : float(waveform_peak_scaled);
+  const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, live_peak));
   const bool  silence = snap.silence && (peak < WFHYB_PRESENCE_FLOOR);
 
   // Signal-presence envelope (audioConfidence analogue): fast rise, ~500 ms

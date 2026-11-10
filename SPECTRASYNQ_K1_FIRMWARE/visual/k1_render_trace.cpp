@@ -11,6 +11,9 @@
 #include "esp32-hal-psram.h"
 #include "../system/globals.h"
 #include "k1_render_trace.h"
+#ifdef K1_AUDIO_FRAME_V1
+#include "../audio/k1_audio_frame.h"
+#endif
 #ifdef K1_EMU_FIXTURE
 #include "../audio/k1_emu_fixture.h"
 #endif
@@ -40,6 +43,10 @@ static const size_t K1_RTRACE_FRAME_BYTES = K1_RTRACE_EDGE_BYTES;
 static uint8_t*  s_buf = nullptr;
 static uint32_t* s_ms = nullptr;
 static uint8_t*  s_mode = nullptr;
+#ifdef K1_AUDIO_FRAME_V1
+// Which prepared-show frame each captured render frame was drawn from.
+static K1PreparedPlayback* s_prepared = nullptr;
+#endif
 static uint32_t s_frames = 0;
 static bool s_armed = false;
 static uint32_t  s_end_ms = 0;
@@ -93,6 +100,13 @@ static bool rtrace_init() {
   s_buf = (uint8_t*)ps_malloc((size_t)K1_RTRACE_MAX_FRAMES * K1_RTRACE_FRAME_BYTES);
   s_ms = (uint32_t*)ps_malloc((size_t)K1_RTRACE_MAX_FRAMES * sizeof(uint32_t));
   s_mode = (uint8_t*)ps_malloc((size_t)K1_RTRACE_MAX_FRAMES);
+#ifdef K1_AUDIO_FRAME_V1
+  s_prepared = (K1PreparedPlayback*)ps_malloc((size_t)K1_RTRACE_MAX_FRAMES * sizeof(K1PreparedPlayback));
+  if (s_prepared == nullptr) {
+    // Applied-frame records are an extra; the LED capture still works without them.
+    USBSerial.println("[RTRACE] INIT NOTE: no memory for prepared-frame records");
+  }
+#endif
   if (s_buf == nullptr || s_ms == nullptr || s_mode == nullptr) {
     USBSerial.println("[RTRACE] INIT FAIL: ps_malloc returned NULL — capture disabled");
     if (s_buf) { free(s_buf); s_buf = nullptr; }
@@ -139,6 +153,17 @@ static void rtrace_store(const uint8_t* primary, const uint8_t* secondary,
 #endif
   s_ms[f] = millis();
   s_mode[f] = mode;
+#ifdef K1_AUDIO_FRAME_V1
+  if (s_prepared != nullptr) {
+    // The render task's own frozen audio frame: the same record the effects
+    // just drew this LED frame from.
+    if (k1_vp_audio_frame_valid()) {
+      s_prepared[f] = k1_vp_audio_frame().prepared;
+    } else {
+      memset(&s_prepared[f], 0, sizeof(K1PreparedPlayback));
+    }
+  }
+#endif
   if (px < s_px) s_px = px;
   s_bpp = bpp;
   s_edges = edges;
@@ -308,6 +333,33 @@ static void rtrace_write_dump() {
     if ((f & 0x3F) == 0x3F) vTaskDelay(1);
   }
   USBSerial.println("[RTRACE-END]");
+#ifdef K1_AUDIO_FRAME_V1
+  // Applied-state record, after the LED block so existing readers are
+  // unaffected. One line per captured frame that was drawn from a prepared-show
+  // frame: P,<capture index>,<capture millis>,<epoch>,<seq>,<t_us>,<applied millis>.
+  // The capture index and millis match the F line of the same index, so each
+  // emitted frame (both edges) names the prepared frame it used and when that
+  // frame arrived. Omitted entirely when no captured frame was prepared.
+  if (s_prepared != nullptr) {
+    uint32_t prepared_frames = 0;
+    for (uint32_t f = 0; f < frames; f++) {
+      if (s_prepared[f].active) prepared_frames++;
+    }
+    if (prepared_frames > 0) {
+      USBSerial.printf("[RTRACE-PREPARED-BEGIN frames=%lu]\n", (unsigned long)prepared_frames);
+      for (uint32_t f = 0; f < frames; f++) {
+        const K1PreparedPlayback& p = s_prepared[f];
+        if (!p.active) continue;
+        USBSerial.printf("P,%lu,%lu,%lu,%lu,%llu,%lu\n", (unsigned long)f,
+                         (unsigned long)s_ms[f], (unsigned long)p.epoch,
+                         (unsigned long)p.seq, (unsigned long long)k1_prepared_t_us(p),
+                         (unsigned long)p.applied_ms);
+        if ((f & 0x3F) == 0x3F) vTaskDelay(1);
+      }
+      USBSerial.println("[RTRACE-PREPARED-END]");
+    }
+  }
+#endif
 }
 
 #if defined(K1_RTRACE_DUAL) || defined(K1_FE_BENCH_B489_V1)

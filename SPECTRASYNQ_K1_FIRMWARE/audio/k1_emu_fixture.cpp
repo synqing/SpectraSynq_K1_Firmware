@@ -18,6 +18,7 @@
 #endif
 #include "globals.h"
 #include "../control/k1_show_state.h"
+#include "k1_authored_source.h"
 
 extern void parse_command(char* command_buf);
 extern void check_serial(uint32_t t_now);
@@ -81,7 +82,10 @@ struct __attribute__((packed)) BlobHeader {
   uint32_t blob_bytes;
   uint32_t payload_crc32;
   uint64_t declared_epoch_us;
-  uint8_t reserved[124];
+  // RX-record adapter: raw USB-serial RX records (see tools/esp_emulator/README.md).
+  uint32_t rx_offset;
+  uint32_t rx_count;
+  uint8_t reserved[116];
   uint32_t header_crc32;
 };
 static_assert(sizeof(BlobHeader) == kHeaderBytes, "scenario header is 256 bytes");
@@ -116,6 +120,22 @@ uint32_t s_gate_count = 0;     // kCmdClient records
 Command s_cmds[kMaxCommands];
 const char* s_invalid = nullptr;
 bool s_client = false;         // client transport: trace on UART1
+
+// ---- RX-record adapter: raw bytes into the production receive loop ----
+// Each 136-byte record is {u32 hop, u32 len, u8 bytes[128]}, ordered by hop. Before hop h is
+// processed, every record for h is queued; the production check_serial() of the same loop
+// iteration reads the queue ahead of USBSerial, so the bytes take the product's own
+// PRSM scanner / hotkey / ':' command path at a deterministic replay coordinate.
+constexpr uint32_t kRxRecordBytes = 136;
+constexpr uint32_t kRxRecordData = 128;
+constexpr uint32_t kRxFifo = 1024;
+uint32_t s_rx_offset = 0;
+uint32_t s_rx_count = 0;
+uint32_t s_rx_next = 0;
+uint8_t s_rx_fifo[kRxFifo];
+uint32_t s_rx_head = 0, s_rx_tail = 0;
+uint32_t s_rx_queued = 0, s_rx_consumed = 0, s_rx_records_done = 0;
+int s_auth_last = -1;
 
 // ---- Progression ----
 bool s_started = false;
@@ -384,7 +404,54 @@ void load_blob() {
   s_stall_ms = h.stall_ms != 0 ? h.stall_ms : 20000;
   s_pcm_offset = h.pcm_offset;
   s_cmd_count = h.command_count;
+  s_rx_offset = h.rx_offset;
+  s_rx_count = h.rx_count;
+  if (s_rx_count != 0 && (s_rx_offset < kHeaderBytes ||
+                          s_rx_offset + s_rx_count * kRxRecordBytes > h.blob_bytes)) {
+    return fail_scenario("rx_layout");
+  }
   s_valid = true;
+}
+
+[[noreturn]] void finish(const char* reason, const char* where);
+
+void rx_queue_hop(uint32_t hop) {
+  if (s_rx_head != s_rx_tail) finish("rx_backlog", "stage");
+  uint32_t records = 0, bytes = 0;
+  while (s_rx_next < s_rx_count) {
+    uint8_t raw[kRxRecordBytes];
+    if (esp_partition_read(s_part, s_rx_offset + s_rx_next * kRxRecordBytes, raw, sizeof(raw)) != ESP_OK) {
+      finish("read_error", "rx");
+    }
+    uint32_t rh, len;
+    memcpy(&rh, raw, 4);
+    memcpy(&len, raw + 4, 4);
+    if (rh < hop || len > kRxRecordData) finish("rx_record", "stage");
+    if (rh > hop) break;
+    for (uint32_t i = 0; i < len; i++) {
+      const uint32_t nxt = (s_rx_head + 1) % kRxFifo;
+      if (nxt == s_rx_tail) finish("rx_overflow", "stage");
+      s_rx_fifo[s_rx_head] = raw[8 + i];
+      s_rx_head = nxt;
+    }
+    s_rx_next++;
+    s_rx_records_done++;
+    records++;
+    bytes += len;
+  }
+  s_rx_queued += bytes;
+  if (records) {
+    K1_EMU_LOG.printf("EMU_RX hop=%lu records=%lu bytes=%lu\n", (unsigned long)hop,
+                      (unsigned long)records, (unsigned long)bytes);
+  }
+}
+
+void report_authored_state(uint32_t hop) {
+  const int st = (int)k1_authored_state();
+  if (st != s_auth_last) {
+    K1_EMU_LOG.printf("EMU_AUTH after_hop=%ld state=%d\n", (long)hop - 1, st);
+    s_auth_last = st;
+  }
 }
 
 void print_show_state(uint32_t generation, const char* when, uint32_t hop, bool only_if_changed) {
@@ -488,6 +555,9 @@ void print_counters(const char* reason, const char* where) {
     }
   }
 #endif
+  K1_EMU_LOG.printf("EMU_RX_END records=%lu/%lu queued=%lu consumed=%lu auth_state=%d\n",
+                    (unsigned long)s_rx_records_done, (unsigned long)s_rx_count, (unsigned long)s_rx_queued,
+                    (unsigned long)s_rx_consumed, (int)k1_authored_state());
   print_counters(reason, where);
   char dump_arg[] = "1";
   k1_render_trace_dispatch("rtrace_dump", dump_arg);
@@ -533,6 +603,8 @@ void stage_next_hop() {
                       epoch_policy(), (unsigned long long)s_epoch_us,
                       (unsigned long long)boot_us, (unsigned long)s_pre_audio_shows);
   }
+  report_authored_state(hop);
+  rx_queue_hop(hop);
   memset(s_stage_buf, 0, sizeof(s_stage_buf));
   const uint64_t first = (uint64_t)hop * kHop;
   uint32_t real = 0;
@@ -617,6 +689,15 @@ void wait_client_ready() {
 #ifdef K1_EMU_UART0
 HardwareSerial& k1_emu_log_port(void) { return s_client ? Serial1 : Serial0; }
 #endif
+
+bool k1_emu_fixture_rx_available(void) { return s_rx_head != s_rx_tail; }
+uint8_t k1_emu_fixture_rx_read(void) {
+  if (s_rx_head == s_rx_tail) return 0;
+  const uint8_t b = s_rx_fifo[s_rx_tail];
+  s_rx_tail = (s_rx_tail + 1) % kRxFifo;
+  s_rx_consumed++;
+  return b;
+}
 
 void k1_emu_fixture_begin(void) {
   s_cap = (CapRecord*)ps_malloc(sizeof(CapRecord) * kMaxSidecar);
@@ -911,8 +992,20 @@ void k1_emu_fixture_host_command_begin(const char* text) {
   s_in_host_command = true;
   s_host_rejects_before = s_rejects;
   s_host_hop = current_hop();
-  K1_EMU_LOG.printf("EMU_HCMD hop=%lu sample=%lu text=%s\n", (unsigned long)s_host_hop,
-                    (unsigned long)(s_host_hop * kHop), text);
+  // The text is whatever arrived on the wire. Bytes outside printable ASCII,
+  // and the backslash itself, are written as \xNN so one command is always
+  // exactly one log line (emu_capture.py reverses it).
+  K1_EMU_LOG.printf("EMU_HCMD hop=%lu sample=%lu text=", (unsigned long)s_host_hop,
+                    (unsigned long)(s_host_hop * kHop));
+  for (const char* p = text; p != nullptr && *p != '\0'; ++p) {
+    const uint8_t b = (uint8_t)*p;
+    if (b < 0x20 || b > 0x7E || b == '\\') {
+      K1_EMU_LOG.printf("\\x%02X", (unsigned)b);
+    } else {
+      K1_EMU_LOG.write(b);
+    }
+  }
+  K1_EMU_LOG.write('\n');
 }
 
 void k1_emu_fixture_host_command_end(void) {

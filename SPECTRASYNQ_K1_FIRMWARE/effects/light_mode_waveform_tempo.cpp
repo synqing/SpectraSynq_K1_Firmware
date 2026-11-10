@@ -173,6 +173,14 @@ static void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParam
   } else {
     t = k1_vp_tempo_read();
     a = k1_vp_audio_snapshot_read();
+    if (k1_vp_prepared_active()) {
+      // Prepared show: the stream carries no beat clock, and the device's own
+      // tempo estimate depends on everything it has heard since it locked, so
+      // the same show position would not always render the same. Run this
+      // mode's unlocked branch (steady scroll, halted in prepared silence).
+      t.confidence = 0.0f;
+      t.locked = false;
+    }
   }
 
   float base_px_s = TEMPO_PX_PER_BEAT * (t.bpm / 60.0f);     // [FACT bpm ∈ 60..156]
@@ -211,8 +219,9 @@ void light_mode_waveform_tempo(ChannelEffectState& fx) {
   const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
   // OR live global peak so a torn/stale snapshot cannot black the plate while
   // AP peak_scaled is hot (same Unit-2 lesson as hybrid_k1).
-  const float peak =
-      tempo_clamp01(fmaxf(snap.peak_scaled, (float)waveform_peak_scaled));
+  // Not during prepared-show playback: there the snapshot is the only source.
+  const float live_peak = k1_vp_prepared_active() ? 0.0f : (float)waveform_peak_scaled;
+  const float peak = tempo_clamp01(fmaxf(snap.peak_scaled, live_peak));
   const bool presence = tempo_presence_ok(snap, peak);
   // True silence only when silence latch AND no live peak — a latched silence
   // flag must never zero a live signal (hybrid_k1 2026-08-09).

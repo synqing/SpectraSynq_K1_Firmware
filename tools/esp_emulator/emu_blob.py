@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import struct
 import zlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 MAGIC = b"K1EMUSC2"
 VERSION = 2
@@ -25,6 +25,10 @@ FLAG_CLIENT_TRANSPORT = 1 << 4   # product USBSerial carries a client; trace on 
 CMD_SCHEDULED = 0                # the fixture runs the text through parse_command
 CMD_CLIENT = 1                   # a client sends the text; the fixture holds the hop for it
 EPOCH_POLICIES = ("zero", "boot_monotonic", "declared")
+# RX-record adapter: raw USB-serial RX records,
+# {u32 hop, u32 len, u8 bytes[128]}, queued before hop h into the production check_serial().
+RX_RECORD_BYTES = 136
+RX_RECORD_DATA = 128
 
 FLASH_SIZE = 16 * 1024 * 1024
 BOOTLOADER_AT = 0x0
@@ -54,6 +58,7 @@ class BlobSpec:
     declared_epoch_us: int = 0
     novelty_trace: bool = False
     client_transport: bool = False
+    rx_records: bytes = b""       # packed RX records, hop-ordered
 
 
 def _epoch_flag(spec: BlobSpec) -> int:
@@ -91,12 +96,20 @@ def build_blob(spec: BlobSpec) -> tuple[bytes, int]:
     pcm_offset = command_offset + len(cmd_blob)
     pcm_offset += (-pcm_offset) % 4
     payload = bytes(cmd_blob) + b"\0" * (pcm_offset - command_offset - len(cmd_blob)) + pcm_padded
+    rx_offset = rx_count = 0
+    if spec.rx_records:
+        if len(spec.rx_records) % RX_RECORD_BYTES:
+            raise ValueError("rx_records is not a whole number of RX records")
+        payload += b"\0" * ((-(HEADER_BYTES + len(payload))) % 4)
+        rx_offset = HEADER_BYTES + len(payload)
+        rx_count = len(spec.rx_records) // RX_RECORD_BYTES
+        payload += spec.rx_records
     blob_bytes = HEADER_BYTES + len(payload)
     if blob_bytes > SCENARIO_SIZE:
         raise ValueError(f"scenario blob {blob_bytes} bytes exceeds the ota_1 partition")
     payload_crc = zlib.crc32(payload) & 0xFFFFFFFF
     head = struct.pack(
-        "<8sII48s14IQ124s",
+        "<8sII48s14IQII116s",
         MAGIC, VERSION, HEADER_BYTES, spec.run_id.encode().ljust(48, b"\0"),
         spec.sample_rate, spec.hop_samples, real_samples, spec.pad_samples,
         spec.capture_start_hop, spec.capture_end_hop, spec.capture_every,
@@ -104,7 +117,7 @@ def build_blob(spec: BlobSpec) -> tuple[bytes, int]:
         | (FLAG_NOVELTY_TRACE if spec.novelty_trace else 0)
         | (FLAG_CLIENT_TRANSPORT if spec.client_transport else 0),
         len(spec.commands), command_offset,
-        pcm_offset, spec.stall_ms, blob_bytes, payload_crc, spec.declared_epoch_us, b"\0" * 124,
+        pcm_offset, spec.stall_ms, blob_bytes, payload_crc, spec.declared_epoch_us, rx_offset, rx_count, b"\0" * 116,
     )
     assert len(head) == HEADER_BYTES - 4
     head += struct.pack("<I", zlib.crc32(head) & 0xFFFFFFFF)

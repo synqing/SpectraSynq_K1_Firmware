@@ -81,7 +81,8 @@ ASSET_KEYS = {"kind", "path", "inventory", "fixture_id", "excerpt", "conversion"
               "samples", "origin", "qualification", "segments", "note", "source_sha256"}
 CASE_KEYS = {"purpose", "pcm", "tail_hops", "partial_hop", "epoch", "capture", "commands",
              "composition", "flash", "save_state", "stall_ms", "expect", "semantic", "trace_novelty",
-             "client"}
+             "client", "rx_stream"}
+RX_KEYS = {"schedule", "sha256", "note"}   # RX-record adapter
 CAPTURE_KEYS = {"start_hop", "end_hop", "every"}
 COMMAND_KEYS = {"hop", "text", "expect"}
 FLASH_KEYS = {"from", "recovery"}
@@ -209,6 +210,8 @@ def load_scenario(path: Path) -> dict:
         if fl["from"] != "blank" and not sc["cases"][fl["from"]].get("save_state"):
             raise ScenarioError(f"{where}.flash: source case {fl['from']!r} does not save state")
         _check_keys(case.get("expect", {}), EXPECT_KEYS, f"{where}.expect")
+        if "rx_stream" in case:
+            _check_keys(case["rx_stream"], RX_KEYS, f"{where}.rx_stream")
     for comp in sc.get("comparisons", []):
         _check_keys(comp, COMPARISON_KEYS, "comparisons")
         if comp.get("kind") == "recovery_state" and "before_case" not in comp:
@@ -565,6 +568,24 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
     blob_cmds = [(c["hop"], c["text"]) for c in cmds] + [(c["hop"], c["text"], emu_blob.CMD_CLIENT)
                                                         for c in client_lines]
     blob_cmds.sort(key=lambda e: e[0])
+    rx_records = b""
+    if case.get("rx_stream"):
+        # RX-record adapter: hop-tagged raw bytes for the production check_serial().
+        rxs = case["rx_stream"]
+        sched = Path(rxs["schedule"])
+        rx_records = sched.read_bytes()
+        rec["rx_stream"] = {"schedule": str(sched), "sha256": sha256_bytes(rx_records),
+                            "records": len(rx_records) // emu_blob.RX_RECORD_BYTES}
+        if rxs.get("sha256") and rxs["sha256"] != rec["rx_stream"]["sha256"]:
+            rec.update(status="FAIL", reasons=["rx schedule sha256 differs from the declared value"])
+            return rec
+        last = 0
+        for k in range(0, len(rx_records), emu_blob.RX_RECORD_BYTES):
+            h = int.from_bytes(rx_records[k:k + 4], "little")
+            if h < last or h >= total_hops:
+                rec.update(status="FAIL", reasons=[f"rx record {k // emu_blob.RX_RECORD_BYTES} hop {h} out of order or beyond {total_hops} hops"])
+                return rec
+            last = h
     ep = case.get("epoch", {"policy": "boot_monotonic"})
     flash_spec = case.get("flash", {"from": "blank", "recovery": False})
     run_id = uuid.uuid4().hex
@@ -575,7 +596,7 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
                              stall_ms=case.get("stall_ms", 20000), epoch_policy=ep["policy"],
                              declared_epoch_us=ep.get("us", 0),
                              novelty_trace=bool(case.get("trace_novelty")),
-                             client_transport=bool(client_lines))
+                             client_transport=bool(client_lines), rx_records=rx_records)
     blob, payload_crc = emu_blob.build_blob(spec)
     boot = (build_dir / "bootloader.bin").read_bytes()
     parts = (build_dir / "partitions.bin").read_bytes()

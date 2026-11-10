@@ -123,6 +123,8 @@ static void k1_af_copy_frame(K1AudioFrame* dst, const K1AudioFrame* src) {
   K1_AF_COPY_SEGMENT();
   dst->dropped_event_records = src->dropped_event_records;
   K1_AF_COPY_SEGMENT();
+  dst->prepared = src->prepared;
+  K1_AF_COPY_SEGMENT();
 
 #if !defined(MUTANT_EARLY_GENERATION)
   dst->ap_generation = src->ap_generation;

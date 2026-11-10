@@ -43,12 +43,12 @@ SERIAL_CMD("H",               0, cmd_help,                    SC_SAFE,          
 SERIAL_CMD("help",            0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("SB?",             0, cmd_sb_query,                SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("reset",           0, cmd_reset,                   SC_TYPED_ONLY,            CMD_DISRUPTIVE,                    IS_TYPED_ONLY )
-SERIAL_CMD("factory_reset",   0, cmd_factory_reset,           SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE | CMD_DISRUPTIVE, IS_TYPED_ONLY )
+SERIAL_CMD("factory_reset",   0, cmd_factory_reset,           SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE | CMD_DISRUPTIVE | CMD_PERSISTS, IS_TYPED_ONLY )
 #if defined(K1_BOOTLOOP_GUARD_V1) && defined(K1_BOOTLOOP_INJECT)
 SERIAL_CMD("bootloop_inject", 0, cmd_bootloop_inject,         SC_FORBIDDEN_SINGLE_BYTE, CMD_DISRUPTIVE,                    IS_TYPED_ONLY )
 #endif
-SERIAL_CMD("restore_defaults",0, cmd_restore_defaults,        SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE | CMD_DISRUPTIVE, IS_TYPED_ONLY )
-SERIAL_CMD("clear_noise_cal", 0, cmd_clear_noise_cal,         SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE,                  IS_TYPED_ONLY )
+SERIAL_CMD("restore_defaults",0, cmd_restore_defaults,        SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE | CMD_DISRUPTIVE | CMD_PERSISTS, IS_TYPED_ONLY )
+SERIAL_CMD("clear_noise_cal", 0, cmd_clear_noise_cal,         SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE | CMD_PERSISTS,   IS_TYPED_ONLY )
 SERIAL_CMD("chip_id",         0, cmd_chip_id,                 SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("identify",        0, cmd_identify,                SC_TYPED_ONLY,            0,                                 IS_TYPED_ONLY )
 SERIAL_CMD("start_noise_cal", 0, cmd_start_noise_cal_guidance,SC_ARM_REQUIRED,          CMD_NEEDS_SILENCE,                 IS_TYPED_ONLY )
@@ -67,11 +67,12 @@ SERIAL_CMD("vp_status",       0, cmd_vp_status,               SC_SAFE,          
 SERIAL_CMD("smart_status",    0, cmd_smart_status,            SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("edge_status",     0, cmd_edge_status,             SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("event_status",    0, cmd_event_status,            SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("authored_status", 0, cmd_authored_status,         SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("vp_out_test",     0, cmd_vp_out_test,             SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("get_knobs",       0, cmd_get_knobs,               SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("get_buttons",     0, cmd_get_buttons,             SC_SAFE,                  0,                                 IS_BOTH       )
 // Effects queue (2026-06-11): `commit` mirrors the '\' immediate hotkey (the
 // keystroke surface lives in serial_handle_hotkey; the hotkey column stays 0),
 // `slot_list` is a read-only typed inspection command.
-SERIAL_CMD("commit",          0, cmd_queue_commit,            SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("commit",          0, cmd_queue_commit,            SC_SAFE,                  CMD_PERSISTS,                      IS_BOTH       )
 SERIAL_CMD("slot_list",       0, cmd_slot_list,               SC_SAFE,                  0,                                 IS_TYPED_ONLY )

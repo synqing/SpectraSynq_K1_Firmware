@@ -77,7 +77,7 @@ enum class Effect {
   CLEAR_NOISE_CAL, CHIP_ID, IDENTIFY, CAL_GUIDANCE, CAL_QUEUED, GET_NUM_MODES,
   GET_MODE, RESET_REASON, DUMP, STOP, FPS, LED_FPS, VP_STATUS, SMART_STATUS,
   EDGE_STATUS, EVENT_STATUS, VP_OUT_TEST, GET_KNOBS, GET_BUTTONS, QUEUE_COMMIT,
-  SLOT_LIST, BUILD, IMAGE_ID, RUNTIME_ID
+  SLOT_LIST, BUILD, IMAGE_ID, RUNTIME_ID, AUTHORED_STATUS
 };
 static Effect g_last_effect = Effect::NONE;
 static bool   g_calibration_queued = false; // mirrors noise_transition_queued
@@ -128,6 +128,7 @@ static void cmd_vp_status()        { g_last_effect = Effect::VP_STATUS; }
 static void cmd_smart_status()     { g_last_effect = Effect::SMART_STATUS; }
 static void cmd_edge_status()      { g_last_effect = Effect::EDGE_STATUS; }
 static void cmd_event_status()     { g_last_effect = Effect::EVENT_STATUS; }
+static void cmd_authored_status()  { g_last_effect = Effect::AUTHORED_STATUS; }
 static void cmd_vp_out_test()      { g_last_effect = Effect::VP_OUT_TEST; }
 static void cmd_get_knobs()        { g_last_effect = Effect::GET_KNOBS; }
 static void cmd_get_buttons()      { g_last_effect = Effect::GET_BUTTONS; }

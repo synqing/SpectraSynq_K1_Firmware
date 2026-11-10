@@ -40,6 +40,7 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #endif
 #include "k1_trace.h"   // (serial_menu.h:10)
 #include "k1_prsm.h"
+#include "k1_prsm_rx.h"
 #include "k1_authored_source.h"
 #ifdef K1_TUNABLE_REGISTRY_V1
 #include "k1_tunables.h"  // generic AP/VP runtime parameter access (:tune)
@@ -2410,6 +2411,7 @@ void cmd_help() {
 	  USBSerial.println("                  smart_scene=[off/assist/l1/auto] | Apply runtime Smart A/B scene preset");
 	  USBSerial.println("                  smart_hooks=[on/off] | Runtime-enable onset/beat visual hooks");
 	  USBSerial.println("                  event_status | Print current onset/kick/snare/hihat event state");
+	  USBSerial.println("               authored_status | Prepared-show receiver: applied frame, epoch and counters (read-only)");
 	  USBSerial.println("                  edge_status | Runtime EdgeMixer status");
 	  USBSerial.println("                  edge_enabled=[on/off] | Runtime-enable secondary EdgeMixer");
 	  USBSerial.println("                  edge_mode=[off/analogous/complementary/split/veil/triadic/tetradic] | EdgeMixer mode");
@@ -4150,20 +4152,87 @@ void parse_command(char* command_buf) {
     }
   }
 }
+static k1_prsm_rx_t k1_serial_rx = {};
+
+// Read-only: what the prepared-show receiver has seen and applied.
+void cmd_authored_status() {
+  k1_authored_status_t st;
+  k1_authored_status(&st);
+  const k1_prsm_rx_counters_t& n = k1_serial_rx.n;
+  tx_begin();
+  USBSerial.printf(
+      "AUTHORED_STATUS state=%d epoch=%lu applied_seq=%lu applied_t_us=%llu "
+      "applied_ms=%lu hz=%u now_ms=%lu frames_applied=%lu frames_rejected=%lu "
+      "frames_duplicate=%lu seq_gaps=%lu rx_frames_ok=%lu rx_frames_bad=%lu "
+      "rx_dropped_bytes=%lu rx_cmd_aborts=%lu sessions=%lu exits=%lu\n",
+      (int)st.state, (unsigned long)st.epoch, (unsigned long)st.applied_seq,
+      (unsigned long long)st.applied_t_us, (unsigned long)st.applied_ms,
+      (unsigned)st.applied_hz, (unsigned long)millis(),
+      (unsigned long)st.frames_applied, (unsigned long)st.frames_rejected,
+      (unsigned long)st.frames_duplicate, (unsigned long)st.seq_gaps,
+      (unsigned long)n.frames_ok, (unsigned long)n.frames_bad,
+      (unsigned long)n.dropped_bytes, (unsigned long)n.cmd_aborts,
+      (unsigned long)n.sessions, (unsigned long)n.exits);
+  tx_end();
+}
+
+// The only place received input turns into an action.
+static void k1_serial_rx_act(k1_prsm_rx_event_t& rx_event, uint32_t t_now) {
+  switch (rx_event.kind) {
+    case K1_PRSM_RX_FRAME:
+      (void)k1_authored_on_frame(&rx_event.frame, t_now);
+      break;
+    case K1_PRSM_RX_HOTKEY:
+      if (serial_hotkey_is_immediate(char(rx_event.byte))) {
+        serial_handle_hotkey(char(rx_event.byte));
+      }
+      break;
+    case K1_PRSM_RX_COMMAND:
+      // The typed ':' line is the only path to the legacy parser.
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_host_command_begin(rx_event.line);
+#endif
+      parse_command(rx_event.line);
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_host_command_end();
+#endif
+      break;
+    case K1_PRSM_RX_SESSION_EXIT:
+      tx_begin();
+      USBSerial.println("PRSM_SESSION: interactive");
+      tx_end();
+      break;
+    case K1_PRSM_RX_LOCKED_NOTICE:
+      tx_begin();
+      USBSerial.println("PRSM_SESSION: locked, input ignored; send ':prsm_exit' after 200 ms of silence");
+      tx_end();
+      break;
+    case K1_PRSM_RX_NONE:
+    default:
+      break;
+  }
+}
+
 void check_serial(uint32_t t_now) {
   // Update timer
   serial_iter++;
 
-  // Non-blocking Serial input, without overwriting unprocessed data
-  static bool command_mode = false;
-  static k1_prsm_scanner_t prsm_scanner = {};
-
   /* Drain every AP tick (not 10 ms). 120 Hz PRSM is 4080 B/s; a 32-byte/10 ms
-   * cap starves the stream. Magic scanner MUST run before hotkeys: PRSM is
-   * 'P''R''S''M' and P/R/S are immediate hotkeys. */
+   * cap starves the stream. Every byte goes through k1_prsm_rx_push() first
+   * (audio/k1_prsm_rx.h): it alone decides whether a byte is part of a
+   * prepared-show frame, a ':' command line, a hotkey, or dropped. Once binary
+   * traffic is seen, hotkeys and ':' commands stay off until ":prsm_exit". */
     uint8_t bytes_processed = 0;
-    while (USBSerial.available() && bytes_processed < 128) {
+    while (bytes_processed < 128) {
+#ifdef K1_EMU_FIXTURE
+      // Emulator replay: scenario RX records first, then the real USBSerial.
+      const bool emu_rx = k1_emu_fixture_rx_available();
+      if (!emu_rx && !USBSerial.available()) break;
+      uint8_t byte = emu_rx ? k1_emu_fixture_rx_read() : USBSerial.read();
+#else
+      if (!USBSerial.available()) break;
       uint8_t byte = USBSerial.read();
+#endif
       bytes_processed++;
 
 #ifdef K1_LOOK_LIB_V1
@@ -4181,65 +4250,15 @@ void check_serial(uint32_t t_now) {
       }
 #endif
 
-      if (!command_mode) {
-        k1_prsm_frame_t prsm_frame;
-        const k1_prsm_scan_result_t scan =
-            k1_prsm_scanner_push(&prsm_scanner, byte, &prsm_frame);
-        if (scan != K1_PRSM_SCAN_NONE) {
-          if (scan == K1_PRSM_SCAN_FRAME_OK) {
-            k1_authored_on_frame(&prsm_frame, t_now);
-          }
-          continue;
-        }
-
-        if (byte == ':') {
-          command_mode = true;
-          memset(&command_buf, 0, sizeof(char) * 128);
-          command_buf_index = 0;
-          continue;
-        }
-
-        if (byte == '\r' || byte == '\n') {
-          continue;
-        }
-
-        if (serial_hotkey_is_immediate(char(byte))) {
-          serial_handle_hotkey(char(byte));
-        }
-        continue;
-      }
-
-      // Command mode is entered with ':' and is the only path to the legacy parser.
-      if (byte == '\r' || byte == '\n') {
-        if (command_buf_index > 0) {
-          command_buf[command_buf_index] = '\0';
-#ifdef K1_EMU_FIXTURE
-          k1_emu_fixture_host_command_begin(command_buf);
-#endif
-          parse_command(command_buf);
-#ifdef K1_EMU_FIXTURE
-          k1_emu_fixture_host_command_end();
-#endif
-        }
-        memset(&command_buf, 0, sizeof(char) * 128);
-        command_buf_index = 0;
-        command_mode = false;
-      } else {
-        command_buf[command_buf_index++] = byte;
-        if (command_buf_index >= 127) {
-          command_buf[127] = '\0';
-#ifdef K1_EMU_FIXTURE
-          k1_emu_fixture_host_command_begin(command_buf);
-#endif
-          parse_command(command_buf);
-#ifdef K1_EMU_FIXTURE
-          k1_emu_fixture_host_command_end();
-#endif
-          memset(&command_buf, 0, sizeof(char) * 128);
-          command_buf_index = 0;
-          command_mode = false;
-        }
-      }
+      k1_prsm_rx_event_t rx_event;
+      k1_prsm_rx_push(&k1_serial_rx, byte, t_now, &rx_event);
+      k1_serial_rx_act(rx_event, t_now);
+    }
+    if (bytes_processed < 128) {
+      // The queue ran empty: a frame held for its next byte is complete.
+      k1_prsm_rx_event_t rx_event;
+      k1_prsm_rx_burst_end(&k1_serial_rx, &rx_event);
+      k1_serial_rx_act(rx_event, t_now);
     }
 }
 void stream_agc_data(uint32_t t_now) {

@@ -61,10 +61,19 @@ class AuthoredIngressNativeTest(unittest.TestCase):
         text = SERIAL_CPP.read_text(encoding="utf-8")
         fn = text.split("void check_serial(uint32_t t_now)", 1)[1]
         body = fn.split("void stream_agc_data", 1)[0]
-        scan_at = body.find("k1_prsm_scanner_push")
-        hot_at = body.find("serial_hotkey_is_immediate")
-        self.assertGreater(scan_at, 0, "check_serial must call k1_prsm_scanner_push")
-        self.assertGreater(hot_at, 0, "check_serial must still dispatch hotkeys")
+        # Every byte goes through the receiver; hotkeys and commands are
+        # dispatched only from the event it returns (k1_serial_rx_act), and the
+        # receiver runs the frame scanner before it will call a byte a hotkey.
+        self.assertIn("k1_prsm_rx_push", body, "check_serial must call k1_prsm_rx_push")
+        self.assertNotIn("serial_handle_hotkey", body, "check_serial must not dispatch hotkeys itself")
+        act = text.split("static void k1_serial_rx_act(", 1)[1].split("void check_serial(", 1)[0]
+        self.assertIn("serial_hotkey_is_immediate", act, "hotkeys must still be dispatched")
+        rx = (AUDIO / "k1_prsm_rx.cpp").read_text(encoding="utf-8")
+        push = rx.split("void k1_prsm_rx_push(", 1)[1]
+        scan_at = push.find("k1_prsm_scanner_push")
+        hot_at = push.find("K1_PRSM_RX_HOTKEY")
+        self.assertGreater(scan_at, 0, "receiver must call k1_prsm_scanner_push")
+        self.assertGreater(hot_at, 0, "receiver must still emit hotkeys")
         self.assertLess(scan_at, hot_at, "PRSM scanner must run before hotkeys")
 
     def test_ino_one_writer(self):
