@@ -7,6 +7,8 @@ light_mode_waveform_hybrid_k1.cpp was unfrozen by the Captain on 2026-11-04
 ("Unfreeze waveform hybrid").
 light_mode_waveform_tempo.cpp carries two exact prepared-show edits approved by
 the Captain on 2026-11-10 ("All fixes now"); see PREPARED_SOURCE_EDITS.
+It also carries two exact prepared-show level edits under the same approval
+(change request R3-2); see PREPARED_LEVEL_EDITS.
 """
 
 from __future__ import annotations
@@ -92,6 +94,41 @@ def _approved_prepared_source_isolation(path, before, after):
             and hashlib.sha256(after).hexdigest() == PREPARED_SOURCE_AFTER)
 
 
+# Same approval, change request R3-2 (prepared-show level, 10 November 2026):
+# during a prepared show the fallback colour takes its hue from the palette and
+# its level from the show (visual/k1_prepared_level.h). Exactly two more edits
+# on top of the prepared-source file, both inert unless k1_vp_prepared_active():
+# the include and the level rule. Live colour and motion stay frozen.
+PREPARED_LEVEL_AFTER = "4db9993a09dc94e2f5fb35ceef38b090ecfbde20730b54975ad77347ad0a2191"
+PREPARED_LEVEL_EDITS = (
+    (b'#include "k1_vp_audio_access.h"\n'
+     b'#include "k1_prepared_level.h"\n',
+     b'#include "k1_vp_audio_access.h"\n'),
+    (b"    if (k1_vp_prepared_active()) {\n"
+     b"      // Prepared show: the palette gives the hue, the show gives the level\n"
+     b"      // (k1_prepared_level.h). Without this the level is multiplied by how\n"
+     b"      // dark the palette is at the CHROMA coordinate.\n"
+     b"      (void)k1_prepared_level_colour(\n"
+     b"          palette_manual_colour(pal, SQ15x16(rp->CHROMA), SQ15x16(1.0f)), fb, &fallback_col);\n"
+     b"    }\n",
+     b""),
+)
+
+
+def _without_prepared_level_edits(after):
+    """The file with the two permitted prepared-level edits taken back out."""
+    for new, old in PREPARED_LEVEL_EDITS:
+        assert after.count(new) == 1
+        after = after.replace(new, old, 1)
+    return after
+
+
+def _approved_prepared_level(path, before, after):
+    return (path == QUIET_MIRROR_PATH
+            and hashlib.sha256(before).hexdigest() == PREPARED_SOURCE_AFTER
+            and hashlib.sha256(after).hexdigest() == PREPARED_LEVEL_AFTER)
+
+
 def test_waveform_fast_hsv_call_count_frozen():
     src = WAVEFORM_FAST.read_text(encoding="utf-8")
     calls = [
@@ -116,13 +153,20 @@ def test_forbidden_effect_files_untouched():
         before = subprocess.check_output(["git", "show", f"HEAD:{path}"], cwd=ROOT)
         after = (ROOT / path).read_bytes()
         if not (_approved_quiet_mirror_repair(path, before, after)
-                or _approved_prepared_source_isolation(path, before, after)):
+                or _approved_prepared_source_isolation(path, before, after)
+                or _approved_prepared_level(path, before, after)):
             violations.append(path)
     assert not violations, f"E2 freeze violated; touched:\n{chr(10).join(violations)}"
 
 
 def test_quiet_mirror_allowance_rejects_other_edits_and_reversal():
-    current = (ROOT / QUIET_MIRROR_PATH).read_bytes()
+    levelled = (ROOT / QUIET_MIRROR_PATH).read_bytes()
+    assert hashlib.sha256(levelled).hexdigest() == PREPARED_LEVEL_AFTER
+    current = _without_prepared_level_edits(levelled)
+    assert _approved_prepared_level(QUIET_MIRROR_PATH, current, levelled)
+    assert not _approved_prepared_level(QUIET_MIRROR_PATH, current,
+                                        levelled + b"\n// another edit\n")
+    assert not _approved_prepared_level(QUIET_MIRROR_PATH, levelled, current)
     assert hashlib.sha256(current).hexdigest() == PREPARED_SOURCE_AFTER
     after = _without_prepared_source_edits(current)
     assert _approved_prepared_source_isolation(QUIET_MIRROR_PATH, after, current)

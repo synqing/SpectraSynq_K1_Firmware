@@ -403,6 +403,76 @@ int main(int argc, char **argv) {
     check(st.frames_rejected == 1 && st.applied_seq == 2501, "a rejected frame is not applied");
   }
 
+  /* 11. Frames lost on the way (change request R3-1): a forward step whose
+   * sequence and show time agree stays inside the epoch, and while the stream
+   * is quiet the last frame is held with the microphone kept out. */
+  {
+    k1_authored_reset();
+    k1_authored_status_t st;
+    k1_prsm_frame_t f;
+    uint32_t seq = 1000;
+    uint32_t now = 10000;
+    auto apply = [&](uint32_t s, uint64_t t_us, uint32_t at_ms) {
+      k1_prsm_parse(make_v1(120, s, t_us, prim8).data(), 34, &f);
+      return k1_authored_on_frame(&f, at_ms);
+    };
+    auto ms_of = [](uint32_t frames) { return (frames * 1000u) / 120u; };
+    apply(seq, tick_us(seq), now);
+    const uint32_t lost_runs[3] = {4, 12, 60};
+    bool held_ok = true;
+    bool live_out = true;
+    for (uint32_t lost : lost_runs) {
+      /* tick through the quiet stretch at the audio hop rate */
+      const uint32_t quiet_ms = ms_of(lost + 1);
+      for (uint32_t t = 7; t < quiet_ms; t += 7) {
+        k1_authored_tick(now + t);
+        live_out = live_out && k1_authored_suppresses_live_update();
+        if (t > K1_AUTHORED_FRESHNESS_MS) held_ok = held_ok && k1_authored_state() == K1_SRC_AUTHORED_DRAIN;
+      }
+      seq += lost + 1;
+      now += quiet_ms;
+      apply(seq, tick_us(seq), now);
+      held_ok = held_ok && k1_authored_state() == K1_SRC_AUTHORED;
+      for (int k = 0; k < 5; k++) { seq++; now += 8; apply(seq, tick_us(seq), now); }
+    }
+    k1_authored_status(&st);
+    check(st.epoch == 1, "lost runs of 4, 12 and 60 frames keep one epoch");
+    check(st.seq_gaps == 76, "every lost frame is counted");
+    check(live_out, "the microphone stays out while frames are missing");
+    check(held_ok && st.holds == 2, "the 12- and 60-frame losses were held; the 4-frame loss stayed fresh");
+
+    apply(seq - 600, tick_us(seq - 600), now + 8);
+    k1_authored_status(&st);
+    check(st.epoch == 2, "a backward jump starts a new epoch");
+    seq = seq - 600;
+    now += 8;
+
+    apply(seq + 10, tick_us(seq + 10) + 200000u, now + 8);
+    k1_authored_status(&st);
+    check(st.epoch == 3, "a forward jump whose show time does not match its sequence step starts a new epoch");
+    apply(seq + 11, tick_us(seq + 11) + 200000u, now + 16);
+    k1_authored_status(&st);
+    check(st.epoch == 3, "and the stream continues on the new timeline");
+    seq += 11;
+    now += 16;
+
+    const uint32_t beyond = (120u * K1_AUTHORED_HOLD_MS) / 1000u + 1u;
+    apply(seq + beyond, tick_us(seq + beyond) + 200000u, now + 8);
+    k1_authored_status(&st);
+    check(st.epoch == 4, "a consistent forward jump longer than the hold window is a seek");
+    seq += beyond;
+    now += 8;
+
+    /* Quiet for longer than the hold: the microphone gets the picture back,
+     * and the stream's return is a new start even if its numbers line up. */
+    for (uint32_t t = 7; t <= K1_AUTHORED_HOLD_MS + 14; t += 7) k1_authored_tick(now + t);
+    check(k1_authored_state() == K1_SRC_STANDALONE && !k1_authored_suppresses_live_update(),
+          "after the hold window the microphone has the snapshot back");
+    apply(seq + 100, tick_us(seq + 100) + 200000u, now + K1_AUTHORED_HOLD_MS + 21);
+    k1_authored_status(&st);
+    check(st.epoch == 5, "a stream that returns after the hold window starts a new epoch");
+  }
+
   if (failures) return 1;
   std::printf("PASS k1_prsm_rx\n");
   return 0;

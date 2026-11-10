@@ -2,6 +2,7 @@
 #include "k1_audio_snapshot.h"
 #include <math.h>
 #include "k1_vp_audio_access.h"
+#include "k1_prepared_level.h"
 
 // ============================================================================
 // light_mode_waveform_hybrid_k1 — faithful port of firmware-v3 effect 0x1313
@@ -219,6 +220,16 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
                                float(fallback_col.b));
     if (fallback_bright > 0.0f && fb_max < 0.02f) {
       fallback_col = hsv(SQ15x16(rp->CHROMA), SQ15x16(rp->SATURATION), SQ15x16(fallback_bright));
+    }
+    if (k1_vp_prepared_active()) {
+      // Prepared show: the palette gives the hue (CHROMA knob plus the
+      // level-driven walk), the show gives the level (k1_prepared_level.h).
+      // Without this the level is multiplied by how dark the palette is at
+      // that coordinate. The live anchor (K1_FALLBACK_HELD_U_V1) is not used:
+      // it remembers what the room played before the show.
+      (void)k1_prepared_level_colour(
+          palette_manual_colour(pal, SQ15x16(rp->CHROMA + hue_walk), SQ15x16(1.0f)),
+          fallback_bright, &fallback_col);
     }
   } else {
     fallback_col = hsv(SQ15x16(rp->CHROMA), SQ15x16(rp->SATURATION), SQ15x16(fallback_bright));

@@ -452,6 +452,18 @@ void report_authored_state(uint32_t hop) {
     K1_EMU_LOG.printf("EMU_AUTH after_hop=%ld state=%d\n", (long)hop - 1, st);
     s_auth_last = st;
   }
+  // Applied-frame bookkeeping, on each change of the prepared-show epoch
+  // (playback start or seek). Frames lost on the way must not change it.
+  static uint32_t epoch_last = 0;
+  k1_authored_status_t prepared;
+  k1_authored_status(&prepared);
+  if (prepared.epoch != epoch_last) {
+    K1_EMU_LOG.printf("EMU_PREP after_hop=%ld epoch=%lu applied_seq=%lu seq_gaps=%lu holds=%lu\n",
+                      (long)hop - 1, (unsigned long)prepared.epoch,
+                      (unsigned long)prepared.applied_seq, (unsigned long)prepared.seq_gaps,
+                      (unsigned long)prepared.holds);
+    epoch_last = prepared.epoch;
+  }
 }
 
 void print_show_state(uint32_t generation, const char* when, uint32_t hop, bool only_if_changed) {
@@ -558,6 +570,16 @@ void print_counters(const char* reason, const char* where) {
   K1_EMU_LOG.printf("EMU_RX_END records=%lu/%lu queued=%lu consumed=%lu auth_state=%d\n",
                     (unsigned long)s_rx_records_done, (unsigned long)s_rx_count, (unsigned long)s_rx_queued,
                     (unsigned long)s_rx_consumed, (int)k1_authored_state());
+  {
+    k1_authored_status_t prepared;
+    k1_authored_status(&prepared);
+    K1_EMU_LOG.printf("EMU_PREP_END epoch=%lu applied_seq=%lu frames_applied=%lu frames_duplicate=%lu "
+                      "frames_rejected=%lu seq_gaps=%lu holds=%lu\n",
+                      (unsigned long)prepared.epoch, (unsigned long)prepared.applied_seq,
+                      (unsigned long)prepared.frames_applied, (unsigned long)prepared.frames_duplicate,
+                      (unsigned long)prepared.frames_rejected, (unsigned long)prepared.seq_gaps,
+                      (unsigned long)prepared.holds);
+  }
   print_counters(reason, where);
   char dump_arg[] = "1";
   k1_render_trace_dispatch("rtrace_dump", dump_arg);
