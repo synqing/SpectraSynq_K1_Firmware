@@ -1,0 +1,14 @@
+# 2026-11-10T13:07:41Z mono=859116.985212 UNIT rpl USB B4:3A:45:A5:87:90 PORT /dev/cu.usbmodem11301
+# 2026-11-10T13:07:41Z mono=859116.985219 SEND :prsm_exit
+sbr{{
+PRSM_SESSION: interactive
+}}
+[AP] SSL=157 DC=-238 max_raw=107 follower=377 peak_scaled=0.147 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=164 rms_raw=0.0034 pky=1.65 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=129.0 conf=0.14 lock=0 phase=0.10 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=16 raw_i16_rms=11.3 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.993 agc_gain=1.233 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.007 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32
+
+# 2026-11-10T13:07:42Z mono=859118.003360 SEND :authored_status
+sbr{{
+AUTHORED_STATUS state=0 epoch=9 applied_seq=18599 applied_t_us=154991667 applied_ms=569433 hz=120 now_ms=573220 frames_applied=28777 frames_rejected=0 frames_duplicate=0 seq_gaps=0 rx_frames_ok=28777 rx_frames_bad=0 rx_dropped_bytes=863499 rx_cmd_aborts=0 sessions=3 exits=3
+}}
+[AP] SSL=157 DC=-238 max_raw=366 follower=628 peak_scaled=0.985 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=583 rms_raw=0.0062 pky=3.32 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=89.0 conf=0.10 lock=0 phase=0.91 beat=0 bstr=0.19 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=28 raw_i16_rms=15.8 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.941 agc_gain=1.108 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.276 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32
+[AP] SSL=157 DC=-238 max_raw=496 follower=1246 peak_scaled=0.753 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=754 rms_raw=0.0071 pky=5.24 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=89.0 conf=0.20 lock=0 phase=0.41 beat=0 bstr=0.10 | onset=0 bass=1 ostr=0.07 | raw_i16_abs_peak=34 raw_i16_rms=18.7 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.813 agc_gain=1.037 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.176 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32
+

@@ -15,6 +15,7 @@ Never changes Mac volume; the player owns audio and its own safety checks.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -54,13 +55,16 @@ def main() -> int:
         (rd / "run.json").write_text(json.dumps(rec, indent=1))
         raise SystemExit("rtrace arm failed")
 
-    cam = subprocess.Popen(
+    # 10 Nov 2026: K1_NO_CAMERA=1 skips footage (a7S III in PC-remote mode is held by macOS
+    # mscamerad and is not an AVFoundation source). The two-edge LED capture is the instrument.
+    no_cam = os.environ.get("K1_NO_CAMERA") == "1"
+    cam = None if no_cam else subprocess.Popen(
         ["ffmpeg", "-hide_banner", "-loglevel", "warning", "-f", "avfoundation",
          "-framerate", "25", "-video_size", "1280x720", "-i", "ILCE-7SM3:ILCE-7SM3",
          "-c:v", "h264_videotoolbox", "-b:v", "10M", "-c:a", "aac", "-b:a", "192k",
          "-y", str(rd / "a7s3.mp4")],
         stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=open(rd / "ffmpeg.log", "w"))
-    rec["steps"]["camera_start"] = now()
+    rec["steps"]["camera_start"] = {**now(), "skipped": no_cam}
     time.sleep(1.5)
     try:
         if no_player:
@@ -82,13 +86,24 @@ def main() -> int:
             (rd / "player.stderr.txt").write_text(p.stderr)
         time.sleep(1.0)
     finally:
-        try:
-            cam.communicate(b"q", timeout=10)
-        except subprocess.TimeoutExpired:
-            cam.terminate()
-            cam.wait(5)
-        rec["steps"]["camera_stop"] = {**now(), "rc": cam.returncode}
+        if cam is not None:
+            try:
+                cam.communicate(b"q", timeout=10)
+            except subprocess.TimeoutExpired:
+                cam.terminate()
+                cam.wait(5)
+        rec["steps"]["camera_stop"] = {**now(), "rc": None if cam is None else cam.returncode}
         (rd / "run.json").write_text(json.dumps(rec, indent=1))
+
+    # a6bad318 receiver: after any stream the port stays locked until ':prsm_exit' (>= 200 ms idle).
+    streamed = not no_player and "--audio-only" not in player_args
+    if streamed:
+        u = subprocess.run([PY, str(HERE / "k1_bench.py"), "unlock", str(rd / "unlock.txt")],
+                           capture_output=True, text=True)
+        rec["steps"]["unlock"] = {**now(), "rc": u.returncode, "out": u.stdout[-300:]}
+        (rd / "run.json").write_text(json.dumps(rec, indent=1))
+        if u.returncode != 0:
+            raise SystemExit("unlock failed: the K1 did not return to interactive; dump skipped")
 
     # rtrace window must have closed before the dump (device stops capture at end time)
     d = subprocess.run([PY, str(HERE / "k1_bench.py"), "dump", str(rd / "dump.txt")],

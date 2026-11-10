@@ -63,6 +63,11 @@ Firmware rule:
 
 ## 6. Decisions only the Captain can make
 
+**DECIDED by the Captain, 10 Nov 2026 ~16:20 AWST (K1-FE-SHOW lead session 2, asked once with recommendations):**
+- (c) Firmware fixes: **"All fixes now"** (recommendation was phase 1 only). The FW lead implements every item of `CHANGE-REQUESTS-FW-LEAD.md` rev 2 except priority 3 (richer harmonic colour stays a Captain decision after the colour diagnosis). Delivered as a dated session brief in `~/K1_Launch_Planning/00-Governance/team/LEAD-FW-FE-RELEASE.md`; FW lead launched 10 Nov 16:18 AWST (`team/logs/FW-20261110-1618.log`). Nothing is flashed by the FW lead.
+- (d) PRISM tools: **"Yes, all of it"** (recommendation excluded per-section editing). Agents fix the PRISM.studio, Spine and Trinity defects on branches in their own repos with their own tests, including per-section editing (later phase). `organs.lock.json` is never repinned without the Captain or the Spine owner.
+- (e) Bench unit: **Main RPL, flash go** (as recommended). Once a fixed candidate passes G1–G4 and the Lane B oracle, the lead may flash the Main RPL (`9087A500`, USB `B4:3A:45:A5:87:90`) with a capture-enabled test build carrying that unit's pin map. The Captain still plugs it in; B489 stays with the FW lead for the FE bench proof.
+
 **DECIDED by the Captain, 9 Nov 2026 ~20:50 AWST (in the lead session, against the agents' recommendations below):**
 - (a) M1 bench session: **tonight** (before G4). It ran 9 Nov 20:57–21:45 AWST on B489A500; no flash. Receipt: `lane-d/D-P2-receipt.md`.
 - (b) T3 (M2, creator loop): **yes, host-side only**, before G4. No hardware or firmware change. Not started by this task; it is the next executable task.
@@ -101,3 +106,4 @@ PROPOSAL — NOT APPROVED (superseded by the decisions above).
 
 2026-11-09 AWST — Lane E created this record from the course file, charters, REV2 brief and PLAN; no other file written.
 2026-11-09 21:50 AWST — lead: recorded the Captain's decisions (bench tonight; M2 host-side yes; both audio conditions). The course file itself was not edited (Operations Manager owns it); add a course changelog line from this section.
+2026-11-10 16:25 AWST — lead (session 2): recorded the Captain's decisions (c) all firmware fixes now, (d) all PRISM tool fixes, (e) Main RPL bench unit with flash go after the gates pass. Course file not edited; proposed course line for the Operations Manager: "2026-11-10 16:20 AWST — Captain: FW lead implements the K1-FE-SHOW change requests rev 2 (except priority 3); agents may fix PRISM.studio/Spine/Trinity on branches; Main RPL is the M1 bench unit with a flash go once fixes pass the emulator gates."

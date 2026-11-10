@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import shutil
 import subprocess
 import sys
@@ -25,9 +26,9 @@ import py_device_model as dm  # noqa: E402
 import validate_prim8_stream as vps  # noqa: E402
 
 FIX = HERE / "fixtures"
-RAW = HERE / "raw"
+RAW = HERE / os.environ.get("LANE_B_RAW", "raw")          # default: the 407fdf6f evidence dir
 ORACLE = HERE / "oracle"
-FW = ORACLE / "fw_407fdf6f"
+FW = ORACLE / os.environ.get("LANE_B_FW", "fw_407fdf6f")  # select snapshot, e.g. fw_8b202f46
 PY313 = "/opt/homebrew/opt/python@3.13/bin/python3.13"
 PRISM = Path.home() / "Workspace_Management/Software/.g5r-clean/PRISM.studio"
 EXPECTED = json.loads((FIX / "expected.json").read_text())

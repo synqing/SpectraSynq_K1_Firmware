@@ -1,0 +1,72 @@
+{
+ "run": "R_M2_m32_authored_music",
+ "capture_s": 92,
+ "player_args": [
+  "--stream",
+  "stream/loreen_75_155_120hz_v2.prsm",
+  "--asset",
+  "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+  "--allow-line",
+  "[AP]",
+  "--start-delay-s",
+  "1",
+  "--log",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/R_M2_m32_authored_music/player.jsonl",
+  "--port",
+  "/dev/cu.usbmodem11301"
+ ],
+ "steps": {
+  "armed": {
+   "utc": "2026-11-10T13:16:19Z",
+   "mono": 859634.925307791,
+   "rc": 0,
+   "out": ".1 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.375 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32\n\n"
+  },
+  "camera_start": {
+   "utc": "2026-11-10T13:16:19Z",
+   "mono": 859634.925331041,
+   "skipped": true
+  },
+  "player_start": {
+   "utc": "2026-11-10T13:16:20Z",
+   "mono": 859636.430366125
+  },
+  "player_end": {
+   "utc": "2026-11-10T13:17:43Z",
+   "mono": 859718.910565041,
+   "rc": 0
+  },
+  "camera_stop": {
+   "utc": "2026-11-10T13:17:44Z",
+   "mono": 859719.916047458,
+   "rc": null
+  },
+  "unlock": {
+   "utc": "2026-11-10T13:17:48Z",
+   "mono": 859723.693993291,
+   "rc": 0,
+   "out": "0 lock=0 phase=0.19 beat=0 bstr=0.14 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=23 raw_i16_rms=20.3 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.126 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.012 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32\n\n"
+  },
+  "dump": {
+   "utc": "2026-11-10T13:18:02Z",
+   "mono": 859737.978834,
+   "rc": 0
+  }
+ },
+ "player_cmd": [
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/.venv/bin/python",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/player/show_player.py",
+  "--stream",
+  "stream/loreen_75_155_120hz_v2.prsm",
+  "--asset",
+  "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+  "--allow-line",
+  "[AP]",
+  "--start-delay-s",
+  "1",
+  "--log",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/R_M2_m32_authored_music/player.jsonl",
+  "--port",
+  "/dev/cu.usbmodem11301"
+ ]
+}

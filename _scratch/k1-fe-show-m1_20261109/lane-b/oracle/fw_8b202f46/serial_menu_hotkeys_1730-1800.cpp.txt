@@ -1,0 +1,71 @@
+bool serial_hotkey_is_immediate(char key) {
+  switch (key) {
+    // EdgeMixer live-control keys (actions in serial_handle_hotkey). All SC_SAFE:
+    // they mutate only the EdgeMixer secondary-colour config, never destructive.
+    case 'g':  // toggle EdgeMixer on/off
+    case 'G':  // cycle edge_mode
+    case 'u':  // toggle rotation faithful<->luma
+    case 'y':  // cycle dual-edge; complementary skips mirror (dead cell)
+#ifndef ENABLE_MOTION_PROBE
+    // ref E spatial toggle (SHIPPING). 'm' doubles as the motion-probe "B knob +"
+    // key under ENABLE_MOTION_PROBE (see the guarded block below); the two are
+    // mutually exclusive by build, so neither duplicates the other.
+    case 'm':  // toggle spatial uniform<->masked (ref E)
+#endif
+    case '-':  // spread -5
+    case '=':  // spread +5
+    case '_':  // strength -0.1
+    case '+':  // strength +0.1
+    case ' ':
+    case 'h':
+    case ';':
+    case 'N':
+    case 'Y':
+    case '[':
+    case ']':
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case '!':  // shift+digit = preset slot save 1..10
+    case '@':
+    case '#':
+    case '$':
+    case '%':
+    case '^':
+    case '&':
+    case '*':
+    case '(':
+    case ')':
+    case '\\': // queue commit
+    case 'U':  // queue mode toggle
+    case 'i':
+    case 'I':
+    case 'o':
+    case 'O':
+    case 'p':
+    case 'P':
+    case 'j':
+    case 'J':
+    case 'k':
+    case 'K':
+    case 'l':
+    case 'L':
+    case 'q':
+    case 'Q':
+    case 'w':
+    case 'W':
+    case 'e':
+    case 'E':
+    case 'r':
+    case 'R':
+    case 't':
+    case 'T':
+    case ',':
+    case '.':

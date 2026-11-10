@@ -1,0 +1,9 @@
+NOT ELIGIBLE fixtures/bad_magic.prsm frames=5/24 hotkeys=26 cmd_entries=6 cmd_swallowed=550 cmds_executed=5 preamble=64B guard=0B
+  - 26 byte(s) reach immediate hotkeys, first at 252 ('0')
+  - 6 ':' command-mode entr(y/ies), first at 259
+  - 550 byte(s) swallowed by command mode, first at 260
+  - 5 command line(s) executed, first ending at 386
+  - 87 stream byte(s) not consumed by the PRSM scanner, first at 237
+  - device accepts 5 of 24 stream frames
+  - end state fill=0 command_mode=1
+bad_magic audit exit=1

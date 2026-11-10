@@ -1,0 +1,53 @@
+{
+ "run": "R_S3_m32_authored_silent",
+ "capture_s": 90,
+ "player_args": [
+  "SILENT",
+  "../lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+  "runs/R_S3_m32_authored_silent/stream.jsonl"
+ ],
+ "steps": {
+  "armed": {
+   "utc": "2026-11-10T13:06:15Z",
+   "mono": 859031.055976166,
+   "rc": 0,
+   "out": ".1 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.998 agc_gain=1.435 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.013 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32\n\n"
+  },
+  "camera_start": {
+   "utc": "2026-11-10T13:06:15Z",
+   "mono": 859031.055999916,
+   "skipped": true
+  },
+  "player_start": {
+   "utc": "2026-11-10T13:06:17Z",
+   "mono": 859032.561044958
+  },
+  "player_end": {
+   "utc": "2026-11-10T13:07:39Z",
+   "mono": 859114.884093416,
+   "rc": 0
+  },
+  "camera_stop": {
+   "utc": "2026-11-10T13:07:40Z",
+   "mono": 859115.889691333,
+   "rc": null
+  },
+  "unlock": {
+   "utc": "2026-11-10T13:07:44Z",
+   "mono": 859119.634815416,
+   "rc": 0,
+   "out": "0 lock=0 phase=0.41 beat=0 bstr=0.10 | onset=0 bass=1 ostr=0.07 | raw_i16_abs_peak=34 raw_i16_rms=18.7 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.813 agc_gain=1.037 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.176 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32\n\n"
+  },
+  "dump": {
+   "utc": "2026-11-10T13:08:10Z",
+   "mono": 859146.190379125,
+   "rc": 3
+  }
+ },
+ "player_cmd": [
+  "/opt/homebrew/opt/python@3.13/bin/python3.13",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/silent_stream.py",
+  "../lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+  "runs/R_S3_m32_authored_silent/stream.jsonl"
+ ]
+}

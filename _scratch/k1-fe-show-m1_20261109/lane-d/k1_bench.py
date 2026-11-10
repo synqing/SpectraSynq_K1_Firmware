@@ -9,6 +9,13 @@ Sub-commands (each opens the port, does one job, closes it):
   dump   OUT               :ap_stream=0, :rtrace_dump=1 until [RTRACE-END] (one re-dump on CRC
                            failure), :ap_stream=1; then parse + CRC-verify into OUT.npz
   parse  RAW OUT           parse/verify an existing dump log (no device needed, no K1_UNIT needed)
+  unlock OUT               after a prepared stream (firmware >= a6bad318): wait for >= 200 ms of
+                           silence, send ':prsm_exit', require 'PRSM_SESSION: interactive', then
+                           read ':authored_status'. Exit 1 if the session did not unlock.
+
+a6bad318 receiver (10 Nov 2026): once binary traffic is seen, hotkeys and ':' commands stay off
+until the exact line ':prsm_exit' arrives after 200 ms of silence. The prepared-frame records
+([RTRACE-PREPARED-BEGIN]..[RTRACE-PREPARED-END], P-lines) follow [RTRACE-END]; dump keeps them.
 
 Dump formats (visual/k1_render_trace.cpp): rgb8hex (6 hex/px) or rgb16hex (12 hex/px, R16 G16 B16
 big-endian); one edge per line, or two when the BEGIN line says edges=2. CRC = zlib/esp crc32 over
@@ -38,7 +45,7 @@ BAUD = 115200
 # serial_cmd_handlers.cpp:1638): used only to set a test mode and to restore the resident one.
 ALLOWED = re.compile(
     r"^:(build|chip_id|dump|smart_status|rtrace_status=1|rtrace_dump=1|"
-    r"rtrace_arm=\d{1,3},\d{1,3}|ap_stream=(0|1)|set_mode=(18|22|32))$"
+    r"rtrace_arm=\d{1,3},\d{1,3}|ap_stream=(0|1)|set_mode=(18|22|32)|prsm_exit|authored_status)$"
 )
 BEGIN_RE = re.compile(r"^\[RTRACE-BEGIN\b(?P<body>[^\]]*)\]\s*$")
 F_RE = re.compile(r"^F,(?P<idx>\d+),(?P<ms>\d+),(?P<mode>\d+),(?P<hex>[0-9a-fA-F]+)(?:,(?P<hex2>[0-9a-fA-F]+))?$")
@@ -200,6 +207,13 @@ def main() -> int:
         wait = float(sys.argv[4]) if len(sys.argv) > 4 else 1.5
         print(cmd_lines(out, [(line, wait)])[-600:])
         return 0
+    if sub == "unlock":
+        out = Path(sys.argv[2])
+        time.sleep(0.4)  # >= 200 ms of silence before the exit line (K1_PRSM_RX_EXIT_GUARD_MS)
+        t = cmd_lines(out, [(":prsm_exit", 1.0), (":authored_status", 1.5)])
+        ok = "PRSM_SESSION: interactive" in t
+        print("UNLOCKED" if ok else "UNLOCK FAILED", t[-700:])
+        return 0 if ok else 1
     if sub == "arm":
         out, sec, every = Path(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
         t = cmd_lines(out, [(f":rtrace_arm={sec},{every}", 1.0)])
@@ -217,6 +231,8 @@ def main() -> int:
             with out.open("wb") as f:
                 send(s, ":rtrace_dump=1")
                 f.write(capture(s, 120.0, until="[RTRACE-END]"))
+                # a6bad318+: prepared-frame records follow [RTRACE-END] when the window held any
+                f.write(capture(s, 3.0, until="[RTRACE-PREPARED-END]"))
             first = parse_dump(out, out.with_suffix(".npz"))
             if not first["crc_ok"]:
                 out.rename(out.with_suffix(".attempt1.txt"))

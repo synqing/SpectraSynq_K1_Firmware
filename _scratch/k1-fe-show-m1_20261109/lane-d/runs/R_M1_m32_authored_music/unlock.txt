@@ -1,0 +1,13 @@
+# 2026-11-10T13:15:57Z mono=859612.815118 UNIT rpl USB B4:3A:45:A5:87:90 PORT /dev/cu.usbmodem11301
+# 2026-11-10T13:15:57Z mono=859612.815135 SEND :prsm_exit
+sbr{{
+PRSM_SESSION: interactive
+}}
+[AP] SSL=157 DC=-238 max_raw=85 follower=342 peak_scaled=0.196 response_gain=1.000 silent_scale=1.000 silence=1 sil_pk=167 rms_raw=0.0028 pky=1.75 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=135.0 conf=0.40 lock=0 phase=0.15 beat=0 bstr=0.18 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=15 raw_i16_rms=12.0 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.527 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32
+
+# 2026-11-10T13:15:58Z mono=859613.834571 SEND :authored_status
+sbr{{
+AUTHORED_STATUS state=0 epoch=13 applied_seq=18599 applied_t_us=154991667 applied_ms=1065033 hz=120 now_ms=1069128 frames_applied=45574 frames_rejected=9404 frames_duplicate=0 seq_gaps=3 rx_frames_ok=54978 rx_frames_bad=0 rx_dropped_bytes=1649972 rx_cmd_aborts=0 sessions=6 exits=6
+}}
+[AP] SSL=157 DC=-238 max_raw=217 follower=295 peak_scaled=0.527 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=255 rms_raw=0.0029 pky=2.27 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=135.0 conf=0.38 lock=0 phase=0.43 beat=0 bstr=0.17 | onset=0 bass=1 ostr=0.06 | raw_i16_abs_peak=13 raw_i16_rms=6.6 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.194 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.059 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32
+

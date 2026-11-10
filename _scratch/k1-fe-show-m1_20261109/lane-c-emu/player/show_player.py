@@ -133,7 +133,7 @@ def stop_previous_player() -> str | None:
 class Audio:
     """Original recording through CoreAudio at the CURRENT system volume (never changed)."""
 
-    def __init__(self, asset: Path, rate: int, start_s: float, silent: bool = False):
+    def __init__(self, asset: Path, rate: int, start_s: float, silent: bool = False, gain_db: float = 0.0):
         import numpy as np
         import sounddevice as sd
         self.sd, self.np = sd, np
@@ -144,6 +144,10 @@ class Audio:
                                   "-f", "f32le", "-ac", "2", "-ar", str(rate), "-"],
                                  check=True, capture_output=True).stdout
             self.pcm = np.frombuffer(raw, dtype="<f4").reshape(-1, 2)
+            # 10 Nov 2026 (lead): digital attenuation of the file data only, for the volume-dependence
+            # test. Never louder than the recording (gain_db <= 0); system volume is never touched.
+            if gain_db < 0.0:
+                self.pcm = (self.pcm * np.float32(10.0 ** (gain_db / 20.0))).astype(np.float32)
         self.rate = rate
         self.pos = int(round(start_s * rate))
         self.first_dac = None          # stream time of the first sample's DAC output
@@ -326,6 +330,8 @@ def main() -> int:
                     help="play the passage with identical audio start/pacing/logging; send no frames, open no port")
     ap.add_argument("--rejected", choices=("hz0", "ver2"),
                     help="send rejected-input frames: hz0 = byte 5 set to 0, ver2 = byte 4 set to 2")
+    ap.add_argument("--gain-db", type=float, default=0.0,
+                    help="digital attenuation of the recording (<= 0 dB only; system volume never touched)")
     ap.add_argument("--start-delay-s", type=float, default=0.0,
                     help="seconds to wait after pre-flight/port open before audio and frames start")
     ap.add_argument("--boundary-timeout-s", type=float, default=3.0,
@@ -458,7 +464,7 @@ def main() -> int:
             state["ser"] = serial.Serial(port, args.baud, timeout=0.05, write_timeout=0.25)
         if audio_wanted:
             state["audio"] = Audio(Path(args.asset) if args.asset else Path("/dev/null"), side["asset"]["sample_rate"],
-                                   start_us / 1e6, silent=args.silent_audio)
+                                   start_us / 1e6, silent=args.silent_audio, gain_db=min(0.0, args.gain_db))
         header["thread_qos_rc"] = raise_thread_qos()
         t_open = time.monotonic_ns()
         if state["ser"] is not None:

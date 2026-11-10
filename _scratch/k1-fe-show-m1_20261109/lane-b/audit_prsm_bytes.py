@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -42,7 +43,7 @@ import prim8_stream as ps  # noqa: E402
 import py_device_model as dm  # noqa: E402
 
 ORACLE = HERE / "oracle"
-FW = ORACLE / "fw_407fdf6f"
+FW = ORACLE / os.environ.get("LANE_B_FW", "fw_407fdf6f")  # select snapshot, e.g. fw_8b202f46
 SRC = [ORACLE / "byte_audit.cpp", FW / "k1_prsm.cpp", FW / "k1_authored_source.cpp"]
 PREAMBLE = ps.RESYNC_PREAMBLE
 ACTIONABLE = dm.IMMEDIATE_HOTKEYS | dm.CONDITIONAL_HOTKEYS
