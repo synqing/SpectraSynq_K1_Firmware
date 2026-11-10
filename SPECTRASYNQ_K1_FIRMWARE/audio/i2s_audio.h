@@ -860,8 +860,15 @@ void acquire_sample_chunk(uint32_t t_now) {
     k1_afe2_init(k1_afe2, (float)CONFIG.SAMPLE_RATE);
     k1_afe2_ready = true;
   }
+  const int64_t k1_afe2_t0_us = AP_STREAM_ENABLED ? esp_timer_get_time() : 0;
   k1_afe2_process_hop(k1_afe2, im69d_samples_i16, (uint16_t)CONFIG.SAMPLES_PER_CHUNK,
                       k1_afe2_gamma, k1_afe2_floor);
+  if (AP_STREAM_ENABLED) {
+    const uint32_t k1_afe2_us = (uint32_t)(esp_timer_get_time() - k1_afe2_t0_us);
+    k1_afe2_us_sum += k1_afe2_us;
+    k1_afe2_us_count++;
+    if (k1_afe2_us > k1_afe2_us_max) k1_afe2_us_max = k1_afe2_us;
+  }
 #endif
 #ifdef K1_MIC_HEALTH_V1
   {
@@ -1727,6 +1734,12 @@ void acquire_sample_chunk(uint32_t t_now) {
       (k1_afe2_ready && k1_afe2_enabled) ? 1 : 0, (k1_afe2_ready && k1_afe2_level_enabled) ? 1 : 0,
       k1_afe2.how_much, k1_afe2_peak_env,
       sqrtf(k1_afe2.section), sqrtf(k1_afe2.anchor), k1_afe2.fast ? 1 : 0, k1_afe2_gamma, k1_afe2_floor);
+    // afe_us = mean and worst time of the meter per hop since the last line (microseconds).
+    USBSerial.printf(" afe_us=%.1f afe_us_max=%u",
+      k1_afe2_us_count ? (float)k1_afe2_us_sum / (float)k1_afe2_us_count : 0.0f, (unsigned)k1_afe2_us_max);
+    k1_afe2_us_sum = 0;
+    k1_afe2_us_max = 0;
+    k1_afe2_us_count = 0;
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     USBSerial.printf(" | i2s_wait_us=%u i2s_seq=%u",

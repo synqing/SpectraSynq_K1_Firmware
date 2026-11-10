@@ -86,6 +86,11 @@ inline float k1_afe2_floor = K1_AFE2_FLOOR_DEFAULT;
 // The level-free beat envelope ("what"). waveform_peak_scaled is this value, times how_much
 // when the exposure is enabled.
 inline float k1_afe2_peak_env = 0.0f;
+// Cost of the meter on the device, measured only while the [AP] telemetry stream is on
+// (two timer reads per hop). Reported and cleared once per telemetry line.
+inline uint32_t k1_afe2_us_sum = 0;
+inline uint32_t k1_afe2_us_max = 0;
+inline uint32_t k1_afe2_us_count = 0;
 
 // Output brightness factor for the live microphone path. 1.0 when the stage is off or has no
 // meter on this build. Read on the render core; a single float written on the audio core.

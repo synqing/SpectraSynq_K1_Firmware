@@ -105,6 +105,14 @@ SUPPORTED_COMMANDS = {
     "temporal_dithering", "incandescent_mode", "secondary_incandescent_mode", "look", "secondary_look",
     "secondary_enabled", "edge_enabled", "edge_mode", "edge_strength", "edge_spread",
     "edge_rotation", "edge_uniform", "edge_dual", "max_current_ma", "save_show",
+    # af-emu guard A/B (10 Nov 2026): production parser commands, serial_cmd_handlers.cpp:290
+    # (sensitivity) and serial_menu.cpp:3611 (k1_loud_guard, K1_LOUD_GUARD_V1).
+    "sensitivity", "k1_loud_guard",
+    # K1-FE-SHOW lead session 3 (10 Nov 2026): chroma sparseness gate probe, production parser
+    # serial_cmd_handlers.cpp:821 (vp_chroma_gate -> VP_FIX_CHROMAGRAM_SPARSENESS). Scratch export only.
+    "vp_chroma_gate",
+    # AFE2 exposure (audio/k1_afe2.*): production typed commands, serial_typed_dispatch.cpp.
+    "k1_afe", "k1_afe_level", "k1_afe_gamma", "k1_afe_floor",
 }
 
 
