@@ -159,7 +159,20 @@ def main() -> int:
         seek_i = 0
         epoch = 0
         tick = 0  # send-slot counter (absolute schedule)
+        skipped = 0
         while idx < n:
+            # Late-drop (session 3, 10 Nov): after a host stall, jump to the slot that is due now
+            # instead of sending the backlog as a burst. Frames keep their own seq and t_us, so the
+            # device sees a truthful forward gap. Stop and seek are re-checked on the new slot below.
+            due = int((time.perf_counter() - t_start) * hz)
+            if due > tick:
+                late = min(due - tick, n - 1 - idx)
+                if late > 0:
+                    recs.append({"kind": "late_skip", "from_slot": tick, "frames": late,
+                                 "from_idx": idx, "mono": time.monotonic()})
+                    skipped += late
+                    idx += late
+                    tick += late
             elapsed_sched = tick / hz
             if a.stop_after_s is not None and elapsed_sched >= a.stop_after_s:
                 break
@@ -200,7 +213,8 @@ def main() -> int:
     errs = [r["send_err_ms"] for r in recs if "send_err_ms" in r]
     errs_sorted = sorted(errs)
     summary = {
-        "kind": "summary", "rc": rc, "frames_sent": len(errs), "epochs": sum(1 for r in recs if r.get("kind") == "epoch"),
+        "kind": "summary", "rc": rc, "frames_sent": len(errs),
+        "frames_skipped_late": sum(r["frames"] for r in recs if r.get("kind") == "late_skip"), "epochs": sum(1 for r in recs if r.get("kind") == "epoch"),
         "mono_start": mono_start if t_start else None, "mono_end": t_end_mono if t_start else None,
         "send_err_ms_p50": errs_sorted[len(errs) // 2] if errs else None,
         "send_err_ms_p95": errs_sorted[int(len(errs) * 0.95)] if errs else None,

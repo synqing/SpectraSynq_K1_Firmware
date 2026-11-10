@@ -1,0 +1,150 @@
+{
+ "R_S3_m32_authored_silent vs R_M1_m32_authored_music": {
+  "npz_keys": [
+   "rgb",
+   "ms",
+   "mode",
+   "idx",
+   "rgb_secondary"
+  ],
+  "p_lines": [
+   699,
+   1893
+  ],
+  "epochs": [
+   [
+    9
+   ],
+   [
+    13
+   ]
+  ],
+  "rgb": {
+   "common_seq": 158,
+   "identical_frames": 0,
+   "mean_abs_diff": 0.03279734409319721,
+   "p99_abs_diff": 0.6427862973983368,
+   "max_abs_diff": 0.9991302357518883,
+   "mean_level_a": 0.047060357077208397,
+   "mean_level_b": 0.04691092248191532,
+   "brightness_corr": 0.9331546321403442
+  },
+  "rgb_secondary": {
+   "common_seq": 158,
+   "identical_frames": 1,
+   "mean_abs_diff": 0.0004824764298009341,
+   "p99_abs_diff": 0.01062027924010071,
+   "max_abs_diff": 0.08249027237354085,
+   "mean_level_a": 0.0018540456045164128,
+   "mean_level_b": 0.0018977293835001042,
+   "brightness_corr": 0.9261676794525645
+  }
+ },
+ "R_S3_m32_authored_silent vs R_M2_m32_authored_music": {
+  "npz_keys": [
+   "rgb",
+   "ms",
+   "mode",
+   "idx",
+   "rgb_secondary"
+  ],
+  "p_lines": [
+   699,
+   1893
+  ],
+  "epochs": [
+   [
+    9
+   ],
+   [
+    14
+   ]
+  ],
+  "rgb": {
+   "common_seq": 18,
+   "identical_frames": 0,
+   "mean_abs_diff": 0.042926793429578204,
+   "p99_abs_diff": 0.6906843671320668,
+   "max_abs_diff": 0.9472343022812237,
+   "mean_level_a": 0.046326602409230005,
+   "mean_level_b": 0.04591393770363024,
+   "brightness_corr": 0.9470905137444768
+  },
+  "rgb_secondary": {
+   "common_seq": 18,
+   "identical_frames": 0,
+   "mean_abs_diff": 0.0005841450285258937,
+   "p99_abs_diff": 0.011123826962691692,
+   "max_abs_diff": 0.07777523460746166,
+   "mean_level_a": 0.0018495170802144177,
+   "mean_level_b": 0.002027256427862974,
+   "brightness_corr": 0.9180872834798345
+  }
+ },
+ "R_M1_m32_authored_music vs R_M2_m32_authored_music": {
+  "npz_keys": [
+   "rgb",
+   "ms",
+   "mode",
+   "idx",
+   "rgb_secondary"
+  ],
+  "p_lines": [
+   1893,
+   1893
+  ],
+  "epochs": [
+   [
+    13
+   ],
+   [
+    14
+   ]
+  ],
+  "rgb": {
+   "common_seq": 303,
+   "identical_frames": 0,
+   "mean_abs_diff": 0.03218487937524965,
+   "p99_abs_diff": 0.6574044403753719,
+   "max_abs_diff": 0.9991302357518883,
+   "mean_level_a": 0.0467046241131323,
+   "mean_level_b": 0.04658065316335555,
+   "brightness_corr": 0.9656140844431088
+  },
+  "rgb_secondary": {
+   "common_seq": 303,
+   "identical_frames": 3,
+   "mean_abs_diff": 0.00041681428385456995,
+   "p99_abs_diff": 0.008529793240253299,
+   "max_abs_diff": 0.08134584573128863,
+   "mean_level_a": 0.0018227990686457065,
+   "mean_level_b": 0.001852200803356448,
+   "brightness_corr": 0.9346068050928159
+  }
+ },
+ "R_M0_m32_live_music vs R_M1_m32_authored_music": {
+  "npz_keys": [
+   "rgb",
+   "ms",
+   "mode",
+   "idx",
+   "rgb_secondary"
+  ],
+  "p_lines": [
+   0,
+   1893
+  ],
+  "epochs": [
+   [],
+   [
+    13
+   ]
+  ],
+  "rgb": {
+   "common_seq": 0
+  },
+  "rgb_secondary": {
+   "common_seq": 0
+  }
+ }
+}
