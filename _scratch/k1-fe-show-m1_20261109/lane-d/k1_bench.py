@@ -47,7 +47,7 @@ ALLOWED = re.compile(
     r"^:(build|chip_id|dump|smart_status|rtrace_status=1|rtrace_dump=1|"
     r"rtrace_arm=\d{1,3},\d{1,3}|ap_stream=(0|1)|set_mode=(18|22|32)|prsm_exit|authored_status|"
     r"k1_afe=(on|off|true|false|status)|k1_afe_gamma=[0-2](\.\d{1,2})?|k1_afe_floor=[01](\.\d{1,2})?|"
-    r"k1_afe_silence=(on|off|true|false))$"  # AFE2 stage 2 switch (11 Nov 2026), RAM only
+    r"k1_afe_silence=(on|off|true|false))$"  # AFE2 stage 2 switch: on d2701d9a only (deleted with the old test after)
 )
 BEGIN_RE = re.compile(r"^\[RTRACE-BEGIN\b(?P<body>[^\]]*)\]\s*$")
 F_RE = re.compile(r"^F,(?P<idx>\d+),(?P<ms>\d+),(?P<mode>\d+),(?P<hex>[0-9a-fA-F]+)(?:,(?P<hex2>[0-9a-fA-F]+))?$")
