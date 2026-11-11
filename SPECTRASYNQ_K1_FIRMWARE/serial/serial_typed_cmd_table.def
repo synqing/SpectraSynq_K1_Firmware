@@ -179,7 +179,6 @@ SERIAL_TYPED_CMD("k1_afe", serial_typed_k1_afe, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("k1_afe_level", serial_typed_k1_afe_level, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("k1_afe_gamma", serial_typed_k1_afe_gamma, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("k1_afe_floor", serial_typed_k1_afe_floor, SC_TYPED_ONLY, 0)
-SERIAL_TYPED_CMD("k1_afe_spec", serial_typed_k1_afe_spec, SC_TYPED_ONLY, 0)
 #endif
 SERIAL_TYPED_CMD("silence_enter", serial_typed_silence_enter, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("silence_exit", serial_typed_silence_exit, SC_TYPED_ONLY, 0)

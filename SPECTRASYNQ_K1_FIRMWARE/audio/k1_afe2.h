@@ -32,12 +32,12 @@
 // applies). It replaced the crest/peak/SSL test, which called loud dense music silent
 // (16-21 of 88 telemetry lines at S = 13-30 counts rms, 11 Nov); that test was deleted.
 //
-// Stage 4 (11 Nov 2026): one gain for the whole spectrum replaces the four-band AGC, chosen at run
-// time by :k1_afe_spec (0 off = the old AGC, 1 anchor, 2 section). M (section_mean) is a 2 s
-// one-pole on e that does not move while quiet. The divisor is A (mode 1) or max(M, A_MIN) (mode 2);
-// the gain is K1_AFE2_SPEC_K / sqrt(divisor), the same for every bin; process_GDFT applies it with
-// the fixed tilt and the fixed soft ceiling. Mode 2 exists because stage 1 already puts how_much on
-// the output brightness, so mode 1 would show the section level twice in spectral modes.
+// Stage 4 (accepted 12 Nov 2026): one gain for the whole spectrum replaced the four-band AGC.
+// M (section_mean) is a 2 s one-pole on e that does not move while quiet; the gain is
+// K1_AFE2_SPEC_K / sqrt(max(M, K1_AFE2_ANCHOR_MIN)), the same for every bin; process_GDFT applies it
+// with a fixed tilt and the fixed soft ceiling. The divisor is M, not the anchor, because stage 1
+// already puts how_much on the output brightness: dividing by the anchor showed the section level
+// twice in spectral modes (emulator A/B, plan section 6). The section level reaches the light once.
 //
 // Specification and reference implementation:
 //   _scratch/k1-fe-show-m2_20261110/audio-forensics/design/afe2_reference.py
@@ -79,9 +79,6 @@ constexpr float K1_AFE2_TAU_Q_RELEASE_S = 0.3f;    // silence meter release (att
 // 0.25 x median(sqrt M / mean magnitude) per track = 4.95-5.64, median 5.42.
 constexpr float K1_AFE2_TAU_M_S         = 2.0f;
 constexpr float K1_AFE2_SPEC_K          = 5.4f;
-#ifndef K1_AFE2_SPEC_DEFAULT
-#define K1_AFE2_SPEC_DEFAULT 0              // 0 off (four-band AGC), 1 anchor, 2 section
-#endif
 
 struct K1Afe2State {
   float b0, b1, b2, a1, a2;      // high-pass biquad, a0 normalised to 1
@@ -115,8 +112,6 @@ inline bool  k1_afe2_ready = false;
 inline bool  k1_afe2_enabled = (K1_AFE2_DEFAULT_ON != 0);
 inline bool  k1_afe2_level_enabled = false;inline float k1_afe2_gamma = K1_AFE2_GAMMA_DEFAULT;
 inline float k1_afe2_floor = K1_AFE2_FLOOR_DEFAULT;
-// Stage 4 spectrum scaling (:k1_afe_spec). 0 keeps the four-band AGC.
-inline uint8_t k1_afe2_spec_mode = (uint8_t)K1_AFE2_SPEC_DEFAULT;
 // Stage 4 attempt 2 (11 Nov 2026): fixed spectral tilt for the single-gain path, multiplied onto the
 // existing tilt table. Factors at the band centres of bass / low-mid / high-mid / treble = median over
 // five tracks x four modes (emulator, room level) of (four-band AGC band level / single-gain band level):
@@ -137,16 +132,9 @@ inline float k1_afe2_spec_tilt_factor(float hz) {
   return g[3];
 }
 
-// The one spectrum gain for mode 1 or 2 (0 for mode 0). Pure: the host test checks it.
-inline float k1_afe2_spec_gain(const K1Afe2State& st, uint8_t mode) {
-  float d;
-  if (mode == 1) {
-    d = st.anchor;
-  } else if (mode == 2) {
-    d = st.section_mean;
-  } else {
-    return 0.0f;
-  }
+// The one spectrum gain. Pure: the host test checks it against the reference.
+inline float k1_afe2_spec_gain(const K1Afe2State& st) {
+  float d = st.section_mean;
   if (!(d >= K1_AFE2_ANCHOR_MIN)) d = K1_AFE2_ANCHOR_MIN;
   return K1_AFE2_SPEC_K / sqrtf(d);
 }

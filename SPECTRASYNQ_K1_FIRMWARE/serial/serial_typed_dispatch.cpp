@@ -762,10 +762,8 @@ static void serial_print_k1_afe_status() {
   USBSerial.println(sqrtf(k1_afe2.section), 1);
   USBSerial.print("K1_AFE_ANCHOR_RMS: ");
   USBSerial.println(sqrtf(k1_afe2.anchor), 1);
-  USBSerial.print("K1_AFE_SPEC: ");
-  USBSerial.println(k1_afe2_spec_mode == 1 ? "anchor" : (k1_afe2_spec_mode == 2 ? "section" : "off"));
   USBSerial.print("K1_AFE_SPEC_GAIN: ");
-  USBSerial.println(k1_afe2_spec_gain(k1_afe2, k1_afe2_spec_mode), 4);
+  USBSerial.println(k1_afe2_spec_gain(k1_afe2), 4);
   USBSerial.print("K1_AFE_SECTION_MEAN_RMS: ");
   USBSerial.println(sqrtf(k1_afe2.section_mean), 1);
 }
@@ -808,24 +806,6 @@ bool serial_typed_k1_afe_floor(const char* command_type, char* command_data) {
   if (!serial_typed_parse_or_reject(command_type, command_data, &value)) return true;
   if (!(value >= 0.0f) || value > 1.0f) { bad_command(command_type, command_data); return true; }
   k1_afe2_floor = value;
-  tx_begin(); serial_print_k1_afe_status(); tx_end();
-  return true;
-}
-
-// :k1_afe_spec=off|anchor|section (or 0|1|2): stage 4 spectrum scaling; off keeps the four-band AGC.
-bool serial_typed_k1_afe_spec(const char* command_type, char* command_data) {
-  uint8_t mode;
-  if (strcmp(command_data, "off") == 0 || strcmp(command_data, "0") == 0) {
-    mode = 0;
-  } else if (strcmp(command_data, "anchor") == 0 || strcmp(command_data, "1") == 0) {
-    mode = 1;
-  } else if (strcmp(command_data, "section") == 0 || strcmp(command_data, "2") == 0) {
-    mode = 2;
-  } else {
-    bad_command(command_type, command_data);
-    return true;
-  }
-  k1_afe2_spec_mode = mode;
   tx_begin(); serial_print_k1_afe_status(); tx_end();
   return true;
 }

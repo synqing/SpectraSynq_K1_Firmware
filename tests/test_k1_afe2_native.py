@@ -63,9 +63,8 @@ def _alpha(dt, tau):
     return 1.0 - math.exp(-dt / tau)
 
 
-def _spec_gain(A, M, mode):
-    d = A if mode == 1 else max(M, A_MIN)
-    return SPEC_K / math.sqrt(max(d, A_MIN))
+def _spec_gain(M):
+    return SPEC_K / math.sqrt(max(M, A_MIN))
 
 
 def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None, spec_out=None):
@@ -115,7 +114,7 @@ def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None, spec_out=None):
         if quiet_out is not None:
             quiet_out.append(1 if silent else 0)
         if spec_out is not None:
-            spec_out.append((M, _spec_gain(A, M, 1), _spec_gain(A, M, 2)))
+            spec_out.append((M, _spec_gain(M)))
     return out
 
 
@@ -201,29 +200,41 @@ def test_afe2_wiring():
 
 
 def test_afe2_spectrum_gain_matches_reference_and_behaves(tmp_path):
-    """Stage 4: the section mean M and the one spectrum gain (mode 1 anchor, mode 2 section) equal the
-    reference on every hop; mode 1 keeps the loud passage's gain through a 10 dB breakdown (the spectrum
-    shows the breakdown smaller); mode 2 re-exposes the spectrum within about 6 s (the level is left to the
-    output brightness); M does not move while quiet, so a stop never raises the gain onto room noise."""
+    """Stage 4 (accepted 12 Nov 2026): the section mean M and the one spectrum gain equal the reference on
+    every hop; the gain rises through a 10 dB breakdown and does not fall at once when the loud passage
+    returns (the drop lands big), then settles back within about 5 s (the section level is left to the
+    output brightness, stage 1); M does not move while quiet, so a stop never raises the gain onto room
+    noise; the gain never exceeds K / sqrt(A_MIN)."""
     samples = _programme(PROGRAMME_S2)
-    cols = [_run(tmp_path, samples, 1.0, 0.25, column=c) for c in (5, 6, 7)]
+    cols = [_run(tmp_path, samples, 1.0, 0.25, column=c) for c in (5, 6)]
     want = []
     _reference(samples, spec_out=want)
     assert len(cols[0]) == len(want) == len(samples) // HOP
-    for c, name in enumerate(("M", "gain anchor", "gain section")):
+    for c, name in enumerate(("M", "spectrum gain")):
         worst = max(abs(g - w[c]) / max(abs(w[c]), 1e-9) for g, w in zip(cols[c], want))
         assert worst < 2e-3, f"{name}: firmware and reference differ by {worst:.2e} (relative)"
-    m, g1, g2 = cols
-    loud1, loud2 = _at(g1, 4.9), _at(g2, 4.9)
-    assert abs(_at(g1, 14.9) / loud1 - 1.0) < 0.15          # breakdown: anchor gain barely moves
-    assert _at(g2, 14.9) / loud2 > 2.5                      # breakdown (10 dB): section gain rises ~3.2x
-    assert _at(g2, 15.1) / loud2 > 2.5                      # ... and does not drop at once (the drop lands big)
-    assert abs(_at(g2, 19.9) / loud2 - 1.0) < 0.2           # 4.9 s after the return: back near the loud gain
+    m, g = cols
+    loud = _at(g, 4.9)
+    assert _at(g, 14.9) / loud > 2.5                        # breakdown (10 dB): the gain rises ~3.2x
+    assert _at(g, 15.1) / loud > 2.5                        # ... and does not drop at once (the drop lands big)
+    assert abs(_at(g, 19.9) / loud - 1.0) < 0.2             # 4.9 s after the return: back near the loud gain
     held = _at(m, 104.0)                                    # quiet from ~3 s after the loud stop: M frozen there
     assert all(abs(v / held - 1.0) < 1e-6 for v in m[int(104.0 * RATE / HOP):int(130.0 * RATE / HOP)])
     assert held > 0.1 * _at(m, 99.9)                        # frozen within 10 dB of the music's mean
-    assert min(g1) > 0.0 and max(g2) <= SPEC_K / math.sqrt(A_MIN) + 1e-9
+    assert min(g) > 0.0 and max(g) <= SPEC_K / math.sqrt(A_MIN) + 1e-9
 
+
+def test_afe2_spectrum_wiring():
+    """Stage 4 is the only spectrum scaling where the meter runs; the four-band AGC is gone; the
+    broadband AGC remains only as the fallback for builds without the meter."""
+    g = (AUDIO / "k1_gdft_core.cpp").read_text(encoding="utf-8")
+    ini = (ROOT / "platformio.ini").read_text(encoding="utf-8")
+    assert "if (k1_afe2_ready) {" in g
+    assert "const float spec_gain = k1_afe2_spec_gain(k1_afe2);" in g
+    assert "k1_afe2_spec_tilt_factor(frequencies[i].target_freq)" in g
+    assert "K1_AGC_PERBAND_V1" not in g and "pb_gain" not in g
+    assert "-DK1_AGC_PERBAND_V1" not in ini
+    assert "k1_afe_spec" not in (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_typed_cmd_table.def").read_text(encoding="utf-8")
 
 def _tilt_ref(hz):
     pts = ((148.0, 1.00), (400.0, 1.00), (1549.0, 1.09), (4170.0, 3.16))
