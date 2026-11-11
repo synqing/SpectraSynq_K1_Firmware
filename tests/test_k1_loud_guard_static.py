@@ -56,57 +56,22 @@ class K1LoudGuardStaticTest(unittest.TestCase):
         self.assertNotIn("k1_loud_gdft_trim", function_body)
         self.assertNotIn("k1_loud_semantic_trim", I2S + GLOBALS + SERIAL)
 
-    def test_gdft_trim_controls_agc_target_and_floor(self):
-        target_index = GDFT.index("SQ15x16 effective_target")
-        trim_index = GDFT.index("k1_loud_gdft_trim")
-        floor_define_index = CONSTANTS.index("K1_LOUD_GUARD_AGC_GAIN_FLOOR")
-        floor_mix_index = GDFT.index("k1_loud_floor_mix")
-        floor_calc_index = GDFT.index("const float k1_loud_floor = K1_LOUD_GUARD_AGC_GAIN_FLOOR")
-        # 2026-07-10: the flat/hybrid floor-cut is applied via the shared helper
-        # k1_loud_guard_apply_floor_cut(); its DEFINITION sits earlier in the TU, but the
-        # invariant is that the loud-guard cut ACTS on the post-AGC output — i.e. the CALL
-        # site is after the gain clamp. Assert the call, not the (relocated) constant token.
-        apply_floor_index = GDFT.index("k1_loud_guard_apply_floor_cut(out")
-        depin_ceiling_index = GDFT.index("K1_LOUD_GUARD_SPECTRAL_CEILING_DROP")
-        clamp_index = GDFT.index("if (target_gain < agc_gain_floor)")
-
-        self.assertLess(target_index, trim_index)
-        self.assertLess(floor_define_index, len(CONSTANTS))
-        self.assertLess(floor_mix_index, clamp_index)
-        self.assertLess(floor_calc_index, clamp_index)
-        self.assertIn("K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT", CONSTANTS)
-        self.assertIn("K1_LOUD_GUARD_SPECTRAL_CEILING_DROP", CONSTANTS)
-        self.assertGreater(apply_floor_index, clamp_index)
-        self.assertGreater(depin_ceiling_index, clamp_index)
-
-    def test_loud_guard_unpins_weak_palette_chroma_without_palette_edits(self):
-        constants = [
-            "K1_LOUD_GUARD_CHROMA_UNPIN_BLEND",
-            "K1_LOUD_GUARD_CHROMA_UNPIN_MIN_CONTRAST",
-        ]
-        for constant in constants:
-            self.assertIn(constant, CONSTANTS)
-            self.assertIn(constant, LIGHTSHOW)
-
-        function_start = LIGHTSHOW.index("inline CRGB16 palette_chroma_colour_with_offset")
-        function_end = LIGHTSHOW.index("inline CRGB16 palette_chroma_colour(", function_start)
-        function_body = LIGHTSHOW[function_start:function_end]
-
-        weak_index = function_body.index("centroid_strength < 0.08f")
-        unpin_index = function_body.index("k1_loud_colour_unpin")
-        dominant_index = function_body.index("dominant_hue")
-        blend_index = function_body.index("K1_LOUD_GUARD_CHROMA_UNPIN_BLEND")
-        held_update_index = function_body.index("held_centroid_hue = hue;", blend_index)
-        energy_index = function_body.index("float energy =")
-
-        self.assertLess(weak_index, unpin_index)
-        self.assertLess(dominant_index, blend_index)
-        self.assertLess(blend_index, held_update_index)
-        self.assertLess(held_update_index, energy_index)
-        self.assertIn("k1_loud_gdft_trim < 0.92f", function_body)
-        self.assertIn("k1_loud_peak_pin_duty > 0.10f", function_body)
-        self.assertIn("k1_loud_spec_sat_duty > 0.02f", function_body)
-        self.assertNotIn("Palettes.cpp", function_body)
+    def test_guard_no_longer_acts_on_the_spectrum(self):
+        # AFE2 stage 3 (2026-11-11): peak_pin read the self-normalised envelope and
+        # spec_sat read the guard's own output, so the GDFT trim fired on dense music at
+        # any volume. The trim, the AGC target/floor scaling, the floor-cut, the ceiling
+        # knee and the colour unpin are deleted; the trim stays 1.000 for telemetry.
+        self.assertNotIn("k1_loud", GDFT)
+        self.assertNotIn("k1_loud", LIGHTSHOW)
+        self.assertIn("k1_loud_gdft_trim = 1.0f;", I2S)
+        self.assertNotIn("gdft_target", I2S)
+        for gone in ("K1_LOUD_GUARD_GDFT_TRIM_MIN", "K1_LOUD_GUARD_AGC_GAIN_FLOOR",
+                     "K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT", "K1_LOUD_GUARD_SPECTRAL_CEILING_DROP",
+                     "K1_LOUD_GUARD_CHROMA_UNPIN_BLEND", "K1_LOUD_GUARD_CHROMA_UNPIN_MIN_CONTRAST",
+                     "K1_LOUD_GUARD_GDFT_ATTACK_SEC", "K1_LOUD_GUARD_GDFT_RELEASE_SEC",
+                     "K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL", "K1_LOUD_GUARD_FLOOR_CUT_PROP_K",
+                     "k1_loud_guard_apply_floor_cut", "k1_loud_guard_gdft_release_sec"):
+            self.assertNotIn(gone, CONSTANTS + I2S + GDFT + LIGHTSHOW, gone)
 
     def test_guard_updates_after_gdft_and_reports_ap_telemetry(self):
         gdft_index = INO.index("process_GDFT();")
@@ -125,26 +90,14 @@ class K1LoudGuardStaticTest(unittest.TestCase):
         self.assertNotIn("save_config", block)
         self.assertNotIn("reboot", block)
 
-    def test_ab_retune_matrix_defaults_to_validated_mode(self):
-        # Loud-guard release/floor-cut A/B retune (AP audit 2026-07-10). Default = mode 2
-        # (0.80 s release + hybrid affine cut); Captain hardware sign-off 2026-07-10.
+    def test_guard_mode_command_and_telemetry_remain_runtime_only(self):
+        # The mode variable, its command and its telemetry field remain; since stage 3
+        # the modes no longer change any spectrum action (none is left).
         self.assertIn("inline uint8_t  k1_loud_guard_mode = 2;", GLOBALS)
-        for c in ("K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS", "K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR",
-                  "K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL", "K1_LOUD_GUARD_FLOOR_CUT_PROP_K"):
-            self.assertIn(c, CONSTANTS)
-        # shared floor-cut helper applied at BOTH AGC paths (per-band + broadband)
-        self.assertIn("static inline void k1_loud_guard_apply_floor_cut(", GDFT)
-        self.assertEqual(GDFT.count("k1_loud_guard_apply_floor_cut(out"), 2)
-        # release is mode-switched; attack is not (engage stays fast)
-        self.assertIn("k1_loud_guard_gdft_release_sec()", I2S)
-        self.assertIn("K1_LOUD_GUARD_GDFT_ATTACK_SEC", I2S)
-        # telemetry carries the active mode
         self.assertIn("spec_sat=%.3f lg_mode=%d lightshow=%u", I2S)
-        # runtime mode switching stays runtime-only (no persistence)
         block = typed_command_block("k1_loud_guard")
         self.assertIn("serial_cycle_k1_loud_guard_mode()", block)
         self.assertNotIn("save_config", block)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -183,15 +183,6 @@ static inline float k1_loud_guard_approach(float current, float target, float dt
   return current + (target - current) * k1_loud_guard_alpha(dt, tau);
 }
 
-// A/B retune: GDFT release select by k1_loud_guard_mode. Attack is never mode-switched
-// (engage must stay fast; the invariant attack < release must hold). Mode 0 = baseline.
-static inline float k1_loud_guard_gdft_release_sec() {
-  switch (k1_loud_guard_mode) {
-    case 1:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS;
-    case 2:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR;
-    default: return K1_LOUD_GUARD_GDFT_RELEASE_SEC;
-  }
-}
 
 static inline float k1_loud_guard_effective_sensitivity() {
   if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
@@ -273,17 +264,13 @@ static inline void k1_loud_guard_update(uint32_t t_now) {
     input_target = 0.75f;
   }
 
-  float gdft_target = 1.0f;
-  if (k1_loud_spec_sat_duty > 0.35f || k1_loud_peak_pin_duty > 0.60f) {
-    gdft_target = K1_LOUD_GUARD_GDFT_TRIM_MIN;
-  } else if (k1_loud_spec_sat_duty > 0.12f || k1_loud_peak_pin_duty > 0.30f) {
-    gdft_target = 0.70f;
-  } else if (k1_loud_spec_sat_duty > 0.04f || k1_loud_peak_pin_duty > 0.12f) {
-    gdft_target = 0.85f;
-  }
-
   k1_loud_input_trim = k1_loud_guard_approach(k1_loud_input_trim, input_target, dt, K1_LOUD_GUARD_INPUT_ATTACK_SEC, K1_LOUD_GUARD_INPUT_RELEASE_SEC);
-  k1_loud_gdft_trim = k1_loud_guard_approach(k1_loud_gdft_trim, gdft_target, dt, K1_LOUD_GUARD_GDFT_ATTACK_SEC, k1_loud_guard_gdft_release_sec());
+  // AFE2 stage 3 (11 Nov 2026): the guard no longer acts on the spectrum. peak_pin read the
+  // self-normalised envelope and spec_sat read the guard's own output, so both fired on dense
+  // music at any volume (89-97 % of music lines at room level). Their duties are still
+  // measured above, for telemetry only; the spectrum trim stays 1.000. The input trim
+  // (real near-clip protection, clip and near-rail counts) stays until stage 5.
+  k1_loud_gdft_trim = 1.0f;
 }
 #else
 static inline float k1_audio_response_gain_effective() {

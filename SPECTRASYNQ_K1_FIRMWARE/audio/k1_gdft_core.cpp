@@ -87,33 +87,6 @@ extern void save_config();                              // persistence/bridge_fs
 extern void save_ambient_noise_calibration();           // persistence/bridge_fs.h
 extern bool save_calibration_profile(uint8_t source);   // persistence/bridge_fs.h
 
-#ifdef K1_LOUD_GUARD_V1
-// k1_loud_guard_clamp_float lives as `static inline` in audio/i2s_audio.h, which
-// is ODR-UNSAFE to include here (it defines a bare global `raw_dump_request` and
-// drags the I2S driver). It is a pure, stateless clamp; mirror it verbatim with
-// internal linkage so the lifted AGC body is byte-for-byte unchanged.
-// CANONICAL SOURCE: audio/i2s_audio.h (kept in sync; pure function, no state).
-static inline float k1_loud_guard_clamp_float(float value, float min_value, float max_value) {
-  if (!isfinite(value)) return min_value;
-  if (value < min_value) return min_value;
-  if (value > max_value) return max_value;
-  return value;
-}
-
-// A/B floor-cut applied at BOTH AGC paths (per-band + broadband) so the retune is valid
-// regardless of which AGC path a build selects. Mode 0 = flat cut (byte-identical shipping).
-// Modes 1/2 = hybrid affine cut: a small absolute pedestal (retains noise-floor/mud
-// suppression via the zero-clamp) plus a magnitude-proportional term (spares quiet musical
-// bins). The ceiling soft-knee (the actual saturation-tamer) is left untouched at the sites.
-static inline void k1_loud_guard_apply_floor_cut(SQ15x16 &out, SQ15x16 loud_depth) {
-  if (k1_loud_guard_mode == 0) {
-    out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
-  } else {
-    out -= loud_depth * (SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL) + out * SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PROP_K));
-  }
-  if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
-}
-#endif
 
 // Obscure audio magic happens here
 void IRAM_ATTR process_GDFT() {
@@ -504,16 +477,7 @@ void IRAM_ATTR process_GDFT() {
   const SQ15x16 AGC_EPS           = SQ15x16(0.001);
   SQ15x16 effective_target = VP_FIX_AGC_SOFT_KNEE ? SQ15x16(0.25) : AGC_TARGET;
   SQ15x16 agc_gain_floor = SQ15x16(0.1);
-  float k1_loud_trim = 1.0f;
-#ifdef K1_LOUD_GUARD_V1
-  if (k1_loud_guard_enabled) {
-    k1_loud_trim = k1_loud_guard_clamp_float(k1_loud_gdft_trim, K1_LOUD_GUARD_GDFT_TRIM_MIN, 1.0f);
-    const float k1_loud_floor_mix = (k1_loud_trim - K1_LOUD_GUARD_GDFT_TRIM_MIN) / (1.0f - K1_LOUD_GUARD_GDFT_TRIM_MIN);
-    const float k1_loud_floor = K1_LOUD_GUARD_AGC_GAIN_FLOOR + (0.1f - K1_LOUD_GUARD_AGC_GAIN_FLOOR) * k1_loud_floor_mix;
-    effective_target *= SQ15x16(k1_loud_trim);
-    agc_gain_floor = SQ15x16(k1_loud_guard_clamp_float(k1_loud_floor, K1_LOUD_GUARD_AGC_GAIN_FLOOR, 0.1f));
-  }
-#endif
+  // AFE2 stage 3 (11 Nov 2026): the loud guard no longer lowers this target or gain floor.
 
 #ifdef K1_AGC_PERBAND_V1
   // ===========================================================================
@@ -592,20 +556,6 @@ void IRAM_ATTR process_GDFT() {
       SQ15x16 excess = out - SQ15x16(0.5);
       out = SQ15x16(0.5) + (excess / (SQ15x16(1.0) + excess));
     }
-#ifdef K1_LOUD_GUARD_V1
-    if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
-      const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      k1_loud_guard_apply_floor_cut(out, loud_depth);
-
-      const SQ15x16 knee = SQ15x16(0.45);
-      const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));
-      if (out > knee && ceiling > knee) {
-        SQ15x16 excess = out - knee;
-        SQ15x16 span = ceiling - knee;
-        out = knee + ((span * excess) / (span + excess));
-      }
-    }
-#endif
     if (out > SQ15x16(1.0)) out = SQ15x16(1.0);
     if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
     spectrogram[i] = out;
@@ -670,20 +620,6 @@ void IRAM_ATTR process_GDFT() {
       SQ15x16 excess = out - SQ15x16(0.5);
       out = SQ15x16(0.5) + (excess / (SQ15x16(1.0) + excess));
     }
-#ifdef K1_LOUD_GUARD_V1
-    if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
-      const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      k1_loud_guard_apply_floor_cut(out, loud_depth);
-
-      const SQ15x16 knee = SQ15x16(0.45);
-      const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));
-      if (out > knee && ceiling > knee) {
-        SQ15x16 excess = out - knee;
-        SQ15x16 span = ceiling - knee;
-        out = knee + ((span * excess) / (span + excess));
-      }
-    }
-#endif
     if (out > SQ15x16(1.0)) out = SQ15x16(1.0);
     if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
     spectrogram[i] = out;

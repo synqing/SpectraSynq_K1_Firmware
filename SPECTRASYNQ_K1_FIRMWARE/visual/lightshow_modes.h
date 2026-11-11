@@ -437,36 +437,11 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
   // held hue, or one ambiguous frame poisons every quiet frame after it.
   if (!isfinite(centroid_strength) || centroid_strength < 0.08f) {
     const float dominant_hue = float(dominant_bin) / 12.0f;
-#ifdef K1_LOUD_GUARD_V1
-    const bool k1_loud_colour_unpin =
-        k1_loud_guard_enabled &&
-        (k1_loud_gdft_trim < 0.92f || k1_loud_peak_pin_duty > 0.10f || k1_loud_spec_sat_duty > 0.02f) &&
-        contrast >= K1_LOUD_GUARD_CHROMA_UNPIN_MIN_CONTRAST;
-    if (k1_loud_colour_unpin && held_hue_valid) {
-      float delta = dominant_hue - held_centroid_hue;
-      if (delta > 0.5f) delta -= 1.0f;
-      if (delta < -0.5f) delta += 1.0f;
-      hue = held_centroid_hue + (delta * K1_LOUD_GUARD_CHROMA_UNPIN_BLEND);
-      hue -= floorf(hue);
-      if (hue < 0.0f) hue += 1.0f;
-      held_centroid_hue = hue;
-    } else if (k1_loud_colour_unpin) {
-      hue = dominant_hue;
-      held_centroid_hue = hue;
-      held_hue_valid = true;
-    } else {
-#ifdef K1_PALETTE_VIBRANCY_V1
-      hue = held_hue_valid ? k1_vibrancy_blend_hue(hue, held_centroid_hue, centroid_strength) : dominant_hue;
-#else
-      hue = held_hue_valid ? held_centroid_hue : dominant_hue;
-#endif
-    }
-#else
+    // AFE2 stage 3 (11 Nov 2026): the loud guard's colour unpin is deleted with its trigger.
 #ifdef K1_PALETTE_VIBRANCY_V1
     hue = held_hue_valid ? k1_vibrancy_blend_hue(hue, held_centroid_hue, centroid_strength) : dominant_hue;
 #else
     hue = held_hue_valid ? held_centroid_hue : dominant_hue;
-#endif
 #endif
   } else {
     held_centroid_hue = hue;
