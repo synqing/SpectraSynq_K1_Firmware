@@ -918,7 +918,9 @@ inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not 
 // silently desynchronised the absolute thresholds above.
 //   MEASURED: quiet room 1.24   ·   music 3.17
 #define K1_SILENCE_PEAK_WIN 64                    // ~0.48 s at the 133 Hz AP frame rate
-inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured audio, never silence
+// K1_SILENCE_PEAKINESS_BREAK deleted 2026-11-11: the IM69D silence test is the AFE2 meter
+// (audio/k1_afe2.h, stage 2). k1_silence_peakiness is still measured for telemetry and the
+// K1_AP_DRIVE_CONTRACT_V1 probe lane.
 // LEVEL FLOOR (2026-08-11, measured on Unit 2 at G=8): peakiness alone is NOT
 // sufficient once the gain revert lifted the quiet-room noise floor's dynamic
 // range. Measured over 90 s of a confirmed-quiet room (-59.4 dB on an
@@ -1000,7 +1002,7 @@ inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured
 // music sat near 2.5 and was marginal. Narrowband hum cannot exploit the extra
 // sensitivity: the gate is an AND, and hum's crest ~1.26 is rejected by the
 // peakiness term regardless of level.
-inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 1.75f; // peakiness may only break silence at/above SSL x this
+// K1_SILENCE_JOINT_LEVEL_SSL_FRAC deleted 2026-11-11 with the crest x level break path (AFE2 stage 2).
 inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 

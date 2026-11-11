@@ -30,6 +30,7 @@ FC_HZ, TAU_S_ATTACK, TAU_S_RELEASE = 110.0, 0.030, 1.5
 TAU_A_UP, TAU_A_SLOW, TAU_A_FAST = 3.0, 60.0, 4.0
 T_HOLD, Q_QUIET, Q_EXIT, A_MIN = 45.0, 0.25, 0.70, 36.0
 SIL_ENTER, SIL_EXIT = 16.0, 25.0   # stage 2 silence test, counts^2 (4.0 / 5.0 counts rms)
+TAU_Q_RELEASE = 0.3                # its own release, so the delay after a stop does not grow with loudness
 
 # (seconds, peak amplitude in raw counts). 400 is about the Main RPL microphone level at
 # living-room volume; 126 is 10 dB below it; 80 is 14 dB below it.
@@ -67,7 +68,7 @@ def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None):
     a0 = 1.0 + al
     b0, b1, b2, a1, a2 = (1 + cw) / 2 / a0, -(1 + cw) / a0, (1 + cw) / 2 / a0, -2 * cw / a0, (1 - al) / a0
     z1 = z2 = 0.0
-    S, A, quiet, fast, silent = 0.0, A_MIN, 0.0, False, False
+    S, A, quiet, fast, silent, Sq = 0.0, A_MIN, 0.0, False, False, 0.0
     dt = HOP / RATE
     out = []
     for h0 in range(0, len(samples) - HOP + 1, HOP):
@@ -101,7 +102,8 @@ def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None):
         else:
             h = ratio ** (gamma * 0.5) if ratio > 0.0 else 0.0
         out.append(min(1.0, max(floor, h)))
-        silent = (S < SIL_EXIT) if silent else (S < SIL_ENTER)
+        Sq += _alpha(dt, TAU_S_ATTACK if e > Sq else TAU_Q_RELEASE) * (e - Sq)
+        silent = (Sq < SIL_EXIT) if silent else (Sq < SIL_ENTER)
         if quiet_out is not None:
             quiet_out.append(1 if silent else 0)
     return out
@@ -147,8 +149,9 @@ def test_afe2_matches_reference_and_behaves(tmp_path):
 
 def test_afe2_silence_test_matches_reference_and_behaves(tmp_path):
     """Stage 2: the quiet flag equals the reference on every hop, never rises while music plays
-    (including a passage 14 dB under the loud one), rises after the music stops, holds through a
-    quiet room, and falls within 100 ms when the music returns."""
+    (including a passage 14 dB under the loud one), rises within 4 s of a loud stop (its own 0.3 s
+    release), holds through a quiet room, and falls within 100 ms when the music returns. The
+    firmware's 5 s dwell turns quiet into silence; it is not modelled here."""
     samples = _programme(PROGRAMME_S2)
     got = [int(v) for v in _run(tmp_path, samples, 1.0, 0.25, column=4)]
     want = []
@@ -158,10 +161,12 @@ def test_afe2_silence_test_matches_reference_and_behaves(tmp_path):
     assert not mismatched, f"firmware and reference quiet differ on {len(mismatched)} hops, first {mismatched[:5]}"
 
     hop_s = HOP / RATE
-    assert not any(got[:int(100.0 / hop_s)])         # 100 s of programme: never quiet
+    assert not any(got[:int(90.0 / hop_s)])          # 90 s of music (incl. 14 dB down): never quiet
+    assert _at(got, 94.9) == 1                       # the programme's own 5 s of silence: quiet (dwell not met)
+    assert not any(got[int(95.1 / hop_s):int(100.0 / hop_s)])  # music back: clear within 100 ms
     assert _at(got, 101.0) == 0                      # 1 s after a loud stop: still counted as music
-    assert _at(got, 115.0) == 1                      # 15 s after: quiet (the dwell then applies)
-    assert all(got[int(115.0 / hop_s):int(130.0 / hop_s)])  # silence, then a quiet room: stays quiet
+    assert _at(got, 104.0) == 1                      # 4 s after a loud stop: quiet (the dwell then applies)
+    assert all(got[int(104.0 / hop_s):int(130.0 / hop_s)])  # silence, then a quiet room: stays quiet
     assert _at(got, 130.1) == 0                      # music again: not quiet within 100 ms
 
 
@@ -180,5 +185,6 @@ def test_afe2_wiring():
     assert "(k1_afe2_peak_env >= K1_LOUD_GUARD_PEAK_PIN_THRESHOLD)" in i2s
     assert "if (!k1_authored_suppresses_live_update()) brightness *= SQ15x16(k1_afe2_brightness_scale());" in led
     assert "if (!k1_authored_suppresses_live_update()) bright_val *= k1_afe2_brightness_scale();" in led
-    # Stage 2: when switched on, the IM69D silence decision is the meter's quiet flag.
-    assert "if (K1_AFE2_V1 && k1_afe2_ready && k1_afe2_silence_enabled) {\n        k1_rms_silent_state = k1_afe2.quiet;" in i2s
+    # Stage 2 (accepted): the IM69D product silence decision is the meter's quiet flag.
+    assert "#if defined(K1_MIC_IM69D_PDM_V1) && !defined(K1_AP_DRIVE_CONTRACT_V1)" in i2s
+    assert "k1_rms_silent_state = k1_afe2_ready && k1_afe2.quiet;" in i2s

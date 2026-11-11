@@ -3680,9 +3680,6 @@ void parse_command(char* command_buf) {
     else if (strcmp(command_type, "k1_afe_floor") == 0) {
       serial_typed_k1_afe_floor(command_type, command_data);
     }
-    else if (strcmp(command_type, "k1_afe_silence") == 0) {
-      serial_typed_k1_afe_silence(command_type, command_data);
-    }
 #endif
 
     else if (strcmp(command_type, "silence_enter") == 0) {

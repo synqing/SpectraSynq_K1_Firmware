@@ -90,10 +90,10 @@
   //
   // First-principles characterisation carried by this profile (measured on
   // IM69D130 silicon, both units, calibrated at final placement):
-  //   • Silence: joint crest×level gate — K1_SILENCE_PEAKINESS_BREAK 2.10 AND
-  //     K1_SILENCE_JOINT_LEVEL_SSL_FRAC 1.75 (IM69D-scoped in i2s_audio.h; the
-  //     legacy RMS Schmitt cannot fire on this mic and is bypassed by design).
-  //     Both units: 100% silence under true silence, 0% under music.
+  //   • Silence (since 2026-11-11, AFE2 stage 2): the AFE2 meter's two-level quiet
+  //     test on high-passed section loudness (audio/k1_afe2.h), then SILENCE_DWELL_MS.
+  //     The earlier joint crest×level gate (deleted) called loud dense music silent:
+  //     up to 79 % of hops in the emulator, 23 of 82 lines on the Main RPL.
   //   • Lock: K1_LOCK_CONFIDENCE 0.60 RETAINED, now cited to IM69D measurement
   //     (IM69D_CONSUMER_BASELINE.md 2026-08-12/13): ambient-quiet conf p95 0.58
   //     sits just below; music conf p75 0.87–0.97 at product SPL sits above.

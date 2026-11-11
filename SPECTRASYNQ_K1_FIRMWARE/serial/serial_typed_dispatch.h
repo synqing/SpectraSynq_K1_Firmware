@@ -108,7 +108,6 @@ bool serial_typed_k1_afe(const char* command_type, char* command_data);
 bool serial_typed_k1_afe_level(const char* command_type, char* command_data);
 bool serial_typed_k1_afe_gamma(const char* command_type, char* command_data);
 bool serial_typed_k1_afe_floor(const char* command_type, char* command_data);
-bool serial_typed_k1_afe_silence(const char* command_type, char* command_data);
 #endif
 bool serial_typed_silence_enter(const char* command_type, char* command_data);
 bool serial_typed_silence_exit(const char* command_type, char* command_data);

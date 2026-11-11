@@ -745,7 +745,6 @@ static bool serial_typed_parse_or_reject(const char* command_type, char* command
 //   :k1_afe_level=on|off    also scale the published level (changes each effect's geometry)
 //   :k1_afe_gamma=0..2      how strongly section loudness shows (0 = as before, 1 = proportional)
 //   :k1_afe_floor=0..1      the least a quiet section is shown at
-//   :k1_afe_silence=on|off  stage 2: silence is the meter's quiet test, or the old test
 static void serial_print_k1_afe_status() {
   USBSerial.print("K1_AFE: ");
   USBSerial.println((k1_afe2_ready && k1_afe2_enabled) ? "on" : "off");
@@ -763,10 +762,6 @@ static void serial_print_k1_afe_status() {
   USBSerial.println(sqrtf(k1_afe2.section), 1);
   USBSerial.print("K1_AFE_ANCHOR_RMS: ");
   USBSerial.println(sqrtf(k1_afe2.anchor), 1);
-  USBSerial.print("K1_AFE_SILENCE: ");
-  USBSerial.println((k1_afe2_ready && k1_afe2_silence_enabled) ? "on" : "off");
-  USBSerial.print("K1_AFE_QUIET: ");
-  USBSerial.println(k1_afe2.quiet ? 1 : 0);
 }
 
 bool serial_typed_k1_afe(const char* command_type, char* command_data) {
@@ -808,17 +803,6 @@ bool serial_typed_k1_afe_floor(const char* command_type, char* command_data) {
   if (!(value >= 0.0f) || value > 1.0f) { bad_command(command_type, command_data); return true; }
   k1_afe2_floor = value;
   tx_begin(); serial_print_k1_afe_status(); tx_end();
-  return true;
-}
-
-bool serial_typed_k1_afe_silence(const char* command_type, char* command_data) {
-  bool value = false;
-  if (vp_parse_bool(command_data, &value)) {
-    k1_afe2_silence_enabled = value;
-    tx_begin(); serial_print_k1_afe_status(); tx_end();
-  } else {
-    bad_command(command_type, command_data);
-  }
   return true;
 }
 #endif

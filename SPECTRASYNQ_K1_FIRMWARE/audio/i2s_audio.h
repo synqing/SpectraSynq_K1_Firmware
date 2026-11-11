@@ -1444,12 +1444,19 @@ void acquire_sample_chunk(uint32_t t_now) {
 #ifdef K1_AP_DRIVE_CONTRACT_V1
     static K1ApStructuredEvidenceState k1_structured_evidence = {};
 #endif
+#if defined(K1_MIC_IM69D_PDM_V1) && !defined(K1_AP_DRIVE_CONTRACT_V1)
+    // AFE2 stage 2 (accepted 11 Nov 2026): the IM69D silence test is the AFE2 meter's
+    // two-level quiet flag on section loudness (audio/k1_afe2.h); the dwell below applies.
+    // It replaced the crest x SSL-level break path and the raw-RMS Schmitt for this
+    // microphone, which called loud dense music silent (up to 79 % of hops in the
+    // emulator, 23 of 82 telemetry lines on the Main RPL). The test reads Sq, a 0.3 s-release
+    // copy of the meter, so silence after a stop takes a few seconds plus the dwell however
+    // loud the music was (AFE2-PLAN section 6). The SPH0645 path keeps its Schmitt below.
+    k1_rms_silent_state = k1_afe2_ready && k1_afe2.quiet;
+#else
 #if defined(K1_MIC_IM69D_PDM_V1)
-    // Scope-gated to the IM69D diagnostic lane. The production SPH0645 path retains
-    // its independently characterised Schmitt trigger below. The new contract is
-    // derived from equal-window, Captain-confirmed silence and low-music captures on
-    // B489A500; it is not transferred to another capsule or configuration epoch.
-#ifdef K1_AP_DRIVE_CONTRACT_V1
+    // IM69D diagnostic contract lane (K1_AP_DRIVE_CONTRACT_V1, probe envs only). Derived
+    // from equal-window, Captain-confirmed silence and low-music captures on B489A500.
     const bool k1_structured_candidate =
         k1_silence_peakiness >= ap_drive.silence_threshold.peakiness_floor &&
         k1_silence_peakiness <= ap_drive.silence_threshold.peakiness_ceiling &&
@@ -1460,19 +1467,7 @@ void acquire_sample_chunk(uint32_t t_now) {
         t_now,
         ap_drive.silence_threshold.structured_evidence_ms);
     if (k1_structured_audio) {
-#else
-    // AFE2 stage 2: silence is the meter's two-level quiet test on section loudness
-    // (audio/k1_afe2.h, always included). The dwell below still applies. No crest, peak
-    // or SSL term. A plain condition rather than a preprocessor guard, so this IM69D
-    // block keeps a single closing directive (tests/test_im69d_env_static.py reads it).
-    if (K1_AFE2_V1 && k1_afe2_ready && k1_afe2_silence_enabled) {
-        k1_rms_silent_state = k1_afe2.quiet;
-    } else
-    if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
-        (float)max_waveform_val_raw >=
-            (float)CONFIG.SWEET_SPOT_MIN_LEVEL * K1_SILENCE_JOINT_LEVEL_SSL_FRAC) {
-#endif
-        k1_rms_silent_state = false;             // peaky AND loud enough → structured audio
+        k1_rms_silent_state = false;             // structured audio evidence
     } else
 #endif
     if (k1_rms_silent_state) {
@@ -1488,6 +1483,7 @@ void acquire_sample_chunk(uint32_t t_now) {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_ENTER);  // enter when below
 #endif
     }
+#endif  // IM69D product path vs SPH0645 / IM69D contract probe
 
     if (!k1_rms_silent_state) {
         if (silence && debug_mode) {
@@ -1742,8 +1738,8 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_afe2.how_much, k1_afe2_peak_env,
       sqrtf(k1_afe2.section), sqrtf(k1_afe2.anchor), k1_afe2.fast ? 1 : 0, k1_afe2_gamma, k1_afe2_floor);
     // afe_us = mean and worst time of the meter per hop since the last line (microseconds).
-    // afe_sil = stage 2 silence test in charge (1) or the old test (0); quiet = its flag.
-    USBSerial.printf(" afe_sil=%d quiet=%d", (k1_afe2_ready && k1_afe2_silence_enabled) ? 1 : 0, k1_afe2.quiet ? 1 : 0);
+    // quiet = the stage 2 silence test's flag (before the dwell; `silence=` is after it).
+    USBSerial.printf(" quiet=%d qsec=%.1f", k1_afe2.quiet ? 1 : 0, sqrtf(k1_afe2.section_quiet));
     USBSerial.printf(" afe_us=%.1f afe_us_max=%u",
       k1_afe2_us_count ? (float)k1_afe2_us_sum / (float)k1_afe2_us_count : 0.0f, (unsigned)k1_afe2_us_max);
     k1_afe2_us_sum = 0;

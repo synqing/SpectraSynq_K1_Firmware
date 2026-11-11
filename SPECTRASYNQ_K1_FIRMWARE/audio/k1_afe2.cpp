@@ -31,6 +31,8 @@ void k1_afe2_init(K1Afe2State& st, float sample_rate_hz) {
   st.alpha_count = 0;
   st.a_s_attack = st.a_s_release = st.a_a_up = st.a_a_slow = st.a_a_fast = 0.0f;
   st.fast = false;
+  st.section_quiet = 0.0f;
+  st.a_q_release = 0.0f;
   st.quiet = false;
 }
 
@@ -44,6 +46,7 @@ float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, f
     st.a_a_up      = k1_afe2_alpha(dt_s, K1_AFE2_TAU_A_UP_S);
     st.a_a_slow    = k1_afe2_alpha(dt_s, K1_AFE2_TAU_A_SLOW_S);
     st.a_a_fast    = k1_afe2_alpha(dt_s, K1_AFE2_TAU_A_FAST_S);
+    st.a_q_release = k1_afe2_alpha(dt_s, K1_AFE2_TAU_Q_RELEASE_S);
   }
 
   float z1 = st.z1, z2 = st.z2, acc = 0.0f;
@@ -98,6 +101,7 @@ float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, f
   if (h < floor) h = floor;
   if (h > 1.0f) h = 1.0f;
   st.how_much = h;
-  st.quiet = st.quiet ? (st.section < K1_AFE2_SILENCE_EXIT) : (st.section < K1_AFE2_SILENCE_ENTER);
+  st.section_quiet += ((e > st.section_quiet) ? st.a_s_attack : st.a_q_release) * (e - st.section_quiet);
+  st.quiet = st.quiet ? (st.section_quiet < K1_AFE2_SILENCE_EXIT) : (st.section_quiet < K1_AFE2_SILENCE_ENTER);
   return h;
 }
