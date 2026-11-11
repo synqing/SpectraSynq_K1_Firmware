@@ -1,0 +1,17 @@
+2026-11-12T05:40:01 gates ['G1', 'G2', 'G3', 'G4'] src /private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/ec33f5ee-3de9-426e-947b-161993bcf799/scratchpad/s4x mode 18; expected today: {"G1": "PASS (M1 C4: three authored repeats byte-identical on ed0aa984)", "G2": "FAIL (M1 C4: authored over zero PCM differed on 1778/1778 frames; live peak is OR-ed in, light_mode_waveform_hybrid_k1.cpp:116)", "G3": "FAIL (no seek reconstruction; bench S5 colour changed and stayed after a backward seek)", "G4": "PASS if the twin is byte-identical and the stream is accepted (determinism, G1)"}
+2026-11-12T05:40:02 work copy /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-93284779ed7a (present in source)
+2026-11-12T05:40:02 run: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/.venv/bin/python /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-93284779ed7a/tools/esp_emulator/run.py --profile scenario --scenario /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/work/src-93284779ed7a/tools/esp_emulator/m2_gates_scenario.json --suite m2gates --output /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/s4x-m18-20261112T054001/emu
+2026-11-12T05:48:09 run.py exit 1 (its SOFTWARE COMPLETE/INCOMPLETE covers the R3 SW criteria, not these gates)
+| Gate | Verdict | Edge A | Edge B | Detail |
+|---|---|---|---|---|
+| G1 g1-a1 vs g1-a2 | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G1 g1-a1 vs g3-cont (shared input prefix, hops 4000-5332 at every 6th) | PASS | 0/222 differ; first hop None | 0/222 differ; first hop None | |
+| G2 passage vs zero | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 passage vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G2 zero vs other-music | PASS | 0/1778 differ; first hop None | 0/1778 differ; first hop None | |
+| G3 continuous vs forward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4132 | 0/667 differ after R; first m-hop None; window agrees from 4132 | R=667 hops |
+| G3 continuous vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from 4132 | 0/667 differ after R; first m-hop None; window agrees from 4132 | R=667 hops |
+| G3 forward vs backward | PASS | 0/667 differ after R; first m-hop None; window agrees from None | 0/667 differ after R; first m-hop None; window agrees from None | R=667 hops |
+| G4 m2 vs twin | PASS | 0/1778 differ | 0/1778 differ | {"g4-m2": {"reached_AUTHORED": true, "rx_all_consumed": true, "rx_end": "records=9599/9599 queued=614400 consumed=614400 auth_state=2", "hotkey_state_changes":  |
+gates.json /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-emu/runs/s4x-m18-20261112T054001/gates.json
+failing gates: 0

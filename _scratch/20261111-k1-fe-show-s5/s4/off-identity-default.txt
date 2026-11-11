@@ -1,0 +1,23 @@
+cfg-recover              PASS frames old=128 new=128 differing=0
+cfg-save                 PASS frames old=128 new=128 differing=0
+client-a                 PASS frames old=128 new=128 differing=0
+client-b                 PASS frames old=128 new=128 differing=0
+client-comp-recover      PASS frames old=128 new=128 differing=0
+client-comp-save         PASS frames old=128 new=128 differing=0
+client-reject            PASS frames old=128 new=128 differing=0
+comp-recover             PASS frames old=128 new=128 differing=0
+comp-ref                 PASS frames old=128 new=128 differing=0
+comp-save                PASS frames old=128 new=128 differing=0
+ctl-a                    PASS frames old=128 new=128 differing=0
+ctl-b                    PASS frames old=128 new=128 differing=0
+limit-a                  PASS frames old=128 new=128 differing=0
+limit-base               PASS frames old=128 new=128 differing=0
+music-a                  PASS frames old=1334 new=1334 differing=0
+music-b                  PASS frames old=1334 new=1334 differing=0
+reject                   PASS frames old=128 new=128 differing=0
+smoke-a                  PASS frames old=128 new=128 differing=0
+smoke-b                  PASS frames old=128 new=128 differing=0
+stall-probe              PASS frames old=0 new=0 differing=0
+startup-sqr              FAIL frames old=1067 new=1067 differing=108
+time-zero-tail           PASS frames old=136 new=136 differing=0
+cases compared 22; failing 1; old-only 0; new-only 0

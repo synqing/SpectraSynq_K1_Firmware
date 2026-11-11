@@ -32,6 +32,8 @@ Stage 4 (11 Nov 2026, session 5): one gain for the whole spectrum replaces the f
                                                              then carries the section level exactly once)
   g        = SPEC_K / sqrt(D)                               the one gain, the same for all 80 bins
   out[i]   = mag[i] * g * tilt[i], then the existing fixed soft ceiling (above 0.5: 0.5 + x/(1 + x)), clamped to [0, 1]
+  ACCEPTED 12 Nov 2026 (Captain, after a camera A/B on the Main RPL): mode 2 "section" with the fixed tilt below
+  (spec_tilt_factor). The firmware keeps only that path (k1_afe2_spec_gain(st)); mode 1 stays here as the record.
   Why two modes: stage 1 put how_much on the output brightness of every effect (the emulator showed scaling the
   level inverted mode 32), so spectral modes already receive the section level. Mode 1 would apply it twice
   (light ~ amplitude^2 at gamma 1); mode 2 applies it once. The emulator A/B decides (plan S4, two attempts).
@@ -91,6 +93,25 @@ def spec_gain(A: float, M: float, mode: int, k: float = None) -> float:
     else:
         raise ValueError("mode 0 is the old AGC")
     return k / math.sqrt(max(d, A_MIN))
+
+
+SPEC_TILT_POINTS = ((148.0, 1.00), (400.0, 1.00), (1549.0, 1.09), (4170.0, 3.16))   # attempt 2 (11 Nov 2026)
+
+
+def spec_tilt_factor(hz: float) -> float:
+    """Stage 4 fixed spectral tilt for the single-gain path, multiplied onto the existing tilt table: band centres
+    of bass / low-mid / high-mid / treble, factor = median over five tracks x four modes of (four-band AGC band level
+    / single-gain band level); linear in log gain over log frequency, flat beyond the end points."""
+    pts = SPEC_TILT_POINTS
+    if hz <= pts[0][0]:
+        return pts[0][1]
+    if hz >= pts[-1][0]:
+        return pts[-1][1]
+    for (f0, g0), (f1, g1) in zip(pts, pts[1:]):
+        if hz <= f1:
+            u = (math.log(hz) - math.log(f0)) / (math.log(f1) - math.log(f0))
+            return math.exp(math.log(g0) + u * (math.log(g1) - math.log(g0)))
+    return pts[-1][1]
 
 
 def spectrum(mag, tilt, g: float, knee: bool = True):

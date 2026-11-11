@@ -1,0 +1,15 @@
+ M SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h
+ M SPECTRASYNQ_K1_FIRMWARE/audio/k1_afe2.h
+ M SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp
+ M SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp
+ M SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def
+ M SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.cpp
+ M SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.h
+ M platformio.ini
+ M scripts/platformio/k1_device_identities.json
+ D scripts/regression-harness/golden/oracle_agc_perband.py
+ M scripts/regression-harness/k1_serial_safety.py
+ M tests/k1_afe2_host.cpp
+ D tests/test_agc_perband_independence.py
+ M tests/test_k1_afe2_native.py
+ M tools/esp_emulator/run.py
