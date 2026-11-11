@@ -30,6 +30,7 @@
 #include "k1_gdft_core.h"        // own declarations (process_GDFT / calculate_novelty)
 #include "k1_spectral_honesty.h" // K1_HANN_COHERENT_GAIN (gated windowing only)
 #include "k1_agc_dt_clock.h"     // α = dt/(τ+dt) at 100 Hz reference; no expf
+#include "k1_afe2.h"             // AFE2 stage 4: the one spectrum gain (k1_afe2_spec_gain)
 
 // Production selector for the exact four-lane Goertzel backend.
 #ifndef K1_GDFT_LANE4_V1
@@ -478,6 +479,39 @@ void IRAM_ATTR process_GDFT() {
   SQ15x16 effective_target = VP_FIX_AGC_SOFT_KNEE ? SQ15x16(0.25) : AGC_TARGET;
   SQ15x16 agc_gain_floor = SQ15x16(0.1);
   // AFE2 stage 3 (11 Nov 2026): the loud guard no longer lowers this target or gain floor.
+
+#if K1_AFE2_V1
+  // AFE2 stage 4 (11 Nov 2026): one gain for the whole spectrum from the AFE2 meter
+  // (audio/k1_afe2.h, :k1_afe_spec). The same gain on every bin, the fixed tilt, the fixed soft
+  // ceiling. Mode 0, or no meter on this build, keeps the AGC below unchanged.
+  if (k1_afe2_ready && k1_afe2_spec_mode != 0) {
+    // Its own fixed tilt: the existing table times k1_afe2_spec_tilt_factor, built once.
+    static float s4_tilt[NUM_FREQS];
+    static bool s4_tilt_ready = false;
+    if (!s4_tilt_ready) {
+      for (uint16_t i = 0; i < NUM_FREQS; i++) {
+        s4_tilt[i] = float(spectral_tilt_lut[i]) * k1_afe2_spec_tilt_factor(frequencies[i].target_freq);
+      }
+      s4_tilt_ready = true;
+    }
+    const float spec_gain = k1_afe2_spec_gain(k1_afe2, k1_afe2_spec_mode);
+    for (uint16_t i = 0; i < NUM_FREQS; i++) {
+      SQ15x16 out = SQ15x16(magnitudes_final[i] * spec_gain * s4_tilt[i]);
+      if (VP_FIX_AGC_SOFT_KNEE && out > SQ15x16(0.5)) {
+        SQ15x16 excess = out - SQ15x16(0.5);
+        out = SQ15x16(0.5) + (excess / (SQ15x16(1.0) + excess));
+      }
+      if (out > SQ15x16(1.0)) out = SQ15x16(1.0);
+      if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+      spectrogram[i] = out;
+    }
+    for (uint8_t b = 0; b < NUM_AGC_BANDS; b++) {
+      agc_bands[b].gain        = SQ15x16(spec_gain);
+      agc_bands[b].target_gain = SQ15x16(spec_gain);
+    }
+    return;
+  }
+#endif
 
 #ifdef K1_AGC_PERBAND_V1
   // ===========================================================================

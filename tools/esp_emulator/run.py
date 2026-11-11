@@ -135,7 +135,7 @@ SUPPORTED_COMMANDS = {
     # serial_cmd_handlers.cpp:821 (vp_chroma_gate -> VP_FIX_CHROMAGRAM_SPARSENESS). Scratch export only.
     "vp_chroma_gate",
     # AFE2 exposure (audio/k1_afe2.*): production typed commands, serial_typed_dispatch.cpp.
-    "k1_afe", "k1_afe_level", "k1_afe_gamma", "k1_afe_floor",
+    "k1_afe", "k1_afe_level", "k1_afe_gamma", "k1_afe_floor", "k1_afe_spec",
 }
 
 

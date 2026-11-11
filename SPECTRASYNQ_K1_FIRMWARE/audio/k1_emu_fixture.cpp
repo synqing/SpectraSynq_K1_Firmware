@@ -17,6 +17,7 @@
 #include "k1_vp_audio_access.h"   // the onset event the effects read (lane R1 consumer O lines)
 #endif
 #include "globals.h"
+#include "k1_afe2.h"           // AFE2 stage 4 probe fields (K1_EMU_TEMPO_PROBE only)
 #include "../control/k1_show_state.h"
 #include "k1_authored_source.h"
 
@@ -312,6 +313,13 @@ struct ProbeRecord {
 #ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
   uint32_t us_presence;  // per-frame presence cost summed over the emit window (17th G field)
 #endif
+#if K1_AFE2_V1
+  // AFE2 stage 4 (11 Nov 2026), appended after every earlier field: mean magnitude before the
+  // spectrum gain, AFE2 S / A / M in counts rms, the spectrum gain applied (agc_bands[0].gain),
+  // and the mean of spectrogram[] in each of the four bands of freq_to_band_map.
+  float mag_mean, afe_s, afe_a, afe_m, spec_gain;
+  float band_mean[4];
+#endif
 };
 ProbeRecord* s_probe = nullptr;
 #endif
@@ -568,6 +576,10 @@ void print_counters(const char* reason, const char* where) {
                         (unsigned long)p.us_publish, (unsigned long)p.us_emit);
 #ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
       K1_EMU_LOG.printf(",%lu", (unsigned long)p.us_presence);
+#endif
+#if K1_AFE2_V1
+      K1_EMU_LOG.printf(",%.6f,%.3f,%.3f,%.3f,%.6f,%.5f,%.5f,%.5f,%.5f", p.mag_mean, p.afe_s, p.afe_a, p.afe_m,
+                        p.spec_gain, p.band_mean[0], p.band_mean[1], p.band_mean[2], p.band_mean[3]);
 #endif
       K1_EMU_LOG.printf("\n");
       if ((i & 0xFF) == 0xFF) {
@@ -907,6 +919,24 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
       p.us_emit = d.emit_elapsed_us;
 #ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
       p.us_presence = d.presence_elapsed_us;
+#endif
+#if K1_AFE2_V1
+      {
+        float msum = 0.0f, bsum[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        uint16_t bcnt[4] = {0, 0, 0, 0};
+        for (uint16_t i = 0; i < NUM_FREQS; i++) {
+          msum += magnitudes_final[i];
+          const uint8_t b = freq_to_band_map[i] & 3U;
+          bsum[b] += float(spectrogram[i]);
+          bcnt[b]++;
+        }
+        p.mag_mean = msum / (float)NUM_FREQS;
+        p.afe_s = sqrtf(k1_afe2.section);
+        p.afe_a = sqrtf(k1_afe2.anchor);
+        p.afe_m = sqrtf(k1_afe2.section_mean);
+        p.spec_gain = float(agc_bands[0].gain);
+        for (uint8_t b = 0; b < 4; b++) p.band_mean[b] = bcnt[b] ? bsum[b] / (float)bcnt[b] : 0.0f;
+      }
 #endif
     }
 #endif

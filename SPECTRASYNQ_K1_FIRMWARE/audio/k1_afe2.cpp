@@ -34,6 +34,8 @@ void k1_afe2_init(K1Afe2State& st, float sample_rate_hz) {
   st.section_quiet = 0.0f;
   st.a_q_release = 0.0f;
   st.quiet = false;
+  st.section_mean = K1_AFE2_ANCHOR_MIN;
+  st.a_m = 0.0f;
 }
 
 float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, float gamma, float floor) {
@@ -47,6 +49,7 @@ float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, f
     st.a_a_slow    = k1_afe2_alpha(dt_s, K1_AFE2_TAU_A_SLOW_S);
     st.a_a_fast    = k1_afe2_alpha(dt_s, K1_AFE2_TAU_A_FAST_S);
     st.a_q_release = k1_afe2_alpha(dt_s, K1_AFE2_TAU_Q_RELEASE_S);
+    st.a_m         = k1_afe2_alpha(dt_s, K1_AFE2_TAU_M_S);
   }
 
   float z1 = st.z1, z2 = st.z2, acc = 0.0f;
@@ -103,5 +106,6 @@ float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, f
   st.how_much = h;
   st.section_quiet += ((e > st.section_quiet) ? st.a_s_attack : st.a_q_release) * (e - st.section_quiet);
   st.quiet = st.quiet ? (st.section_quiet < K1_AFE2_SILENCE_EXIT) : (st.section_quiet < K1_AFE2_SILENCE_ENTER);
+  if (!st.quiet) st.section_mean += st.a_m * (e - st.section_mean);   // stage 4: held while quiet
   return h;
 }

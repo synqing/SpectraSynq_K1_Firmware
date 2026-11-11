@@ -32,12 +32,20 @@
 // applies). It replaced the crest/peak/SSL test, which called loud dense music silent
 // (16-21 of 88 telemetry lines at S = 13-30 counts rms, 11 Nov); that test was deleted.
 //
+// Stage 4 (11 Nov 2026): one gain for the whole spectrum replaces the four-band AGC, chosen at run
+// time by :k1_afe_spec (0 off = the old AGC, 1 anchor, 2 section). M (section_mean) is a 2 s
+// one-pole on e that does not move while quiet. The divisor is A (mode 1) or max(M, A_MIN) (mode 2);
+// the gain is K1_AFE2_SPEC_K / sqrt(divisor), the same for every bin; process_GDFT applies it with
+// the fixed tilt and the fixed soft ceiling. Mode 2 exists because stage 1 already puts how_much on
+// the output brightness, so mode 1 would show the section level twice in spectral modes.
+//
 // Specification and reference implementation:
 //   _scratch/k1-fe-show-m2_20261110/audio-forensics/design/afe2_reference.py
 // Host test against that reference: tests/test_k1_afe2_native.py.
 //
 // Core 0 audio path: no heap, no blocking, no clock read (time comes from the sample count).
 
+#include <math.h>
 #include <stdint.h>
 
 #ifndef K1_AFE2_V1
@@ -66,6 +74,14 @@ constexpr float K1_AFE2_FLOOR_DEFAULT   = 0.25f;
 constexpr float K1_AFE2_SILENCE_ENTER   = 16.0f;   // 4.0 counts rms
 constexpr float K1_AFE2_SILENCE_EXIT    = 25.0f;   // 5.0 counts rms
 constexpr float K1_AFE2_TAU_Q_RELEASE_S = 0.3f;    // silence meter release (attack = S attack)
+// Stage 4. K: magnitude units per count rms, so that steady music sits at the old AGC target (0.25,
+// soft knee on). Measured 11 Nov 2026 on the five-track set (emulator, room level, AGC on):
+// 0.25 x median(sqrt M / mean magnitude) per track = 4.95-5.64, median 5.42.
+constexpr float K1_AFE2_TAU_M_S         = 2.0f;
+constexpr float K1_AFE2_SPEC_K          = 5.4f;
+#ifndef K1_AFE2_SPEC_DEFAULT
+#define K1_AFE2_SPEC_DEFAULT 0              // 0 off (four-band AGC), 1 anchor, 2 section
+#endif
 
 struct K1Afe2State {
   float b0, b1, b2, a1, a2;      // high-pass biquad, a0 normalised to 1
@@ -81,6 +97,8 @@ struct K1Afe2State {
   float section_quiet;           // Sq, counts^2: S with a 0.3 s release, for the silence test
   float a_q_release;
   bool quiet;                    // stage 2: Sq under the silence floor (two levels)
+  float section_mean;            // M, counts^2: stage 4's 2 s mean of e, held while quiet
+  float a_m;
 };
 
 void  k1_afe2_init(K1Afe2State& st, float sample_rate_hz);
@@ -97,6 +115,41 @@ inline bool  k1_afe2_ready = false;
 inline bool  k1_afe2_enabled = (K1_AFE2_DEFAULT_ON != 0);
 inline bool  k1_afe2_level_enabled = false;inline float k1_afe2_gamma = K1_AFE2_GAMMA_DEFAULT;
 inline float k1_afe2_floor = K1_AFE2_FLOOR_DEFAULT;
+// Stage 4 spectrum scaling (:k1_afe_spec). 0 keeps the four-band AGC.
+inline uint8_t k1_afe2_spec_mode = (uint8_t)K1_AFE2_SPEC_DEFAULT;
+// Stage 4 attempt 2 (11 Nov 2026): fixed spectral tilt for the single-gain path, multiplied onto the
+// existing tilt table. Factors at the band centres of bass / low-mid / high-mid / treble = median over
+// five tracks x four modes (emulator, room level) of (four-band AGC band level / single-gain band level):
+// 1.01, 1.00, 1.09, 3.16 (treble 2.72-3.89). One gain shows music's natural treble roll-off, which the
+// four-band AGC hid; this puts the bands back where the effects were tuned, without any loop.
+// Linear in log gain over log frequency, flat beyond the end points. Pure: the host test checks it.
+inline float k1_afe2_spec_tilt_factor(float hz) {
+  static const float f[4] = {148.0f, 400.0f, 1549.0f, 4170.0f};
+  static const float g[4] = {1.00f, 1.00f, 1.09f, 3.16f};
+  if (!(hz > f[0])) return g[0];
+  if (hz >= f[3]) return g[3];
+  for (int k = 0; k < 3; k++) {
+    if (hz <= f[k + 1]) {
+      const float u = (logf(hz) - logf(f[k])) / (logf(f[k + 1]) - logf(f[k]));
+      return expf(logf(g[k]) + u * (logf(g[k + 1]) - logf(g[k])));
+    }
+  }
+  return g[3];
+}
+
+// The one spectrum gain for mode 1 or 2 (0 for mode 0). Pure: the host test checks it.
+inline float k1_afe2_spec_gain(const K1Afe2State& st, uint8_t mode) {
+  float d;
+  if (mode == 1) {
+    d = st.anchor;
+  } else if (mode == 2) {
+    d = st.section_mean;
+  } else {
+    return 0.0f;
+  }
+  if (!(d >= K1_AFE2_ANCHOR_MIN)) d = K1_AFE2_ANCHOR_MIN;
+  return K1_AFE2_SPEC_K / sqrtf(d);
+}
 // The level-free beat envelope ("what"). waveform_peak_scaled is this value, times how_much
 // when the exposure is enabled.
 inline float k1_afe2_peak_env = 0.0f;

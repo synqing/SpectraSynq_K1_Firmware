@@ -1727,6 +1727,10 @@ void acquire_sample_chunk(uint32_t t_now) {
     // afe_us = mean and worst time of the meter per hop since the last line (microseconds).
     // quiet = the stage 2 silence test's flag (before the dwell; `silence=` is after it).
     USBSerial.printf(" quiet=%d qsec=%.1f", k1_afe2.quiet ? 1 : 0, sqrtf(k1_afe2.section_quiet));
+    // spec = stage 4 spectrum scaling (0 four-band AGC, 1 anchor, 2 section); sgain = its one
+    // gain; smean = its 2 s section mean in raw counts rms.
+    USBSerial.printf(" spec=%u sgain=%.4f smean=%.1f", (unsigned)k1_afe2_spec_mode,
+      k1_afe2_spec_gain(k1_afe2, k1_afe2_spec_mode), sqrtf(k1_afe2.section_mean));
     USBSerial.printf(" afe_us=%.1f afe_us_max=%u",
       k1_afe2_us_count ? (float)k1_afe2_us_sum / (float)k1_afe2_us_count : 0.0f, (unsigned)k1_afe2_us_max);
     k1_afe2_us_sum = 0;

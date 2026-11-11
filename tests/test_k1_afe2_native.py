@@ -31,6 +31,7 @@ TAU_A_UP, TAU_A_SLOW, TAU_A_FAST = 3.0, 60.0, 4.0
 T_HOLD, Q_QUIET, Q_EXIT, A_MIN = 45.0, 0.25, 0.70, 36.0
 SIL_ENTER, SIL_EXIT = 16.0, 25.0   # stage 2 silence test, counts^2 (4.0 / 5.0 counts rms)
 TAU_Q_RELEASE = 0.3                # its own release, so the delay after a stop does not grow with loudness
+TAU_M, SPEC_K = 2.0, 5.4           # stage 4: the spectrum's 2 s section mean (held while quiet) and its scale
 
 # (seconds, peak amplitude in raw counts). 400 is about the Main RPL microphone level at
 # living-room volume; 126 is 10 dB below it; 80 is 14 dB below it.
@@ -62,13 +63,18 @@ def _alpha(dt, tau):
     return 1.0 - math.exp(-dt / tau)
 
 
-def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None):
+def _spec_gain(A, M, mode):
+    d = A if mode == 1 else max(M, A_MIN)
+    return SPEC_K / math.sqrt(max(d, A_MIN))
+
+
+def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None, spec_out=None):
     w0 = 2.0 * math.pi * FC_HZ / RATE
     cw, al = math.cos(w0), math.sin(w0) / (2.0 * math.sqrt(0.5))
     a0 = 1.0 + al
     b0, b1, b2, a1, a2 = (1 + cw) / 2 / a0, -(1 + cw) / a0, (1 + cw) / 2 / a0, -2 * cw / a0, (1 - al) / a0
     z1 = z2 = 0.0
-    S, A, quiet, fast, silent, Sq = 0.0, A_MIN, 0.0, False, False, 0.0
+    S, A, quiet, fast, silent, Sq, M = 0.0, A_MIN, 0.0, False, False, 0.0, A_MIN
     dt = HOP / RATE
     out = []
     for h0 in range(0, len(samples) - HOP + 1, HOP):
@@ -104,8 +110,12 @@ def _reference(samples, gamma=1.0, floor=0.25, quiet_out=None):
         out.append(min(1.0, max(floor, h)))
         Sq += _alpha(dt, TAU_S_ATTACK if e > Sq else TAU_Q_RELEASE) * (e - Sq)
         silent = (Sq < SIL_EXIT) if silent else (Sq < SIL_ENTER)
+        if not silent:
+            M += _alpha(dt, TAU_M) * (e - M)
         if quiet_out is not None:
             quiet_out.append(1 if silent else 0)
+        if spec_out is not None:
+            spec_out.append((M, _spec_gain(A, M, 1), _spec_gain(A, M, 2)))
     return out
 
 
@@ -188,3 +198,54 @@ def test_afe2_wiring():
     # Stage 2 (accepted): the IM69D product silence decision is the meter's quiet flag.
     assert "#if defined(K1_MIC_IM69D_PDM_V1) && !defined(K1_AP_DRIVE_CONTRACT_V1)" in i2s
     assert "k1_rms_silent_state = k1_afe2_ready && k1_afe2.quiet;" in i2s
+
+
+def test_afe2_spectrum_gain_matches_reference_and_behaves(tmp_path):
+    """Stage 4: the section mean M and the one spectrum gain (mode 1 anchor, mode 2 section) equal the
+    reference on every hop; mode 1 keeps the loud passage's gain through a 10 dB breakdown (the spectrum
+    shows the breakdown smaller); mode 2 re-exposes the spectrum within about 6 s (the level is left to the
+    output brightness); M does not move while quiet, so a stop never raises the gain onto room noise."""
+    samples = _programme(PROGRAMME_S2)
+    cols = [_run(tmp_path, samples, 1.0, 0.25, column=c) for c in (5, 6, 7)]
+    want = []
+    _reference(samples, spec_out=want)
+    assert len(cols[0]) == len(want) == len(samples) // HOP
+    for c, name in enumerate(("M", "gain anchor", "gain section")):
+        worst = max(abs(g - w[c]) / max(abs(w[c]), 1e-9) for g, w in zip(cols[c], want))
+        assert worst < 2e-3, f"{name}: firmware and reference differ by {worst:.2e} (relative)"
+    m, g1, g2 = cols
+    loud1, loud2 = _at(g1, 4.9), _at(g2, 4.9)
+    assert abs(_at(g1, 14.9) / loud1 - 1.0) < 0.15          # breakdown: anchor gain barely moves
+    assert _at(g2, 14.9) / loud2 > 2.5                      # breakdown (10 dB): section gain rises ~3.2x
+    assert _at(g2, 15.1) / loud2 > 2.5                      # ... and does not drop at once (the drop lands big)
+    assert abs(_at(g2, 19.9) / loud2 - 1.0) < 0.2           # 4.9 s after the return: back near the loud gain
+    held = _at(m, 104.0)                                    # quiet from ~3 s after the loud stop: M frozen there
+    assert all(abs(v / held - 1.0) < 1e-6 for v in m[int(104.0 * RATE / HOP):int(130.0 * RATE / HOP)])
+    assert held > 0.1 * _at(m, 99.9)                        # frozen within 10 dB of the music's mean
+    assert min(g1) > 0.0 and max(g2) <= SPEC_K / math.sqrt(A_MIN) + 1e-9
+
+
+def _tilt_ref(hz):
+    pts = ((148.0, 1.00), (400.0, 1.00), (1549.0, 1.09), (4170.0, 3.16))
+    if hz <= pts[0][0]:
+        return pts[0][1]
+    if hz >= pts[-1][0]:
+        return pts[-1][1]
+    for (f0, g0), (f1, g1) in zip(pts, pts[1:]):
+        if hz <= f1:
+            u = (math.log(hz) - math.log(f0)) / (math.log(f1) - math.log(f0))
+            return math.exp(math.log(g0) + u * (math.log(g1) - math.log(g0)))
+
+
+def test_afe2_spectrum_tilt_matches_reference(tmp_path):
+    """Stage 4 attempt 2: the fixed spectral tilt equals the reference from 100 Hz to 6,400 Hz, is 1.0 in the
+    bass and low-mid, rises monotonically above 400 Hz, and is 3.16 from 4,170 Hz up (no loop, no state)."""
+    _run(tmp_path, _programme(((1, 0),)), 1.0, 0.25)            # builds the harness
+    ran = subprocess.run([str(tmp_path / "k1_afe2_host"), "tilt"], capture_output=True, text=True)
+    assert ran.returncode == 0, ran.stderr
+    rows = [(int(a), float(b)) for a, b in (ln.split() for ln in ran.stdout.splitlines())]
+    assert len(rows) == 253
+    assert max(abs(g - _tilt_ref(hz)) for hz, g in rows) < 1e-4
+    assert all(g == 1.0 for hz, g in rows if hz <= 400)
+    assert all(b >= a - 1e-6 for (_, a), (_, b) in zip(rows, rows[1:]))
+    assert all(abs(g - 3.16) < 1e-6 for hz, g in rows if hz >= 4170)
