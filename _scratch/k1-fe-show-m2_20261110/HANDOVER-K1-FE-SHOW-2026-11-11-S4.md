@@ -6,6 +6,13 @@ abstract: "Handover from K1-FE-SHOW lead session 4 (11 Nov 2026, 04:20 to 07:10 
 
 Every fact below was checked in this session unless marked **[UNVERIFIED]**. Use `/usr/bin/git`. British English. AWST. Session 3's handover (`HANDOVER-K1-FE-SHOW-2026-11-11-S3.md`) still holds for rules and commands; this file adds to it.
 
+## 0. Update, 11 Nov ~09:00 AWST (Captain: "continue as planned")
+
+- **Stage 2 accepted** (`fe/k1-afe2-s2` = `c36a9225`; code `7177d90a`). Removing the old test exposed one more defect: silence after a loud stop took 8–19 s (20.6 s on the loud smoke clip) and the emulator's delayed-save case missed its save. The silence test now reads its own 0.3 s-release copy of the meter: 5.4–7.6 s after a stop at any level, still 0 false silences in music. The old crest/SSL test, its two constants, tunables, the `:k1_afe_silence` switch and the test that modelled only the old rule are deleted.
+- **Stage 3 done** (`fe/k1-afe2-s3` = `714277c8`; code `df435671`): the loud guard no longer acts on the spectrum (trim, AGC target/floor, floor-cut, ceiling knee, colour unpin, retune matrix deleted). Emulator: guard on = guard off, 0 differing frames in modes 22/32/18. Bench: `gdft_trim` 1.000 on every line; loud passage light 4.0 → 7.0 %, loud ÷ breakdown 2.03 → 3.52.
+- **Main RPL now runs `df435671`** (epoch `1794383885`), 30 settings unchanged. Restore images (full read-backs): `d2701d9a` `f763a236…8b60` (`bench/flash-s2final/`), `7177d90a` `56a47a95…c815` (`bench/flash-s3/`).
+- **Open:** stage 3's hot-level input check (no hard clipping at the hot fixture) was not run; stages 4–7; the Captain's look at the plate. Sections 2, 4 and 5 below are the state before this update; section 5 items 1 and 2 are done.
+
 ## 1. Where things stand
 
 The merge of AFE2 stage 1, the FW lead's show fixes and the Modernes C++ fixes is done and judged on every count the plan names. On the real unit it keeps a prepared show running through dropped frames (one session, epoch +1, where `a6bad318` reset 180 times) and reproduces stage 1's bench result. AFE2 stage 2 replaces the old silence test, which called live music "silent" up to 79 % of the time, with one two-level test on the meter: 0 false silences in 15 emulator cases at three room levels and 0 of 81 lines on the bench. It is on the Main RPL now. One acceptance number is not met: after the music stops, silence is declared after ~10 s (bench) / 8–19 s (emulator), not within the 5 s dwell. The Captain has not yet looked at the plate for stage 1 or 2.
@@ -74,3 +81,4 @@ The merge of AFE2 stage 1, the FW lead's show fixes and the Modernes C++ fixes i
 | Date | Author | Change |
 |---|---|---|
 | 2026-11-11 | agent:claude (K1-FE-SHOW lead, session 4) | Created at the end of session 4. |
+| 2026-11-11 | agent:claude (K1-FE-SHOW lead, session 4) | Section 0: stage 2 accepted, stage 3 done, both on the Main RPL. |

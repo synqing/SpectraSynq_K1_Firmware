@@ -9,9 +9,12 @@ then the first 6 s of the passage again (music returns). Hops: music 0-11200, ze
 room 12800-14400, music 14400-15200. The silence flag per hop comes from the novelty trace (N lines).
 The room segment is a model, not a recording: no raw microphone recording of the quiet room exists.
 Adds three local fixtures to the EXPORT's copy of the inventory (scratch only, never committed).
-Usage: make_scenario_s2.py <export dir>   (run make_scenario_tracks.py on the same export first)"""
+Usage: make_scenario_s2.py <export dir>   (run make_scenario_tracks.py on the same export first)
+S2_NEW_ONLY=1: only the new-test cases, with no :k1_afe_silence command (for builds after the switch
+was deleted with the old test, 11 Nov 2026); their output must equal the earlier "-new" cases."""
 import copy
 import json
+import os
 import shutil
 import sys
 import wave
@@ -62,10 +65,12 @@ for key in TR:
             {"zeros_ms": 12000, "label": "declared digital silence: the music stops"},
             {"asset": "s2_room", "from_ms": 0, "to_ms": 12000, "label": "room-noise model"},
             {"asset": f"s2_{key}_{lab}_src", "from_ms": 72000, "to_ms": 78000, "label": "music returns"}]}
-        for test in ("old", "new"):
+        new_only = os.environ.get("S2_NEW_ONLY") == "1"
+        for test in (("new",) if new_only else ("old", "new")):
             comp = f"s2_{test}"
+            switch = [] if new_only else [f"k1_afe_silence={'true' if test == 'new' else 'false'}"]
             sc["compositions"][comp] = {"commands": ["set_mode=22", "secondary_mode=22", "secondary_enabled=true", "sensitivity=2.7",
-                                                     "k1_afe=true", f"k1_afe_silence={'true' if test == 'new' else 'false'}"],
+                                                     "k1_afe=true"] + switch,
                                         "note": f"mode 22, exposure on, silence test {test}"}
             cid = f"s2-{key}-{lab}-{test}"
             sc["cases"][cid] = {"purpose": f"{key} at {lab}: music, stop, room model, music; silence test {test}.", "pcm": f"s2_{key}_{lab}",

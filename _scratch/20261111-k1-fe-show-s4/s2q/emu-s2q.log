@@ -1,0 +1,49 @@
+invocation d3da1eb89d804e8082d7300343db63b5 source unknown dirty_inputs 38794a8bcdd7
+case s2-loreen-m10-new ...
+  PASS 
+case s2-loreen-room-new ...
+  PASS 
+case s2-loreen-p10-new ...
+  PASS 
+case s2-stay-m10-new ...
+  PASS 
+case s2-stay-room-new ...
+  PASS 
+case s2-stay-p10-new ...
+  PASS 
+case s2-rideit-m10-new ...
+  PASS 
+case s2-rideit-room-new ...
+  PASS 
+case s2-rideit-p10-new ...
+  PASS 
+case s2-secret-m10-new ...
+  PASS 
+case s2-secret-room-new ...
+  PASS 
+case s2-secret-p10-new ...
+  PASS 
+case s2-mammoth-m10-new ...
+  PASS 
+case s2-mammoth-room-new ...
+  PASS 
+case s2-mammoth-p10-new ...
+  PASS 
+SW01  PASS               15/15 runs accepted with firmware-observed run id, scenario CRC and counters; executed app region == built firmware.bin; image never patched
+SW02  NOT_RUN            repeat-smoke: NOT_RUN case(s) not in this suite: ['smoke-a', 'smoke-b']
+SW03  NOT_RUN            time-zero-tail: NOT_RUN case(s) not in this suite: ['time-zero-tail'] | stall: NOT_RUN case(s) not in this suite: ['stall-probe'] | repeat-time: NOT_R
+SW04  FAIL               0/0 planted captures rejected for the stated reason through ec.accept; 
+SW05  NOT_RUN            iso-a: NOT_RUN case(s) not in this suite: ['smoke-a', 'ctl-a'] | iso-b: NOT_RUN case(s) not in this suite: ['smoke-a', 'ctl-b'] | limit-coupling: NOT_
+SW06  NOT_RUN            reject-unchanged: NOT_RUN case(s) not in this suite: ['smoke-a', 'reject'] | recovery-state: NOT_RUN case(s) not in this suite: ['comp-save', 'comp-re
+SW07  PASS               pio run -e k1_main_rpl_im69d exit=0; forbidden flags=[]; fixture symbols=0; emu-only flags=['K1_EMU_FIXTURE', 'K1_EMU_SKIP_EMIT', 'K1_EMU_UART0', 'K1_
+SW08  NOT_RUN            repeat-music: NOT_RUN case(s) not in this suite: ['music-a', 'music-b'] | startup-quiet-return: NOT_RUN case(s) not in this suite: ['startup-sqr'] | m
+SW09  NOT_RUN            music-semantic-continuity: NOT_RUN case(s) not in this suite: ['music-a'] | startup-semantic-continuity: NOT_RUN case(s) not in this suite: ['startup-
+SW10  NOT_RUN            report.html from this invocation; smoke-a/smoke-b not in this suite
+SW11  FAIL               invocation ran from a clean export of the committed candidate (no .git, no prior outputs, no emulator-workspace sources); tool via K1_ESP_EMU, hash-ch
+SW12  NOT_APPLICABLE     no learned-model runtime in the product ELF (no tflite/tensorflow/interpreter/esp_nn/MicroInterpreter symbols); model inference is not active on k1_ma
+SW13  FAIL               local client chain (existing client -> run-owned pty -> esp-emu USB-Serial/JTAG -> production parser), not physical USB; client cases [] client-a-matc
+EX01  DEFERRED_EXTERNAL  physical parity, device/optical/AV/leave-state evidence: shelved by the Captain's R3 instruction; no hardware accessed
+EX02  DEFERRED_EXTERNAL  hosted CI/publication: no push authorised; no Linux-pinned esp-emu executable hash exists, so CI only builds k1_main_rpl_im69d and k1_main_rpl_emu
+result /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/20261111-k1-fe-show-s4/s2q/emu-s2q/result.json
+report /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/20261111-k1-fe-show-s4/s2q/emu-s2q/report.html
+SOFTWARE INCOMPLETE
