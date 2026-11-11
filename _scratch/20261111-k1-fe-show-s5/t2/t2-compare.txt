@@ -1,0 +1,5 @@
+T2 (session 5, 11 Nov 2026): hot fixture (Loreen excerpt, peak 4,096 raw, clip point 1,517), guard on, per-hop probe record
+fields: input_trim, gdft_trim, clip_count, sample_count; S2 = fe/k1-afe2-s2 c36a9225, S3 = fe/k1-afe2-s3 714277c8
+fix-m22-on: hops 3600/3600; input_trim differs 0; clip_count differs 0; sample_count differs 0; S2 gdft_trim min 0.352 (<1 on 3598 hops); S3 gdft_trim min 1.000 max 1.000; S3 input_trim min 0.376 mean 0.553; S3 clipped samples 1300 of 345600 (0.376 %)
+fix-m32-on: hops 3600/3600; input_trim differs 0; clip_count differs 0; sample_count differs 0; S2 gdft_trim min 0.352 (<1 on 3598 hops); S3 gdft_trim min 1.000 max 1.000; S3 input_trim min 0.376 mean 0.553; S3 clipped samples 1300 of 345600 (0.376 %)
+fix-m18-on: hops 3600/3600; input_trim differs 0; clip_count differs 0; sample_count differs 0; S2 gdft_trim min 0.352 (<1 on 3598 hops); S3 gdft_trim min 1.000 max 1.000; S3 input_trim min 0.376 mean 0.553; S3 clipped samples 1300 of 345600 (0.376 %)

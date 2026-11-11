@@ -1,0 +1,166 @@
+{
+ "cases": {
+  "s4-loreen-room-m22-agc": {
+   "frames": 2000,
+   "rejects": 0,
+   "r": 0.5478311447768621,
+   "slope_db_per_db": 0.34209489420149,
+   "contrast": 1.890716550828256,
+   "movement_loud": 0.022091437015714123,
+   "mean_light": 0.042915427634088656,
+   "loud_minus_quiet_db": 7.976852723536538,
+   "hue_bins": 1.9975,
+   "lock_pct": 46.79464285714286,
+   "conf_mean": 0.5676249805357143,
+   "stuck0_pct": 0.0,
+   "stuck1_pct": 0.0,
+   "band_median": [
+    0.31732,
+    0.346515,
+    0.25149,
+    0.19544
+   ],
+   "gain_median": 0.100372,
+   "movement_kept": 1.0
+  },
+  "s4-mammoth-room-m22-agc": {
+   "frames": 2000,
+   "rejects": 0,
+   "r": 0.6411838216045501,
+   "slope_db_per_db": 0.4675903050975089,
+   "contrast": 2.9755392515917594,
+   "movement_loud": 0.020298314260512044,
+   "mean_light": 0.03607120905495791,
+   "loud_minus_quiet_db": 8.4501315513048,
+   "hue_bins": 2.1165,
+   "lock_pct": 86.28571428571429,
+   "conf_mean": 0.7747835075,
+   "stuck0_pct": 0.0,
+   "stuck1_pct": 0.4,
+   "band_median": [
+    0.31118,
+    0.28675,
+    0.22762,
+    0.188515
+   ],
+   "gain_median": 0.099991,
+   "movement_kept": 1.0
+  },
+  "s4-rideit-room-m22-agc": {
+   "frames": 2000,
+   "rejects": 0,
+   "r": 0.17226360753617098,
+   "slope_db_per_db": -0.03133783857649694,
+   "contrast": 1.298099972121394,
+   "movement_loud": 0.023231382274927707,
+   "mean_light": 0.051073516854861264,
+   "loud_minus_quiet_db": 3.123563016175929,
+   "hue_bins": 1.59,
+   "lock_pct": 82.88392857142857,
+   "conf_mean": 0.7864104692857142,
+   "stuck0_pct": 0.0,
+   "stuck1_pct": 0.3,
+   "band_median": [
+    0.44114,
+    0.39519499999999996,
+    0.218,
+    0.17037000000000002
+   ],
+   "gain_median": 0.099991,
+   "movement_kept": 1.0
+  },
+  "s4-secret-room-m22-agc": {
+   "frames": 2000,
+   "rejects": 0,
+   "r": 0.4637610521523502,
+   "slope_db_per_db": 0.41182524779645824,
+   "contrast": 1.4492279046067478,
+   "movement_loud": 0.024591931616517716,
+   "mean_light": 0.051812948265557844,
+   "loud_minus_quiet_db": 4.181753673732814,
+   "hue_bins": 1.8385,
+   "lock_pct": 78.41071428571429,
+   "conf_mean": 0.7998016586607144,
+   "stuck0_pct": 0.0,
+   "stuck1_pct": 0.0,
+   "band_median": [
+    0.425225,
+    0.30208,
+    0.27212000000000003,
+    0.18556
+   ],
+   "gain_median": 0.099991,
+   "movement_kept": 1.0
+  },
+  "s4-stay-room-m22-agc": {
+   "frames": 2000,
+   "rejects": 0,
+   "r": 0.22290130023721255,
+   "slope_db_per_db": 0.1122830980614482,
+   "contrast": 1.1601506838694633,
+   "movement_loud": 0.019593835175680755,
+   "mean_light": 0.05083843248518603,
+   "loud_minus_quiet_db": 3.102978625695428,
+   "hue_bins": 1.185,
+   "lock_pct": 84.11607142857143,
+   "conf_mean": 0.7690737144642857,
+   "stuck0_pct": 0.0,
+   "stuck1_pct": 2.8000000000000003,
+   "band_median": [
+    0.757005,
+    0.476235,
+    0.2707,
+    0.18713000000000002
+   ],
+   "gain_median": 0.099991,
+   "movement_kept": 1.0
+  }
+ },
+ "calibration": {
+  "cases": [
+   {
+    "case": "s4-loreen-room-m22-agc",
+    "k_median": 5.415006421052407,
+    "k_p10": 4.52821054221118,
+    "k_p90": 10.68246742936468,
+    "agc_out_mean_median": 0.28544875,
+    "hops": 8000
+   },
+   {
+    "case": "s4-mammoth-room-m22-agc",
+    "k_median": 5.239437505682868,
+    "k_p10": 4.293810261622701,
+    "k_p90": 8.108096455933369,
+    "agc_out_mean_median": 0.2584675,
+    "hops": 8000
+   },
+   {
+    "case": "s4-rideit-room-m22-agc",
+    "k_median": 5.480453337001647,
+    "k_p10": 4.213531042817621,
+    "k_p90": 7.890807920503321,
+    "agc_out_mean_median": 0.30628125,
+    "hops": 8000
+   },
+   {
+    "case": "s4-secret-room-m22-agc",
+    "k_median": 5.644673193774641,
+    "k_p10": 4.4349396522003195,
+    "k_p90": 9.50635207700436,
+    "agc_out_mean_median": 0.29714125,
+    "hops": 8000
+   },
+   {
+    "case": "s4-stay-room-m22-agc",
+    "k_median": 4.945178456126564,
+    "k_p10": 4.237205559294198,
+    "k_p90": 6.579455407168171,
+    "agc_out_mean_median": 0.42813249999999997,
+    "hops": 8000
+   }
+  ],
+  "spec_k_median_of_tracks": 5.415006421052407,
+  "spec_k_min": 4.945178456126564,
+  "spec_k_max": 5.644673193774641
+ }
+}

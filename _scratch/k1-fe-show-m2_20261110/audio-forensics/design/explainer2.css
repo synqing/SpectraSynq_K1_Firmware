@@ -62,3 +62,9 @@ ul.tight{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;f
 .nt{text-transform:none} td.nw{white-space:nowrap}
 .ln.mean{stroke-width:4.5;stroke-linecap:butt;opacity:1} .lg i.ln-bar{background:var(--ink-2);height:5px;border-radius:0}
 table.spec td.m{white-space:nowrap}
+
+/* Stages 2 and 3: horizontal bars and dots */
+.hb{width:100%;height:auto;display:block;max-width:560px} .bar.old{fill:var(--old)} .bar.new{fill:var(--new)}
+.tk.l{font-size:12px;fill:var(--ink)} .tk.v{font-size:12px;fill:var(--ink);font-family:var(--f-mono)} .dot.new{fill:var(--new)}
+.lg i.sw-old,.lg i.sw-new{display:inline-block;width:14px;height:8px;border-radius:2px;margin-right:6px} .lg i.sw-old{background:var(--old)} .lg i.sw-new{background:var(--new)}
+.chart.hb text.hl-t{font-size:12px}

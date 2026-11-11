@@ -305,8 +305,8 @@ SCI = [("Cochlear compression", "0.2–0.3 dB out per dB in near best frequency,
        ("Dual-loop AGC", "slow loop sets level; fast loop acts only on a jump of more than about 8 dB; gain held in pauses", "Moore and Glasberg 1988; Stone et al. 1999; Moore 2008", "The anchor's three states."),
        ("Microphone", "−36 dBFS at 94 dB SPL (±1 dB); overload 130 dB SPL; 1 % distortion at 128 dB SPL; noise 25–29 dB(A)", "Infineon IM69D130 datasheet, Table 1", "0 dBFS = 130 dB SPL. Nothing in a venue clips it.")]
 sci_rows = "".join(f'<tr><th scope="row">{n}</th><td>{f}</td><td>{s}</td><td>{i}</td></tr>' for n, f, s, i in SCI)
-ROAD = [("1", "Exposure on output brightness", "meter, anchor, how_much", "nothing yet", "built, flashed, measured", "ok"), ("2", "One silence test from the meter", "", "crest and RMS classifier for this microphone", "planned", "no"),
-        ("3", "Loud guard: false trigger and spectrum actions", "", "peak_pin and spec_sat ladders, floor-cut, ceiling knee, colour unpin", "planned", "no"), ("4", "Spectrum exposure", "one gain from the anchor, fixed tilt, fixed ceiling", "four-band AGC and its gate", "planned", "no"),
+ROAD = [("1", "Exposure on output brightness", "meter, anchor, how_much", "nothing yet", "built, flashed, measured", "ok"), ("2", "One silence test from the meter", "", "crest and RMS classifier for this microphone", "built, flashed, measured", "ok"),
+        ("3", "Loud guard: false trigger and spectrum actions", "", "spectrum trim, gain-floor cut, ceiling knee, colour unpin (input trim stays until stage 5)", "built, flashed, measured", "ok"), ("4", "Spectrum exposure", "one gain from the anchor, fixed tilt, fixed ceiling", "four-band AGC and its gate", "planned", "no"),
         ("5", "Full-precision capture", "scaling inside the 64-bit recurrence", "×21.6, clamp, &gt;&gt; 6, the rest of the guard", "planned", "no"), ("6", "VU from the meter", "", "VU floor calibration", "planned", "no"),
         ("7", "Line input, ritual, dead code", "meter on the FE line path", "noise-calibration ritual, dead telemetry", "planned", "no"), ("8", "Mode 22's dark stretches", "", "", "separate; needs the Captain's eye", "no")]
 road_rows = "".join(f'<tr><th scope="row">{n}. {t}</th><td>{ad}</td><td>{de}</td><td>{vk[s] if s == "ok" else ""} {stt}</td></tr>' for n, t, ad, de, stt, s in ROAD)
@@ -317,8 +317,58 @@ i0 = next(i for i, l in enumerate(src) if "float z1 = st.z1" in l); i1 = next(i 
 code = E("\n".join(l for l in src[i0:i1 + 1] if "isfinite" not in l and l.strip() not in ("z1 = 0.0f;", "z2 = 0.0f;", "acc = 0.0f;", "}") or l.startswith("  }") and "isfinite" not in l))
 code = E("\n".join(src[i0:i1 + 1]))
 
+# ------------------------------------------------------------------ stages 2 and 3 (s2_/s3_ sections), numbers read from the evidence files at build time
+S4 = HERE.parent.parent.parent / "20261111-k1-fe-show-s4"
+S2OLD = json.loads((HERE.parent / "emu" / "analysis-s2" / "s2.json").read_text())
+S2NEW = json.loads((HERE.parent / "emu" / "analysis-s2" / "s2-fast-release.json").read_text())
+S2B_AB = json.loads((S4 / "bench" / "s2_bench_ab.json").read_text()); S2B_FIN = json.loads((S4 / "bench" / "s2final_bench.json").read_text())
+S3B = json.loads((S4 / "bench" / "s3_bench.json").read_text()); S3B_BEFORE = S3B["s2final_m22_m10dB"]; S3B_AFTER = S3B["s3_m22_m10dB"]
+import re
+S3EMU = {}
+for ln in (S4 / "s3" / "s3-compare.txt").read_text().splitlines():
+    mm = re.match(r"mode (\d+): .*what the guard did\) \((\d+), (\d+), (\d+)\)", ln); S3EMU[mm.group(1)] = (int(mm.group(2)), int(mm.group(4)), int(re.search(r"S3 guard ON vs S2 guard OFF differing frames \((\d+),", ln).group(1)))
+TRKN = {"loreen": "Loreen", "mammoth": "Mammoth", "rideit": "Ride It", "secret": "Secret Game", "stay": "Stay"}; LVN = {"m10": "−10 dB", "room": "room level", "p10": "+10 dB"}
+
+def hbar(rows, vmax, unit="", w=520, lab_w=150, rh=22, fmt="{:g}"):
+    """rows: (label, [(value, cls, text)]) -> horizontal bars, one or two per row; the number sits at the bar end."""
+    n = sum(len(r[1]) for r in rows); h = n * (rh - 6) + len(rows) * 8 + 24; y = 8; o = [f'<svg viewBox="0 0 {w} {h}" role="img" class="chart hb">']
+    bw = w - lab_w - 70
+    for lab, bars in rows:
+        o.append(f'<text x="{lab_w-8}" y="{y + (len(bars)*(rh-6))/2 + 4:.1f}" text-anchor="end" class="tk l">{E(lab)}</text>')
+        for v, cls, txt in bars:
+            L = max(v / vmax * bw, 0)
+            o.append(f'<rect x="{lab_w}" y="{y}" width="{L:.1f}" height="{rh-10}" rx="2" class="bar {cls}"/><text x="{lab_w+L+6:.1f}" y="{y+rh-12}" class="tk v">{E(txt)}</text>'); y += rh - 6
+        y += 8
+    o.append(f'<line x1="{lab_w}" x2="{lab_w}" y1="4" y2="{h-20}" stroke="var(--ink-3)"/><text x="{lab_w}" y="{h-5}" class="tk">0</text><text x="{lab_w+bw}" y="{h-5}" text-anchor="end" class="tk">{fmt.format(vmax)} {E(unit)}</text></svg>')
+    return "".join(o)
+
+SW = '<div class="lgrow"><span class="lg"><i class="sw-old"></i>old (before the stage)</span><span class="lg"><i class="sw-new"></i>new (after the stage)</span></div>'
+s2_rows = []
+for t in TRKN:
+    for lv in LVN:
+        old = S2OLD[f"s2-{t}-{lv}-old"]["music_share"] * 100; new = S2NEW[f"s2-{t}-{lv}-new"]
+        assert new["music_silent"] == 0
+        s2_rows.append((f"{TRKN[t]}, {LVN[lv]}", [(old, "old", f"{old:.1f} %"), (0, "new", "0 %")]))
+s2_chart = hbar(s2_rows, 80, "%", fmt="{:g}")
+s2_stop = [v["stop_to_silent_s"] for v in S2NEW.values()]
+def dotstrip():
+    w, h, L, R = 520, 110, 20, 20; X = lambda v: L + v / 10 * (w - L - R); o = [f'<svg viewBox="0 0 {w} {h}" role="img" class="chart hb">']
+    o.append(f'<line x1="{L}" x2="{w-R}" y1="70" y2="70" stroke="var(--ink-3)"/>')
+    for t in range(0, 11, 2): o.append(f'<line x1="{X(t):.1f}" x2="{X(t):.1f}" y1="70" y2="75" stroke="var(--ink-3)"/><text x="{X(t):.1f}" y="90" text-anchor="middle" class="tk">{t}</text>')
+    o.append(f'<text x="{(L+w-R)/2:.0f}" y="106" text-anchor="middle" class="tk">seconds after the music stops</text>')
+    o.append(f'<line x1="{X(5):.1f}" x2="{X(5):.1f}" y1="22" y2="70" class="hl-l"/><text x="{X(5)-4:.1f}" y="16" text-anchor="end" class="hl-t">5 s wait</text>')
+    for i, v in enumerate(sorted(S2NEW.values(), key=lambda d: d["stop_to_silent_s"])):
+        o.append(f'<circle cx="{X(v["stop_to_silent_s"]):.1f}" cy="{58 - (i % 3) * 10}" r="4.5" class="dot new"/>')
+    o.append('</svg>')
+    return "".join(o)
+s2_stop_chart = dotstrip()
+s3_emu_chart = hbar([(f"Mode {m}", [(S3EMU[m][0], "old", f"{S3EMU[m][0]:,}"), (S3EMU[m][2], "new", f"{S3EMU[m][2]:,}")]) for m in ("22", "32", "18")], 2000, "frames", fmt="{:,}")
+s3_bench_chart = hbar([("Loud passage, light %", [(S3B_BEFORE["loud_pct"], "old", f'{S3B_BEFORE["loud_pct"]:.2f}'), (S3B_AFTER["loud_pct"], "new", f'{S3B_AFTER["loud_pct"]:.2f}')]),
+                       ("Breakdown, light %", [(S3B_BEFORE["breakdown_pct"], "old", f'{S3B_BEFORE["breakdown_pct"]:.2f}'), (S3B_AFTER["breakdown_pct"], "new", f'{S3B_AFTER["breakdown_pct"]:.2f}')]),
+                       ("Loud ÷ breakdown", [(S3B_BEFORE["loud_over_breakdown"], "old", f'{S3B_BEFORE["loud_over_breakdown"]:.2f}'), (S3B_AFTER["loud_over_breakdown"], "new", f'{S3B_AFTER["loud_over_breakdown"]:.2f}')])], 8, "", fmt="{:g}")
+
 SECS = [("summary", "Summary"), ("old", "The old chain"), ("budget", "Level budget"), ("time", "Time scales and transfer"), ("design", "AFE2 design"), ("behaviour", "Behaviour"),
-        ("try", "Interactive model"), ("impl", "Implementation"), ("verify", "Verification"), ("compare", "Comparison"), ("context", "Science and prior art"), ("road", "Roadmap and open items"), ("refs", "Sources")]
+        ("try", "Interactive model"), ("impl", "Implementation"), ("verify", "Verification"), ("s2", "Stage 2: one silence test"), ("s3", "Stage 3: the loud guard stops cutting"), ("compare", "Comparison"), ("context", "Science and prior art"), ("road", "Roadmap and open items"), ("refs", "Sources")]
 toc = "".join(f'<li><a href="#{i}"><b>{n+1}</b>{t}</a></li>' for n, (i, t) in enumerate(SECS))
 def H(i): n = [s[0] for s in SECS].index(i); return f'<h2 id="{i}"><span class="n">{n+1}</span>{SECS[n][1]}</h2>'
 fig = [0]
@@ -334,14 +384,14 @@ P.append(f'''<meta charset="utf-8">
 <style>{CSS}</style>
 <div class="wrap">
 <header class="mast">
-  <p class="eyebrow">K1 Main RPL (ESP32-S3, IM69D130 PDM microphone, 2 × 160 LEDs) · before: a6bad318 · AFE2 stage 1: 7ea24446 and a6113aaf on fe/k1-afe2 · measured 10–11 Nov 2026</p>
+  <p class="eyebrow">K1 Main RPL (ESP32-S3, IM69D130 PDM microphone, 2 × 160 LEDs) · before: a6bad318 · AFE2 stages 1–3 (stage 1: 7ea24446 and a6113aaf on fe/k1-afe2) · measured 10–11 Nov 2026</p>
   <h1>K1 Audio Front End</h1>
   <p class="dek">A technical account of the level-control path between the microphone and the light effects: what it was, why it could not show a song's sections, the replacement design, and the evidence for each claim. Every number is from the source, the emulator running the real binary, or the bench unit.</p>
 </header>
 <nav class="card" aria-label="Contents"><ol class="toc">{toc}</ol></nav>
 
 <section class="sec">{H("summary")}
-  <div class="kv"><div><b>{n_adapt} → 1</b><span>stages that adapt level by themselves: before, and the design target. Stage 1 adds the new one and removes none yet.</span></div>
+  <div class="kv"><div><b>{n_adapt} → 1</b><span>stages that adapt level by themselves: before, and the design target. Stages 1–3 are built and on the bench unit: stage 1 added the new one, stages 2 and 3 removed two old ones.</span></div>
   <div><b>{T_OLD:.2f} → {T_TOT:.2f}</b><span>dB out per dB in at 0.03 Hz (a 30 s section), old level signal against the product with AFE2. Seven tracks.</span></div>
   <div><b>{BR("off", "rgb"):.2f} → {BR("on", "rgb"):.2f}</b><span>loud ÷ breakdown light output on the real unit, stage off then on, same passage, same session. Second edge: {BR("off", "rgb_secondary"):.2f} → {BR("on", "rgb_secondary"):.2f}.</span></div>
   <div><b>{n_better} of {len(pairs)}</b><span>track × mode cases where both tracking and contrast of the LED output improved (five tracks, modes 22 and 32, real firmware). Off is byte-identical to the previous build.</span></div></div>
@@ -354,7 +404,7 @@ P.append(f'''<meta charset="utf-8">
     <li><b>One meter</b> on the raw samples above 110 Hz: section loudness S, 30 ms up, 1.5 s down.</li>
     <li><b>One anchor</b> A, the only automatic level control: 3 s up, 60 s down, re-anchoring after 45 s of lasting quiet.</li>
     <li><b>One output</b>, how_much = clamp((S/A)^(γ/2), floor, 1), applied to the brightness of both edges for the live path.</li>
-    <li><b>The fast signals are untouched</b>, so the beat response is the one already approved. Stage 1 is additive; the old stages come out in stages 2–5.</li></ul></div></div>
+    <li><b>The fast signals are untouched</b>, so the beat response is the one already approved. Stage 1 is additive; stages 2 and 3 have removed two old stages, and stages 4–7 remove the rest.</li></ul></div></div>
 </section>
 
 <section class="sec">{H("old")}
@@ -472,6 +522,49 @@ how    = clamp((S / A)^(γ/2), floor, 1)
   <div class="card tw"><table class="spec"><thead><tr><th>Hypothesis</th><th>Test</th><th>Observed</th><th>Verdict</th></tr></thead><tbody>{fals_rows}</tbody></table></div>
 </section>
 
+<section class="sec">{H("s2")}
+  <p class="lede">Built, flashed to the bench unit and measured. The old silence test mistook loud, dense music for silence. The new one reads the same loudness meter as stage 1.</p>
+  <div class="kv"><div><b>0 of {S2B_FIN["music_lines"]}</b><span>music lines called silent on the real unit with the new test. The old test: 16 to 21 of 88 (plan, section 6).</span></div>
+  <div><b>{min(s2_stop):.1f}–{max(s2_stop):.1f} s</b><span>from the music stopping to silence being declared, in the emulator (15 cases). The wait is 5 s.</span></div>
+  <div><b>{S2B_FIN["silence_after_stop_s"]:.1f} s</b><span>the same measurement on the real unit, after the quick-release fix.</span></div>
+  <div><b>15 of 15</b><span>emulator cases with 0 music hops called silent. A hop is one 7.5 ms slice of sound.</span></div></div>
+  <div class="cols2"><div class="card stack"><h3>What was wrong</h3><ul class="tight">
+    <li><b>The old test judged the shape of the sound.</b> Its rule (crest factor: how spiky the wave is against its average) read loud, dense music as flat, so it called it silence.</li>
+    <li><b>Calling music silent has a cost.</b> It reset the beat tracking in the middle of a song.</li>
+    <li><b>On the real unit:</b> {S2B_AB["off"]["silent_during_music"]} of {S2B_AB["off"]["music_lines"]} music lines were called silent with the old test on, {S2B_AB["on"]["silent_during_music"]} of {S2B_AB["on"]["music_lines"]} with the new one.</li></ul></div>
+  <div class="card stack"><h3>What stage 2 does</h3><ul class="tight">
+    <li><b>One test, one meter.</b> It reads the loudness meter stage 1 already built.</li>
+    <li><b>Two levels, so it does not flicker.</b> Quiet below 16 counts² and music above 25 (counts are the microphone's own units).</li>
+    <li><b>A 5 s wait</b> before it declares silence, on a quick-release copy of the meter (0.3 s).</li>
+    <li><b>Deleted:</b> the crest-factor rule and the settings only it used.</li></ul></div></div>
+  <figure class="card fig"><h3>Music wrongly called silent: old test against new test</h3>{SW}{s2_chart}
+    {cap("Emulator, mode 22, five tracks at three volumes, 15 cases per test. Amber is the old test, blue the new one (0 % in every case). Source: emu/analysis-s2/s2.json (old) and s2-fast-release.json (new), the Mammoth, Stay and Loreen rows at −10 dB being the worst.")}</figure>
+  <figure class="card fig"><h3>How long silence takes to be declared after the music stops</h3>{s2_stop_chart}
+    {cap("Each blue dot is one emulator case with the new test (15 cases). Source: emu/analysis-s2/s2-fast-release.json, stop_to_silent_s. The real unit, with the same fix: " + f'{S2B_FIN["silence_after_stop_s"]:.2f}' + " s, bench/s2final_bench.json.")}</figure>
+</section>
+
+<section class="sec">{H("s3")}
+  <p class="lede">Built, flashed to the bench unit and measured. The loud guard used to dim the spectrum on ordinary music. Stage 3 removed those actions.</p>
+  <div class="kv"><div><b>{S3EMU["22"][0]:,}–{max(v[0] for v in S3EMU.values()):,} → 0</b><span>of 2,000 frames the old guard changed, against the new guard. Three modes, emulator.</span></div>
+  <div><b>{S3B_BEFORE["gdft_trim_lines_below_1"]} → {S3B_AFTER["gdft_trim_lines_below_1"]} of {S3B_AFTER["lines"]}</b><span>telemetry lines where the guard's spectrum trim was below 1. Lowest value before: {S3B_BEFORE["gdft_trim_min"]:.3f}. Now {S3B_AFTER["gdft_trim_min"]:.3f} on every line.</span></div>
+  <div><b>{S3B_BEFORE["loud_pct"]:.2f} → {S3B_AFTER["loud_pct"]:.2f} %</b><span>light from the loud passage on the real unit, mode 22, Loreen at −10 dB.</span></div>
+  <div><b>{S3B_BEFORE["loud_over_breakdown"]:.2f} → {S3B_AFTER["loud_over_breakdown"]:.2f}</b><span>loud passage divided by breakdown. Higher means the sections show more clearly.</span></div></div>
+  <div class="cols2"><div class="card stack"><h3>What was wrong</h3><ul class="tight">
+    <li><b>The guard read the wrong thing.</b> Its level was self-normalised, so it was the same at any volume. Dense music looked "too loud" at room volume.</li>
+    <li><b>So it dimmed the spectrum.</b> The loud passage lost light and the section contrast shrank.</li></ul></div>
+  <div class="card stack"><h3>What stage 3 does</h3><ul class="tight">
+    <li><b>Deleted the guard's spectrum actions:</b> the spectrum trim, the gain-floor cut, the ceiling knee and the colour unpin.</li>
+    <li><b>The spectrum trim is fixed at 1.000.</b></li>
+    <li><b>Kept until stage 5:</b> the guard's input trim.</li></ul></div></div>
+  <figure class="card fig"><h3>Emulator: frames the guard changed, out of 2,000</h3>{SW}{s3_emu_chart}
+    {cap("Loreen at room level, modes 22, 32 and 18. Amber: stage 2 guard on against guard off, what the old guard did. Blue: stage 3 guard on against stage 2 guard off, 0 differing frames in each mode. Source: 20261111-k1-fe-show-s4/s3/s3-compare.txt.")}</figure>
+  <figure class="card fig"><h3>Real unit: light before and after stage 3</h3>{SW}{s3_bench_chart}
+    {cap("Main RPL, mode 22, Loreen at −10 dB, 110 telemetry lines each. Amber: stage 2. Blue: stage 3. The breakdown barely moves ({:.2f} to {:.2f} %); the loud passage gets the light back. Source: 20261111-k1-fe-show-s4/bench/s3_bench.json.".format(S3B_BEFORE["breakdown_pct"], S3B_AFTER["breakdown_pct"]))}</figure>
+  <div class="card stack"><h3>Where we are</h3><ul class="tight">
+    <li><b>Self-adjusting or gating stages removed so far: 2</b> (the crest-factor silence gate and the guard's spectrum actions).</li>
+    <li><b>Still to go:</b> the four-band AGC (stage 4); the fixed gain and clamp, and the guard's input trim (stage 5); the VU absolute level (stage 6); the calibration ritual (stage 7). Source: AFE2-PLAN-2026-11-10.md, sections 4 and 6.</li></ul></div>
+</section>
+
 <section class="sec">{H("compare")}
   <div class="card tw"><table class="spec narrow"><thead><tr><th>Dimension</th><th>Before (a6bad318)</th><th>AFE2 stage 1 (7ea24446)</th><th>AFE2 target (after stage 5)</th></tr></thead><tbody>{cmp_rows}</tbody></table></div>
 </section>
@@ -498,7 +591,7 @@ how    = clamp((S / A)^(γ/2), floor, 1)
       <li>The Captain's eye has not judged it. That is the acceptance test, and no measurement here replaces it.</li>
       <li>dB SPL figures assume unity gain in the PDM converter.</li>
       <li>The transfer measurement treats a non-linear, clamped system as linear; read it as a describing gain.</li>
-      <li>Until stages 2–5 land the unit runs five self-adjusting stages.</li></ul></div>
+      <li>Stages 1–3 are built and on the bench unit; until stages 4–7 land the unit still runs the four-band AGC and the guard's input trim.</li></ul></div>
   </div>
 </section>
 

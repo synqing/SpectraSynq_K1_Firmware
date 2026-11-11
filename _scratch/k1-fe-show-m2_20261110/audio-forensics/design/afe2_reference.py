@@ -23,6 +23,21 @@ One meter, one anchor, one output:
              No crest, peak or SSL term: loud dense music has a large S whatever its crest factor.
 The published level is `what x how_much`, where `what` is the existing 2 s self-normalised beat signal.
 
+Stage 4 (11 Nov 2026, session 5): one gain for the whole spectrum replaces the four-band AGC.
+  M        = section mean for the spectrum: one-pole on e, TAU_M both ways (2 s, the time scale of the level
+             path's "what"); it does not move while `quiet` (the stage-2 flag), so a stop never re-exposes room noise
+  D        = the spectrum's divisor (counts^2), chosen at run time:
+               mode 1 "anchor":  D = A                      (the plan text: every bin divided by the slow anchor)
+               mode 2 "section": D = max(M, A_MIN)          (level-free "what"; how_much on the output brightness
+                                                             then carries the section level exactly once)
+  g        = SPEC_K / sqrt(D)                               the one gain, the same for all 80 bins
+  out[i]   = mag[i] * g * tilt[i], then the existing fixed soft ceiling (above 0.5: 0.5 + x/(1 + x)), clamped to [0, 1]
+  Why two modes: stage 1 put how_much on the output brightness of every effect (the emulator showed scaling the
+  level inverted mode 32), so spectral modes already receive the section level. Mode 1 would apply it twice
+  (light ~ amplitude^2 at gamma 1); mode 2 applies it once. The emulator A/B decides (plan S4, two attempts).
+  SPEC_K   sets where the spectrum sits: at D = e (steady music) the mean bin of mag * g equals SPEC_TARGET, the
+           old AGC's target with the soft knee on (0.25). Measured in counts on the five-track set; see SPEC_K below.
+
 Why these numbers (sources in research_notes/K1 audio front end design/):
   FC_HZ 110        the plate shows nothing below its lowest bin; room rumble must not set the reference
   TAU_S_ATTACK 30 ms   a drop must land at once (Light-Show Law 1 and 2); equals the present follower attack
@@ -60,6 +75,34 @@ FLOOR_DEFAULT = 0.25
 SIL_ENTER = 16.0
 SIL_EXIT = 25.0
 TAU_Q_RELEASE = 0.3
+TAU_M = 2.0
+SPEC_TARGET = 0.25
+SPEC_K = 5.4          # magnitude units per count rms; measured 11 Nov 2026: 4.95-5.64 over five tracks, median 5.42
+SPEC_OFF, SPEC_ANCHOR, SPEC_SECTION = 0, 1, 2
+
+
+def spec_gain(A: float, M: float, mode: int, k: float = None) -> float:
+    """Stage 4: the one spectrum gain for mode 1 (anchor) or 2 (section). Mode 0 has no gain here (old AGC)."""
+    k = SPEC_K if k is None else k
+    if mode == SPEC_ANCHOR:
+        d = A
+    elif mode == SPEC_SECTION:
+        d = max(M, A_MIN)
+    else:
+        raise ValueError("mode 0 is the old AGC")
+    return k / math.sqrt(max(d, A_MIN))
+
+
+def spectrum(mag, tilt, g: float, knee: bool = True):
+    """Stage 4: every bin times the same gain and the fixed tilt, the fixed soft ceiling, clamp to [0, 1]."""
+    out = []
+    for m, t in zip(mag, tilt):
+        o = m * g * t
+        if knee and o > 0.5:
+            x = o - 0.5
+            o = 0.5 + x / (1.0 + x)
+        out.append(min(1.0, max(0.0, o)))
+    return out
 
 
 def biquad_highpass(fs: float, fc: float = FC_HZ):
@@ -89,6 +132,7 @@ class Afe2:
         self.how_much = 1.0
         self.Sq = 0.0
         self.quiet = False
+        self.M = A_MIN
 
     def process_hop(self, raw) -> float:
         n = len(raw)
@@ -133,4 +177,6 @@ class Afe2:
         self.how_much = min(1.0, max(self.floor, h))
         self.Sq += alpha(dt, TAU_S_ATTACK if e > self.Sq else TAU_Q_RELEASE) * (e - self.Sq)
         self.quiet = (self.Sq < SIL_EXIT) if self.quiet else (self.Sq < SIL_ENTER)
+        if not self.quiet:
+            self.M += alpha(dt, TAU_M) * (e - self.M)
         return self.how_much
