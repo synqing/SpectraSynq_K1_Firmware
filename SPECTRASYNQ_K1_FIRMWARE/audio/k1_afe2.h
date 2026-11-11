@@ -105,6 +105,12 @@ float k1_afe2_process_hop(K1Afe2State& st, const int16_t* raw, uint16_t count, f
 // :k1_afe_floor). Not saved: a reboot returns to the build default.
 inline K1Afe2State k1_afe2 = {};
 inline bool  k1_afe2_ready = false;
+// True while the hops being analysed go through the meter (the microphone path). The FE line-in
+// branch clears it: line-in samples never reach the meter, so neither the stage-1 brightness nor
+// the stage-4 spectrum gain may use the microphone's stale reading (and its units) on line-in;
+// the spectrum falls back to the broadband AGC until AFE2 stage 7 gives line-in its own meter.
+// Set only after the meter runs, cleared only by the line branch: never toggled within a mic hop.
+inline bool  k1_afe2_metered = false;
 // k1_afe2_enabled: how_much scales the OUTPUT BRIGHTNESS of both edges (the same for every
 // effect). k1_afe2_level_enabled: how_much also scales the published level, which changes each
 // effect's geometry in that effect's own way (smaller shapes in mode 22, but wider bands in
@@ -150,7 +156,7 @@ inline uint32_t k1_afe2_us_count = 0;
 // Output brightness factor for the live microphone path. 1.0 when the stage is off or has no
 // meter on this build. Read on the render core; a single float written on the audio core.
 inline float k1_afe2_brightness_scale() {
-  return (k1_afe2_ready && k1_afe2_enabled) ? k1_afe2.how_much : 1.0f;
+  return (k1_afe2_ready && k1_afe2_metered && k1_afe2_enabled) ? k1_afe2.how_much : 1.0f;
 }
 
 #endif  // K1_AFE2_H

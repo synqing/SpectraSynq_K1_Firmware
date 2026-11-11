@@ -229,7 +229,14 @@ def test_afe2_spectrum_wiring():
     broadband AGC remains only as the fallback for builds without the meter."""
     g = (AUDIO / "k1_gdft_core.cpp").read_text(encoding="utf-8")
     ini = (ROOT / "platformio.ini").read_text(encoding="utf-8")
-    assert "if (k1_afe2_ready) {" in g
+    assert "if (k1_afe2_ready && k1_afe2_metered) {" in g
+    i2s = (AUDIO / "i2s_audio.h").read_text(encoding="utf-8")
+    afe = (AUDIO / "k1_afe2.h").read_text(encoding="utf-8")
+    # The flag is set right after the meter and cleared only by the FE line-in branch.
+    assert "k1_afe2_gamma, k1_afe2_floor);\n  k1_afe2_metered = true;" in i2s
+    assert i2s.count("k1_afe2_metered = false;") == 1
+    assert i2s.index("k1_afe2_metered = false;") < i2s.index("k1_pcm1808_take_canonical_samples(pcm_hop, t_now);")
+    assert "(k1_afe2_ready && k1_afe2_metered && k1_afe2_enabled) ? k1_afe2.how_much : 1.0f" in afe
     assert "const float spec_gain = k1_afe2_spec_gain(k1_afe2);" in g
     assert "k1_afe2_spec_tilt_factor(frequencies[i].target_freq)" in g
     assert "K1_AGC_PERBAND_V1" not in g and "pb_gain" not in g

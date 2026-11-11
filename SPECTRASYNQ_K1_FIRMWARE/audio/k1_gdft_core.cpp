@@ -484,8 +484,8 @@ void IRAM_ATTR process_GDFT() {
   // AFE2 stage 4 (accepted 12 Nov 2026 by the Captain after a camera A/B): one gain for the whole
   // spectrum from the AFE2 meter (audio/k1_afe2.h): every bin divided by the same 2 s section mean,
   // a fixed tilt, the fixed soft ceiling. It replaced the four-band AGC. Builds whose meter does not
-  // run (no IM69D microphone path) keep the broadband AGC below until AFE2 stage 7.
-  if (k1_afe2_ready) {
+  // run (no IM69D microphone path), and FE line-in hops, keep the broadband AGC below until AFE2 stage 7.
+  if (k1_afe2_ready && k1_afe2_metered) {
     // Its own fixed tilt: the existing table times k1_afe2_spec_tilt_factor, built once.
     static float s4_tilt[NUM_FREQS];
     static bool s4_tilt_ready = false;

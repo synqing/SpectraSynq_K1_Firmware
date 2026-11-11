@@ -559,6 +559,9 @@ void acquire_sample_chunk(uint32_t t_now) {
   }
   if (k1_fe_line) {
 #endif
+#if K1_PCM1808_LINE_SWITCH && K1_AFE2_V1
+  k1_afe2_metered = false;   // line-in owns this hop: no AFE2 meter on it until stage 7
+#endif
   int16_t pcm_hop[96];
   k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
   const K1PcmCanonicalReadTiming pcm_read = k1_pcm1808_last_canonical_read_timing();
@@ -850,6 +853,7 @@ void acquire_sample_chunk(uint32_t t_now) {
   const int64_t k1_afe2_t0_us = AP_STREAM_ENABLED ? esp_timer_get_time() : 0;
   k1_afe2_process_hop(k1_afe2, im69d_samples_i16, (uint16_t)CONFIG.SAMPLES_PER_CHUNK,
                       k1_afe2_gamma, k1_afe2_floor);
+  k1_afe2_metered = true;
   if (AP_STREAM_ENABLED) {
     const uint32_t k1_afe2_us = (uint32_t)(esp_timer_get_time() - k1_afe2_t0_us);
     k1_afe2_us_sum += k1_afe2_us;
