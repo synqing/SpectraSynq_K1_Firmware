@@ -51,9 +51,13 @@ Each: purpose → method → acceptance → failure → STOP. Repair authority: 
 
 **S8** — picture for the Captain only (mode 22 dark stretches). Note: the S4 camera stills show mode 22 dark at 1:42 with the old AGC and lit with S4.
 
-**T6 — merge into `lane/k1-fe-release`** (`git merge-tree` + private index; check `~/K1_Launch_Planning/00-Governance/COURSE-2026-11-02.md`). Judge: pytest, four builds, G1–G4 ×3, live regression, receiver test. Also update the skill text listing the deleted silence constants (S5 handover "Known open items").
+**T6 — merge into `lane/k1-fe-release` — DONE 12 Nov ~22:00.** `lane/k1-fe-release` `0aa48f64` (FW lead's local receipt commit on the show fixes `c949151c`) → **`88f096ea`** (merge with `fe/k1-afe2-s4` `6ac7bd31`), pushed (origin was `024389b4`). The FW lead's 12 Nov receipt (finding 6) expected this merge. The release side added documents only (0 files outside `docs/`), so the firmware equals `fe/k1-afe2-s4`'s code `9ff2addf`, judged there; no re-run was needed. Still to do: update the skill text listing the deleted silence constants (S5 handover "Known open items").
 
-**T7 — FE board, A06, A18, `fe-1.0.0`**: FE board flash only with identity confirmed and S7 done (the jack must be measured). A06 timing (iPhone 240 fps clap, one Captain action), A18 musical value with the Captain. Tagging is a publication step: confirm with the Captain.
+**Q3 (asked 12 Nov ~22:00): stage 1 on the FE build.** `k1_fe` extends `k1_main_rpl_im69d`, which does not set `K1_AFE2_DEFAULT_ON`, so on the FE the stage-1 output-brightness exposure is measured but **not applied**; the Captain's approved camera A/B had it applied (bench env). Without it, spectral modes on the FE get no section dynamics at all (stage 4 leaves the section level to stage 1). Lead's recommendation: add `-DK1_AFE2_DEFAULT_ON=1` to `[env:k1_fe]` so the FE shows what the Captain approved. One-line change; then pytest, `k1_fe` build, G1–G4 (`fe` profile) and the release lane.
+
+**Critical path note (FW lead receipt 12 Nov, not this lane's work):** the Captain's FE board is K1-FE-S31-G01 with an **ESP32-S31**, not the S3 the course names (Captain ruling 10 Nov 17:00). The FE firmware compiles for the S31 only with patches; the S31 port (FastLED patch, pin map, BLE library, pre-release toolchain, web flasher) is the FW lead's lane and needs the Operations Manager to update the course first. AFE2 needs nothing extra for the S31 beyond the microphone proof on a real S31.
+
+**T7 — FE board, A06, A18, `fe-1.0.0`**: FE board flash only with identity confirmed (S31 port first, FW lead). Line-in measurement no longer required (Captain ruling above). A06 timing (iPhone 240 fps clap, one Captain action), A18 musical value with the Captain. Tagging is a publication step: confirm with the Captain.
 
 ## 6. Commands that work
 S5 handover §6 holds export, commit, merge, pytest, builds, emulator, gates, flash, registry commands. New in session 5 (all in `s5/tools/`, on `lane/k1-fe-show-m2`):
