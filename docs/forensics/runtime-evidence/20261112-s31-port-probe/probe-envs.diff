@@ -1,0 +1,41 @@
+--- /dev/fd/12	2026-11-12 08:06:29
++++ platformio.ini	2026-11-12 08:03:55
+@@ -2231,3 +2231,38 @@
+     -Wl,--wrap=rmt_new_tx_channel
+     -Wl,--wrap=rmt_transmit
+ 
++
++; S31 PORT PROBE (FW lead, 12 Nov 2026). NON-SHIPPABLE, scratch export only, never committed.
++; Question: does the FE firmware compile for ESP32-S31 on arduino-esp32 4.0.0-RC1 / ESP-IDF 6.1?
++[env:k1_fe_s31_probe]
++extends = env:k1_fe
++platform = file:///Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/20261112-fw-lead-s31-port-probe/platform/platform-espressif32-61.04.00-RC1
++board = esp32-s31-coreboard-1
++build_flags =
++    ${env:k1_fe.build_flags}
++    -DK1_S31_PORT_PROBE
++
++; Same probe with the newest FastLED from the registry (3.10.3 fails on IDF 6.1).
++[env:k1_fe_s31_probe_fl]
++extends = env:k1_fe_s31_probe
++lib_deps =
++    fastled/FastLED
++    file://libraries/FixedPoints
++    file://libraries/M5ROTATE8
++
++; BLE stack probe on S31: NimBLE-Arduino + the K1 BLE-MIDI central and decoder.
++[env:k1_fe_s31_probe_ble]
++extends = env:k1_fe_s31_probe
++build_src_filter =
++    ${env:k1_fe.build_src_filter}
++    +<network/ble_remoted_central.cpp>
++    +<network/k1_ble_midi_decoder.cpp>
++    +<network/k1_deck_identity_v1.cpp>
++    +<network/k1_deck_state_v1.cpp>
++    +<network/k1_deck_state_tx.cpp>
++build_flags =
++    ${env:k1_fe_s31_probe.build_flags}
++    -DK1_BLE_REMOTED
++lib_deps =
++    ${env:k1_hardware.lib_deps}
++    h2zero/NimBLE-Arduino@^2.5.0

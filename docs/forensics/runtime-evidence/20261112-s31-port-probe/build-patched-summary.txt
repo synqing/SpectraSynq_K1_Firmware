@@ -1,0 +1,21 @@
+# k1_fe_s31_probe with probe-only patches (see README in this folder). Rebuild after a PlatformIO build-folder clean; first build gave the same sizes.
+RAM:   [=====     ]  45.7% (used 149820 bytes from 327680 bytes)
+Flash: [=         ]  12.0% (used 785464 bytes from 6553600 bytes)
+exit=0
+
+eef6ceb5dcb4b65752466dc5cb6173e0800b0ed517a6d06395c95d53d0e11903  images/k1_fe_s31_probe/firmware.bin
+bytes 834016
+# LED driver symbols (riscv32-esp-elf-nm -C firmware.elf)
+ClocklessController<15, 250, 625, 375, (fl::EOrder)10, 0, false, 5>
+ClocklessController<16, 250, 625, 375, (fl::EOrder)10, 0, false, 5>
+ClocklessController<17, 250, 625, 375, (fl::EOrder)10, 0, false, 5>
+ClocklessController<18, 250, 625, 375, (fl::EOrder)10, 0, false, 5>
+RmtController5::DmaMode
+RmtController5::RmtController
+RmtController5::loadPixelData
+RmtController5::showPixels
+# FastLED warnings (count, with and without the [-Wcpp] echo line)
+  83 #warning "Unknown board, assuming support for clockless RMT5 and SPI chipsets. Please file an bug report with FastLED and tell them about your board type."
+  83 #warning "Unknown board, assuming support for clockless RMT5 and SPI chipsets. Please file an bug report with FastLED and tell them about your board type." 
+  74 #warning Unknown ESP32 chip variant.  Only pins defined by ESP-IDF will be masked.
+  74 #warning Unknown ESP32 chip variant. Only pins defined by ESP-IDF will be masked. 

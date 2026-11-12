@@ -1,0 +1,17 @@
+# FastLED 3.10.9 (newest), unpatched, keep-going
+# log: build-s31-4-fl.log
+==================== 1 failed, 0 succeeded in 00:01:24.823 ====================
+exit=1
+
+SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h:92:2: error: #error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
+SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:670:34: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'uint16_t' {aka 'short unsigned int'} in assignment
+SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:675:34: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'uint16_t' {aka 'short unsigned int'} in assignment
+SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:679:34: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'uint16_t' {aka 'short unsigned int'} in assignment
+SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:729:34: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'uint16_t' {aka 'short unsigned int'} in assignment
+SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:732:34: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'uint16_t' {aka 'short unsigned int'} in assignment
+SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:735:34: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'uint16_t' {aka 'short unsigned int'} in assignment
+SPECTRASYNQ_K1_FIRMWARE/system/globals.h:1225:51: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'const uint16_t' {aka 'const short unsigned int'} in initialization
+SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp:66:3: error: cannot convert 'const EOrder' {aka 'const fl::EOrder'} to 'uint16_t' {aka 'short unsigned int'} in initialization
+libdeps/FastLED/src/platforms/esp/32/drivers/i2s/i2s_peripheral_esp32dev_esp.cpp.hpp:62:10: fatal error: rom/lldesc.h: No such file or directory
+libdeps/FastLED/src/platforms/esp/32/drivers/parlio/bus_traits.h:28:19: error: redefinition of 'struct fl::BusTraits<fl::Bus::FLEX_IO, 0>'
+libdeps/FastLED/src/platforms/esp/32/drivers/parlio/bus_traits.h:47:19: error: redefinition of 'struct fl::BusSupports<fl::Bus::FLEX_IO, fl::SpiChipsetConfig, 0>'

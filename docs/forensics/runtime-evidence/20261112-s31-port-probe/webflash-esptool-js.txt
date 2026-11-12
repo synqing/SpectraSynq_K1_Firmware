@@ -1,0 +1,5 @@
+# Web flasher chip support for ESP32-S31 (checked 12 Nov 2026 08:10 AWST)
+tools/webflash/assets/esptool-js-0.6.1.bundle.js  -> chip names present: ESP32-S3, ESP32-P4, ESP32-C5; no ESP32-S31
+npm esptool-js latest = 0.7.1 (registry.npmjs.org/esptool-js/latest, shasum 493dccb5f33f35336e9217c38ed838611471e5a4)
+esptool-js-0.7.1.tgz contains package/lib/targets/esp32s31.js
+=> An S31 FE board needs the web flasher's esptool-js bundle moved from 0.6.1 to 0.7.1 (not done; not tested).

@@ -1,0 +1,14 @@
+# FastLED 3.10.3, unpatched, keep-going
+# log: build-s31-3-k.log
+==================== 1 failed, 0 succeeded in 00:00:27.312 ====================
+exit=1
+
+SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h:92:2: error: #error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
+libdeps/FastLED/src/platforms/esp/32/audio/devices/idf5_i2s_context.hpp:121:21: error: 'i2s_port_t' does not name a type; did you mean 'i2s_role_t'?
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:116:72: error: implicit declaration of function 'pdMS_TO_TICKS' [-Wimplicit-function-declaration]
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:127:89: error: 'portMAX_DELAY' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:218:25: error: 'MALLOC_CAP_DEFAULT' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:221:21: error: 'MALLOC_CAP_INTERNAL' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:221:43: error: 'MALLOC_CAP_DMA' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:223:15: error: assignment to 'led_strip_spi_obj *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:223:17: error: implicit declaration of function 'heap_caps_calloc' [-Wimplicit-function-declaration]

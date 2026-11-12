@@ -1,0 +1,11 @@
+--- /dev/fd/12	2026-11-12 08:06:29
++++ SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h	2026-11-12 08:02:50
+@@ -88,7 +88,7 @@
+ #include <esp_idf_version.h>
+ #ifndef K1_PLATFORM_P4
+ #if K1_AUDIO_SOURCE_MIC
+-#if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(5, 4, 1)
++#if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(5, 4, 1) && !defined(K1_S31_PORT_PROBE)
+ #error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
+ #endif
+ #endif

@@ -1,0 +1,23 @@
+# NimBLE-Arduino 2.5.2 + K1 BLE central (FastLED unpatched in this env)
+# log: build-s31-6-ble.log
+==================== 1 failed, 0 succeeded in 00:00:54.550 ====================
+exit=1
+
+libdeps/FastLED/src/platforms/esp/32/audio/devices/idf5_i2s_context.hpp:121:21: error: 'i2s_port_t' does not name a type; did you mean 'i2s_role_t'?
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:116:72: error: implicit declaration of function 'pdMS_TO_TICKS' [-Wimplicit-function-declaration]
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:127:89: error: 'portMAX_DELAY' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:218:25: error: 'MALLOC_CAP_DEFAULT' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:221:21: error: 'MALLOC_CAP_INTERNAL' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:221:43: error: 'MALLOC_CAP_DMA' undeclared (first use in this function)
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:223:15: error: assignment to 'led_strip_spi_obj *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+libdeps/FastLED/src/third_party/espressif/led_strip/src/led_strip_spi_dev.c:223:17: error: implicit declaration of function 'heap_caps_calloc' [-Wimplicit-function-declaration]
+libdeps/NimBLE-Arduino/src/NimBLEDevice.cpp:930:16: error: 'struct esp_bt_controller_config_t' has no member named 'nimble_max_connections'
+libdeps/NimBLE-Arduino/src/NimBLEDevice.cpp:942:16: error: 'struct esp_bt_controller_config_t' has no member named 'ble_ll_rsp_dup_list_count'
+libdeps/NimBLE-Arduino/src/NimBLEDevice.cpp:943:16: error: 'struct esp_bt_controller_config_t' has no member named 'ble_ll_adv_dup_list_count'
+libdeps/NimBLE-Arduino/src/nimble/nimble/host/src/ble_hs_periodic_sync.c:58:24: error: 'struct ble_npl_event' has no member named 'event'
+libdeps/NimBLE-Arduino/src/nimble/nimble/include/nimble/nimble_npl.h:167:6: error: conflicting declaration of C function 'void ble_npl_hw_set_isr(int, uint32_t)'
+libdeps/NimBLE-Arduino/src/nimble/nimble/include/nimble/nimble_npl.h:167:6: error: conflicting types for 'ble_npl_hw_set_isr'; have 'void(int,  uint32_t)' {aka 'void(int,  long unsigned int)'}
+libdeps/NimBLE-Arduino/src/nimble/porting/npl/freertos/include/nimble/nimble_npl_os.h:681:35: error: invalid conversion from 'void (*)()' to 'uint32_t' {aka 'long unsigned int'} [-fpermissive]
+libdeps/NimBLE-Arduino/src/nimble/porting/npl/freertos/include/nimble/nimble_npl_os.h:681:35: error: passing argument 2 of 'npl_freertos_hw_set_isr' makes integer from pointer without a cast [-Wint-conversion]
+libdeps/NimBLE-Arduino/src/nimble/porting/npl/freertos/include/nimble/nimble_npl_os.h:687:13: error: 'uxGetCriticalNestingDepth' was not declared in this scope
+libdeps/NimBLE-Arduino/src/nimble/porting/npl/freertos/include/nimble/nimble_npl_os.h:687:13: error: implicit declaration of function 'uxGetCriticalNestingDepth' [-Wimplicit-function-declaration]

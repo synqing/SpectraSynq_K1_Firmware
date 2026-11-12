@@ -1,0 +1,29 @@
+# Minimal BLE-MIDI peripheral, Arduino 4.0 BLE library, esp32s31
+exit=0
+RAM:   [=         ]   8.4% (used 27576 bytes from 327680 bytes)
+Flash: [=         ]  12.4% (used 813428 bytes from 6553600 bytes)
+
+// S31 probe: Arduino 4.0 built-in BLE library (IDF NimBLE host), BLE-MIDI peripheral shape. Scratch only.
+#include <Arduino.h>
+#include <BLE.h>
+static const BLEUUID kSvc("03B80E5A-EDE8-4B33-A751-6CE34EC4C700");
+static const BLEUUID kChr("7772E5DB-3868-4112-A1A9-F2669D106BF3");
+static BLECharacteristic g_chr;
+static volatile uint32_t g_writes = 0;
+static volatile size_t g_last_len = 0;
+void setup() {
+  Serial.begin(115200);
+  if (!BLE.begin("SpectraSynq K1")) { return; }
+  BLEServer srv = BLE.createServer();
+  srv.onDisconnect([](BLEServer, const BLEConnInfo&, uint8_t) { BLE.startAdvertising(); });
+  BLEService svc = srv.createService(kSvc);
+  g_chr = svc.createCharacteristic(kChr,
+      BLEProperty::Read | BLEProperty::WriteNR | BLEProperty::Notify, BLEPermission::ReadWriteOpen);
+  g_chr.onWrite([](const BLECharacteristic& c, const BLEConnInfo&) {
+    size_t n = 0; (void)c.getValue(&n); g_last_len = n; ++g_writes; });
+  srv.start();
+  BLEAdvertising adv = BLE.getAdvertising();
+  adv.addServiceUUID(kSvc);
+  BLE.startAdvertising();
+}
+void loop() { uint8_t pkt[5] = {0x80, 0x80, 0xB0, 0x20, 0}; g_chr.notify(pkt, 5); delay(1000); }

@@ -1,0 +1,7 @@
+6-#include <driver/i2s_std.h>
+7:typedef int i2s_port_t; /* S31 PROBE PATCH */
+8-
+14-#include <sys/cdefs.h>
+15:#include "freertos/FreeRTOS.h" /* S31 PROBE PATCH */
+16-#include "esp_heap_caps.h"
+17-#include "esp_log.h"
