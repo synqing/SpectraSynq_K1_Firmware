@@ -68,7 +68,11 @@ SERIAL_CMD("smart_status",    0, cmd_smart_status,            SC_SAFE,          
 SERIAL_CMD("edge_status",     0, cmd_edge_status,             SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("event_status",    0, cmd_event_status,            SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("authored_status", 0, cmd_authored_status,         SC_SAFE,                  0,                                 IS_BOTH       )
+// Stage E (10 Nov 2026): probe command — developer/harness builds only
+// (instrumentation boundary; same gate as vp_probe).
+#if ENABLE_VP_PROBE_CMD
 SERIAL_CMD("vp_out_test",     0, cmd_vp_out_test,             SC_SAFE,                  0,                                 IS_BOTH       )
+#endif
 SERIAL_CMD("get_knobs",       0, cmd_get_knobs,               SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("get_buttons",     0, cmd_get_buttons,             SC_SAFE,                  0,                                 IS_BOTH       )
 // Effects queue (2026-06-11): `commit` mirrors the '\' immediate hotkey (the

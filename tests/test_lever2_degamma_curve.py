@@ -127,6 +127,8 @@ def test_firmware_applies_look_after_limiter():
     assert body is not None
     assert "k1_ws2816_degamma_u16" not in body
     pack = EMIT[EMIT.index("k1_lever2_pack_frame") :]
-    assert "k1_look_apply_u16" in pack
+    # Look applied per pixel through the edge's K1LookFrame snapshot (Stage B,
+    # 10 Nov 2026), still after the limiter.
+    assert "look.apply(" in pack
     limited = pack[pack.index("k1_lever2_apply_q16") :]
-    assert limited.index("k1_lever2_apply_q16") < limited.index("k1_look_apply_u16")
+    assert limited.index("k1_lever2_apply_q16") < limited.index("look.apply(")

@@ -30,6 +30,7 @@
 #include "k1_gdft_core.h"        // own declarations (process_GDFT / calculate_novelty)
 #include "k1_spectral_honesty.h" // K1_HANN_COHERENT_GAIN (gated windowing only)
 #include "k1_agc_dt_clock.h"     // α = dt/(τ+dt) at 100 Hz reference; no expf
+#include "k1_afe2.h"             // AFE2 stage 4: the one spectrum gain (k1_afe2_spec_gain)
 
 // Production selector for the exact four-lane Goertzel backend.
 #ifndef K1_GDFT_LANE4_V1
@@ -87,33 +88,6 @@ extern void save_config();                              // persistence/bridge_fs
 extern void save_ambient_noise_calibration();           // persistence/bridge_fs.h
 extern bool save_calibration_profile(uint8_t source);   // persistence/bridge_fs.h
 
-#ifdef K1_LOUD_GUARD_V1
-// k1_loud_guard_clamp_float lives as `static inline` in audio/i2s_audio.h, which
-// is ODR-UNSAFE to include here (it defines a bare global `raw_dump_request` and
-// drags the I2S driver). It is a pure, stateless clamp; mirror it verbatim with
-// internal linkage so the lifted AGC body is byte-for-byte unchanged.
-// CANONICAL SOURCE: audio/i2s_audio.h (kept in sync; pure function, no state).
-static inline float k1_loud_guard_clamp_float(float value, float min_value, float max_value) {
-  if (!isfinite(value)) return min_value;
-  if (value < min_value) return min_value;
-  if (value > max_value) return max_value;
-  return value;
-}
-
-// A/B floor-cut applied at BOTH AGC paths (per-band + broadband) so the retune is valid
-// regardless of which AGC path a build selects. Mode 0 = flat cut (byte-identical shipping).
-// Modes 1/2 = hybrid affine cut: a small absolute pedestal (retains noise-floor/mud
-// suppression via the zero-clamp) plus a magnitude-proportional term (spares quiet musical
-// bins). The ceiling soft-knee (the actual saturation-tamer) is left untouched at the sites.
-static inline void k1_loud_guard_apply_floor_cut(SQ15x16 &out, SQ15x16 loud_depth) {
-  if (k1_loud_guard_mode == 0) {
-    out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
-  } else {
-    out -= loud_depth * (SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL) + out * SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PROP_K));
-  }
-  if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
-}
-#endif
 
 // Obscure audio magic happens here
 void IRAM_ATTR process_GDFT() {
@@ -504,121 +478,43 @@ void IRAM_ATTR process_GDFT() {
   const SQ15x16 AGC_EPS           = SQ15x16(0.001);
   SQ15x16 effective_target = VP_FIX_AGC_SOFT_KNEE ? SQ15x16(0.25) : AGC_TARGET;
   SQ15x16 agc_gain_floor = SQ15x16(0.1);
-  float k1_loud_trim = 1.0f;
-#ifdef K1_LOUD_GUARD_V1
-  if (k1_loud_guard_enabled) {
-    k1_loud_trim = k1_loud_guard_clamp_float(k1_loud_gdft_trim, K1_LOUD_GUARD_GDFT_TRIM_MIN, 1.0f);
-    const float k1_loud_floor_mix = (k1_loud_trim - K1_LOUD_GUARD_GDFT_TRIM_MIN) / (1.0f - K1_LOUD_GUARD_GDFT_TRIM_MIN);
-    const float k1_loud_floor = K1_LOUD_GUARD_AGC_GAIN_FLOOR + (0.1f - K1_LOUD_GUARD_AGC_GAIN_FLOOR) * k1_loud_floor_mix;
-    effective_target *= SQ15x16(k1_loud_trim);
-    agc_gain_floor = SQ15x16(k1_loud_guard_clamp_float(k1_loud_floor, K1_LOUD_GUARD_AGC_GAIN_FLOOR, 0.1f));
-  }
-#endif
+  // AFE2 stage 3 (11 Nov 2026): the loud guard no longer lowers this target or gain floor.
 
-#ifdef K1_AGC_PERBAND_V1
-  // ===========================================================================
-  // PER-BAND AGC v1 (K1_AGC_PERBAND_V1 — DEFAULT OFF, prepare-only candidate).
-  //
-  // Lane N6 fix for the "louder -> dimmer" inverse (eyes-on-verdict 2026-06-21;
-  // DSP root-cause spike #72837): the broadband stage below computes ONE global
-  // agc_gain from the mean magnitude across ALL bins, so loud broadband energy
-  // collapses the single gain and crushes quiet tonal detail in every band.
-  //
-  // This path replicates the SAME proven envelope/noise-floor/gate/gain pipeline
-  // INDEPENDENTLY per perceptual band (BASS/LOW_MID/HIGH_MID/TREBLE via the
-  // existing freq_to_band_map[]), reusing the existing agc_channel scaffold
-  // (agc_bands[]) for telemetry. The ONLY change vs broadband is the per-band
-  // partition — same ATTACK/RELEASE/NOISE/GAIN_SMOOTH constants, same
-  // effective_target, same AGC_MAX_GAIN / agc_gain_floor — so it is a behaviour-
-  // faithful split, not a re-tune. Per-band max-gain / attack shaping
-  // (AGC_*_MAX_GAIN, agc_bands[].attack_rate, A-weighting) is a SEPARATE
-  // Captain-gated tuning lane and is intentionally NOT engaged here.
-  //
-  // State is function-static (persists across frames like the broadband
-  // agc_gain). Re-seeding on noise_cal completion is a tracked follow-up for the
-  // device-proof lane (the A/B excludes the first ~8-10 s convergence transient,
-  // so initial settle is outside the measured window). NO production env defines
-  // this flag — k1_hardware compiles the #else (broadband) path byte-identically.
-  // ===========================================================================
-  static SQ15x16 pb_envelope[NUM_AGC_BANDS]    = { SQ15x16(0.0), SQ15x16(0.0), SQ15x16(0.0), SQ15x16(0.0) };
-  static SQ15x16 pb_noise_floor[NUM_AGC_BANDS] = { AGC_EPS, AGC_EPS, AGC_EPS, AGC_EPS };
-  static bool    pb_gated[NUM_AGC_BANDS]       = { true, true, true, true };
-  static SQ15x16 pb_gain[NUM_AGC_BANDS]        = { SQ15x16(1.0), SQ15x16(1.0), SQ15x16(1.0), SQ15x16(1.0) };
-
-  // 1. Per-band signal level (mean magnitude over each band's bins).
-  SQ15x16  pb_sum[NUM_AGC_BANDS] = { SQ15x16(0.0), SQ15x16(0.0), SQ15x16(0.0), SQ15x16(0.0) };
-  uint16_t pb_cnt[NUM_AGC_BANDS] = { 0, 0, 0, 0 };
-  for (uint16_t i = 0; i < NUM_FREQS; i++) {
-    uint8_t b = freq_to_band_map[i];
-    pb_sum[b] += SQ15x16(magnitudes_final[i]);
-    pb_cnt[b]++;
-  }
-
-  for (uint8_t b = 0; b < NUM_AGC_BANDS; b++) {
-    SQ15x16 sig_b = (pb_cnt[b] > 0) ? (pb_sum[b] / SQ15x16((int)pb_cnt[b])) : SQ15x16(0.0);
-
-    // 2. Envelope follower (asymmetric attack/release) — per band.
-    if (sig_b > pb_envelope[b]) {
-      pb_envelope[b] += (sig_b - pb_envelope[b]) * ATTACK_ALPHA;
-    } else {
-      pb_envelope[b] += (sig_b - pb_envelope[b]) * RELEASE_ALPHA;
-    }
-
-    // 3. Slow noise-floor tracker (rejects loud transients) — per band.
-    if (pb_envelope[b] < pb_noise_floor[b] * SQ15x16(2.0)) {
-      pb_noise_floor[b] += (pb_envelope[b] - pb_noise_floor[b]) * NOISE_ALPHA;
-    }
-    if (pb_noise_floor[b] < AGC_EPS) pb_noise_floor[b] = AGC_EPS;
-
-    // 4. Hysteretic silence gate — per band.
-    SQ15x16 gate_open_th  = pb_noise_floor[b] * SQ15x16(4.0);
-    SQ15x16 gate_close_th = pb_noise_floor[b] * SQ15x16(2.5);
-    if (pb_gated[b]  && pb_envelope[b] > gate_open_th)  pb_gated[b] = false;
-    if (!pb_gated[b] && pb_envelope[b] < gate_close_th) pb_gated[b] = true;
-
-    // 5+6. Target gain (frozen while gated) — per band.
-    if (!pb_gated[b]) {
-      SQ15x16 target_gain = effective_target / (pb_envelope[b] + AGC_EPS);
-      if (target_gain > AGC_MAX_GAIN) target_gain = AGC_MAX_GAIN;
-      if (target_gain < agc_gain_floor) target_gain = agc_gain_floor;
-      pb_gain[b] += (target_gain - pb_gain[b]) * GAIN_SMOOTH;
-    }
-  }
-
-  // 7. Apply each band's gain × tilt to its bins, clamp to [0, 1].
-  for (uint16_t i = 0; i < NUM_FREQS; i++) {
-    SQ15x16 out = SQ15x16(magnitudes_final[i]) * pb_gain[freq_to_band_map[i]] * spectral_tilt_lut[i];
-    if (VP_FIX_AGC_SOFT_KNEE && out > SQ15x16(0.5)) {
-      SQ15x16 excess = out - SQ15x16(0.5);
-      out = SQ15x16(0.5) + (excess / (SQ15x16(1.0) + excess));
-    }
-#ifdef K1_LOUD_GUARD_V1
-    if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
-      const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      k1_loud_guard_apply_floor_cut(out, loud_depth);
-
-      const SQ15x16 knee = SQ15x16(0.45);
-      const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));
-      if (out > knee && ceiling > knee) {
-        SQ15x16 excess = out - knee;
-        SQ15x16 span = ceiling - knee;
-        out = knee + ((span * excess) / (span + excess));
+#if K1_AFE2_V1
+  // AFE2 stage 4 (accepted 12 Nov 2026 by the Captain after a camera A/B): one gain for the whole
+  // spectrum from the AFE2 meter (audio/k1_afe2.h): every bin divided by the same 2 s section mean,
+  // a fixed tilt, the fixed soft ceiling. It replaced the four-band AGC. Builds whose meter does not
+  // run (no IM69D microphone path), and FE line-in hops, keep the broadband AGC below until AFE2 stage 7.
+  if (k1_afe2_ready && k1_afe2_metered) {
+    // Its own fixed tilt: the existing table times k1_afe2_spec_tilt_factor, built once.
+    static float s4_tilt[NUM_FREQS];
+    static bool s4_tilt_ready = false;
+    if (!s4_tilt_ready) {
+      for (uint16_t i = 0; i < NUM_FREQS; i++) {
+        s4_tilt[i] = float(spectral_tilt_lut[i]) * k1_afe2_spec_tilt_factor(frequencies[i].target_freq);
       }
+      s4_tilt_ready = true;
     }
+    const float spec_gain = k1_afe2_spec_gain(k1_afe2);
+    for (uint16_t i = 0; i < NUM_FREQS; i++) {
+      SQ15x16 out = SQ15x16(magnitudes_final[i] * spec_gain * s4_tilt[i]);
+      if (VP_FIX_AGC_SOFT_KNEE && out > SQ15x16(0.5)) {
+        SQ15x16 excess = out - SQ15x16(0.5);
+        out = SQ15x16(0.5) + (excess / (SQ15x16(1.0) + excess));
+      }
+      if (out > SQ15x16(1.0)) out = SQ15x16(1.0);
+      if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+      spectrogram[i] = out;
+    }
+    for (uint8_t b = 0; b < NUM_AGC_BANDS; b++) {
+      agc_bands[b].gain        = SQ15x16(spec_gain);
+      agc_bands[b].target_gain = SQ15x16(spec_gain);
+    }
+    return;
+  }
 #endif
-    if (out > SQ15x16(1.0)) out = SQ15x16(1.0);
-    if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
-    spectrogram[i] = out;
-  }
 
-  // Telemetry mirror — REAL per-band gain/energy into the agc_bands[] scaffold.
-  for (uint8_t b = 0; b < NUM_AGC_BANDS; b++) {
-    agc_bands[b].gain        = pb_gain[b];
-    agc_bands[b].target_gain = pb_gain[b];
-    agc_bands[b].energy      = pb_envelope[b];
-    agc_active_floor_debug[b] = pb_noise_floor[b];
-  }
-#else
+  // Broadband AGC: the fallback for builds whose AFE2 meter does not run (deleted in AFE2 stage 7).
   // 1. Broadband signal level (average magnitude across bins)
   float signal_level = 0.0f;
   for (uint16_t i = 0; i < NUM_FREQS; i++) {
@@ -670,20 +566,6 @@ void IRAM_ATTR process_GDFT() {
       SQ15x16 excess = out - SQ15x16(0.5);
       out = SQ15x16(0.5) + (excess / (SQ15x16(1.0) + excess));
     }
-#ifdef K1_LOUD_GUARD_V1
-    if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
-      const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      k1_loud_guard_apply_floor_cut(out, loud_depth);
-
-      const SQ15x16 knee = SQ15x16(0.45);
-      const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));
-      if (out > knee && ceiling > knee) {
-        SQ15x16 excess = out - knee;
-        SQ15x16 span = ceiling - knee;
-        out = knee + ((span * excess) / (span + excess));
-      }
-    }
-#endif
     if (out > SQ15x16(1.0)) out = SQ15x16(1.0);
     if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
     spectrogram[i] = out;
@@ -695,8 +577,7 @@ void IRAM_ATTR process_GDFT() {
     agc_bands[b].target_gain = agc_gain;
     agc_bands[b].energy      = sig_q;
   }
-#endif  // K1_AGC_PERBAND_V1
-  // --- END AGC (broadband v2 default / per-band v1 under K1_AGC_PERBAND_V1) ---
+  // --- END AGC (AFE2 stage 4 one gain; broadband fallback) ---
 }
 
 void calculate_novelty(uint32_t t_now) {

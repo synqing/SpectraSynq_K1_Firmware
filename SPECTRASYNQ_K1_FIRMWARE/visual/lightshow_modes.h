@@ -9,6 +9,7 @@
 #include "channel_effect_state.h" // Per-channel effect state for vu_dot/kaleidoscope
 #include "k1_vp_audio_access.h"
 #include "k1_trace.h"
+#include "k1_diag_ownership.h"  // Stage E: acknowledged diagnostic render park
 #ifdef K1_EDGE_PALETTE_HONOUR_V1
 #include "k1_palette_edge_bridge.h"
 #endif
@@ -436,36 +437,11 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
   // held hue, or one ambiguous frame poisons every quiet frame after it.
   if (!isfinite(centroid_strength) || centroid_strength < 0.08f) {
     const float dominant_hue = float(dominant_bin) / 12.0f;
-#ifdef K1_LOUD_GUARD_V1
-    const bool k1_loud_colour_unpin =
-        k1_loud_guard_enabled &&
-        (k1_loud_gdft_trim < 0.92f || k1_loud_peak_pin_duty > 0.10f || k1_loud_spec_sat_duty > 0.02f) &&
-        contrast >= K1_LOUD_GUARD_CHROMA_UNPIN_MIN_CONTRAST;
-    if (k1_loud_colour_unpin && held_hue_valid) {
-      float delta = dominant_hue - held_centroid_hue;
-      if (delta > 0.5f) delta -= 1.0f;
-      if (delta < -0.5f) delta += 1.0f;
-      hue = held_centroid_hue + (delta * K1_LOUD_GUARD_CHROMA_UNPIN_BLEND);
-      hue -= floorf(hue);
-      if (hue < 0.0f) hue += 1.0f;
-      held_centroid_hue = hue;
-    } else if (k1_loud_colour_unpin) {
-      hue = dominant_hue;
-      held_centroid_hue = hue;
-      held_hue_valid = true;
-    } else {
-#ifdef K1_PALETTE_VIBRANCY_V1
-      hue = held_hue_valid ? k1_vibrancy_blend_hue(hue, held_centroid_hue, centroid_strength) : dominant_hue;
-#else
-      hue = held_hue_valid ? held_centroid_hue : dominant_hue;
-#endif
-    }
-#else
+    // AFE2 stage 3 (11 Nov 2026): the loud guard's colour unpin is deleted with its trigger.
 #ifdef K1_PALETTE_VIBRANCY_V1
     hue = held_hue_valid ? k1_vibrancy_blend_hue(hue, held_centroid_hue, centroid_strength) : dominant_hue;
 #else
     hue = held_hue_valid ? held_centroid_hue : dominant_hue;
-#endif
 #endif
   } else {
     held_centroid_hue = hue;
@@ -966,6 +942,60 @@ inline void vp_probe_reset_mode_statics() {
   vp_probe_reset_generation++;
 }
 
+// --- Stage E (10 Nov 2026): probe ownership ---------------------------------
+// The probes render from the serial/audio loop, which owns the audio-side inputs
+// they borrow; the render task must be parked for the WHOLE probe. The old code
+// raised led_thread_halt and slept 10 ms (no acknowledgement), and the render
+// task's 1 s park self-heal could resume it mid-probe. Now the probe waits for
+// a fresh park acknowledgement, holds the park (k1_render_diag_hold), and
+// reports itself invalid if the render task was forced out anyway.
+inline bool vp_diag_render_park_acquire(uint32_t timeout_ms, uint32_t *breaks_at_start) {
+  k1_render_diag_hold.store(true, std::memory_order_release);
+  led_thread_halt = true;
+  *breaks_at_start = k1_render_park_breaks.load(std::memory_order_acquire);
+  if (led_task == nullptr) {
+    return true;  // boot: no render task to park
+  }
+  const uint32_t acks = k1_render_park_acks.load(std::memory_order_acquire);
+  uint32_t waited_ms = 0;
+  while (k1_render_park_acks.load(std::memory_order_acquire) == acks && waited_ms < timeout_ms) {
+    delay(1);
+    waited_ms++;
+  }
+  if (k1_render_park_acks.load(std::memory_order_acquire) == acks) {
+    led_thread_halt = false;  // not parked: touch nothing, report busy
+    k1_render_diag_hold.store(false, std::memory_order_release);
+    return false;
+  }
+  return true;
+}
+
+// True if the exclusive interval held from acquire to release.
+inline bool vp_diag_render_park_release(uint32_t breaks_at_start) {
+  const bool held = k1_render_park_breaks.load(std::memory_order_acquire) == breaks_at_start;
+  k1_render_diag_hold.store(false, std::memory_order_release);
+  led_thread_halt = false;
+  return held;
+}
+
+// CONFIG fields vp_probe_prepare_render() writes, and the values it last wrote.
+// The restore puts back only fields still holding the probe's value, so a
+// control update accepted meanwhile (e.g. BLE-MIDI) is not overwritten.
+inline conf vp_probe_written_config = {};
+inline void vp_probe_restore_config(const conf &saved) {
+#define K1_VP_RESTORE(field) \
+  if (CONFIG.field == vp_probe_written_config.field) CONFIG.field = saved.field
+  K1_VP_RESTORE(PALETTE_MODE_ENABLED);
+  K1_VP_RESTORE(PALETTE_INDEX);
+  K1_VP_RESTORE(CHROMA);
+  K1_VP_RESTORE(SATURATION);
+  K1_VP_RESTORE(AUTO_COLOR_SHIFT);
+  K1_VP_RESTORE(MIRROR_ENABLED);
+  K1_VP_RESTORE(SQUARE_ITER);
+  K1_VP_RESTORE(MOOD);
+#undef K1_VP_RESTORE
+}
+
 inline void vp_probe_prepare_render(bool palette_mode, float chroma, float saturation, SQ15x16 hue_offset) {
   vp_probe_reset_mode_statics();
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
@@ -983,6 +1013,7 @@ inline void vp_probe_prepare_render(bool palette_mode, float chroma, float satur
   CONFIG.MIRROR_ENABLED = true;
   CONFIG.SQUARE_ITER = 1.0f;
   CONFIG.MOOD = 0.05f;
+  vp_probe_written_config = CONFIG;  // Stage E: what the probe itself wrote
 
   hue_position = hue_offset;
   hue_shifting_mix = SQ15x16(0.35f);
@@ -1163,9 +1194,13 @@ inline void vp_probe_print_mode(uint8_t mode) {
 }
 
 inline void vp_run_output_probe() {
-  bool saved_halt = led_thread_halt;
-  led_thread_halt = true;
-  delay(10);
+  uint32_t vp_park_breaks = 0;
+  if (!vp_diag_render_park_acquire(200, &vp_park_breaks)) {
+    tx_begin(false);
+    USBSerial.println("VPO,ver=1,event=busy,reason=render_not_parked");
+    tx_end(false);
+    return;
+  }
 
   conf saved_config = CONFIG;
   bool saved_secondary_render = vp_render_secondary_channel;
@@ -1240,7 +1275,7 @@ inline void vp_run_output_probe() {
   memcpy(leds_16, leds_16_temp, sizeof(CRGB16) * NATIVE_RESOLUTION);
   memcpy(leds_16_prev, leds_16_fx, sizeof(CRGB16) * NATIVE_RESOLUTION);
   memcpy(dots, saved_dots, sizeof(DOT) * MAX_DOTS);
-  CONFIG = saved_config;
+  vp_probe_restore_config(saved_config);
   vp_render_secondary_channel = saved_secondary_render;
   hue_position = saved_hue_position;
   hue_shifting_mix = saved_hue_shifting_mix;
@@ -1261,7 +1296,11 @@ inline void vp_run_output_probe() {
   waveform_hybrid_last_frame_ms_primary = saved_waveform_hybrid_last_frame;
   vu_level_smooth_primary = saved_vu_level_smooth;
   vu_max_level_primary = saved_vu_max_level;
-  led_thread_halt = saved_halt;
+  if (!vp_diag_render_park_release(vp_park_breaks)) {
+    tx_begin(false);
+    USBSerial.println("VPO,ver=1,event=invalid,reason=render_resumed_during_probe");
+    tx_end(false);
+  }
 }
 
 // ITEM 16 — single-line secondary/dual-channel state dump (tag VPS). Reports the
@@ -1315,9 +1354,13 @@ inline void vp_print_secondary_state() {
 // global CONFIG unchanged (no mutation), and (b) produce a different frame hash. Mirrors
 // vp_run_output_probe's halt/snapshot/restore frame. Harness only (gated caller).
 inline void vp_run_secondary_bleed_probe() {
-  bool saved_halt = led_thread_halt;
-  led_thread_halt = true;
-  delay(10);
+  uint32_t vp_park_breaks = 0;
+  if (!vp_diag_render_park_acquire(200, &vp_park_breaks)) {
+    tx_begin(false);
+    USBSerial.println("VPB,ver=1,event=busy,reason=render_not_parked");
+    tx_end(false);
+    return;
+  }
 
   // FULL snapshot for restore (mirrors vp_run_output_probe exactly).
   conf saved_config = CONFIG;
@@ -1420,7 +1463,7 @@ inline void vp_run_secondary_bleed_probe() {
   memcpy(leds_16, leds_16_temp, sizeof(CRGB16) * NATIVE_RESOLUTION);
   memcpy(leds_16_prev, leds_16_fx, sizeof(CRGB16) * NATIVE_RESOLUTION);
   memcpy(dots, saved_dots, sizeof(DOT) * MAX_DOTS);
-  CONFIG = saved_config;
+  vp_probe_restore_config(saved_config);
   vp_render_secondary_channel = saved_secondary_render;
   hue_position = saved_hue_position;
   hue_shifting_mix = saved_hue_shifting_mix;
@@ -1441,5 +1484,9 @@ inline void vp_run_secondary_bleed_probe() {
   waveform_hybrid_last_frame_ms_primary = saved_waveform_hybrid_last_frame;
   vu_level_smooth_primary = saved_vu_level_smooth;
   vu_max_level_primary = saved_vu_max_level;
-  led_thread_halt = saved_halt;
+  if (!vp_diag_render_park_release(vp_park_breaks)) {
+    tx_begin(false);
+    USBSerial.println("VPB,ver=1,event=invalid,reason=render_resumed_during_probe");
+    tx_end(false);
+  }
 }

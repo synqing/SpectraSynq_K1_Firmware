@@ -1721,7 +1721,9 @@ bool serial_cmd_dispatch_mode(const char* command_type, char* command_data) {
 
     // Set Mode Number ----------------------------------------
     else if (strcmp(command_type, "set_mode") == 0) {
-      mode_transition_queued = true;
+      // Stage D (10 Nov 2026): the destination is computed first and posted as
+      // one complete request; the render task's fade takes it in one exchange.
+      int16_t destination;
 #ifdef K1_EFFECT_REGISTRY_V1
       // Input is the gap-free DENSE menu index (0..registry_dense_count()-1),
       // which also reaches the native effects. Map it to the real persisted
@@ -1729,22 +1731,23 @@ bool serial_cmd_dispatch_mode(const char* command_type, char* command_data) {
       if (k1::effects::framework::registry_is_healthy()) {
         const long dense_max = (long)k1::effects::framework::registry_dense_count() - 1;
         const uint16_t dense = (uint16_t)constrain(atol(command_data), 0, dense_max);
-        mode_destination = (uint8_t)k1::effects::framework::registry_dense_to_ordinal(dense);
+        destination = (uint8_t)k1::effects::framework::registry_dense_to_ordinal(dense);
       } else {
-        mode_destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
+        destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
       }
 #else
-      mode_destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
+      destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
 #endif
+      k1_mode_request_post(destination);
 
       save_config_delayed();
       tx_begin();
       // CONFIG.LIGHTSHOW_MODE is the raw persisted ordinal (storage truth /
       // tooling-stable); the MODE line shows the dense menu index + name.
       USBSerial.print("CONFIG.LIGHTSHOW_MODE: ");
-      USBSerial.println(mode_destination);
+      USBSerial.println(destination);
 #ifdef K1_EFFECT_REGISTRY_V1
-      serial_print_mode_line("MODE", mode_destination);
+      serial_print_mode_line("MODE", destination);
 #endif
       tx_end();
     }

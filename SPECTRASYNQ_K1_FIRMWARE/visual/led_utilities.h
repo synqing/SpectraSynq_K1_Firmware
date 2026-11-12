@@ -2,6 +2,7 @@
 #define LED_UTILITIES_H
 
 #include <Arduino.h>
+#include "k1_afe2.h"
 #include <FastLED.h>
 #include <FixedPoints.h>
 #include <FixedPointsCommon.h>
@@ -310,13 +311,15 @@ inline void k1_fe_gx_prepare(const CRGB16* scaled, uint16_t count,
                               SQ15x16 inc_g, SQ15x16 inc_b, uint8_t look_slot) {
 #ifndef K1_LOOK_LIB_V1
   (void)look_slot;
+#else
+  const K1LookFrame look(look_slot);  // one reader + snapshot per edge
 #endif
   for (uint16_t i = 0; i < count; ++i) {
     native[i].r = k1_lever2_sq_to_u16(scaled[i].r, inc_r);
     native[i].g = k1_lever2_sq_to_u16(scaled[i].g, inc_g);
     native[i].b = k1_lever2_sq_to_u16(scaled[i].b, inc_b);
 #ifdef K1_LOOK_LIB_V1
-    k1_look_apply_u16(&native[i].r, &native[i].g, &native[i].b, look_slot);
+    look.apply(&native[i].r, &native[i].g, &native[i].b);
 #endif
   }
 }
@@ -343,13 +346,15 @@ inline void k1_b489_prepare_native(const CRGB16* scaled, uint16_t count,
                                     uint8_t look_slot) {
 #ifndef K1_LOOK_LIB_V1
   (void)look_slot;
+#else
+  const K1LookFrame look(look_slot);  // one reader + snapshot per edge
 #endif
   for (uint16_t i = 0; i < count; ++i) {
     native[i].r = k1_lever2_sq_to_u16(scaled[i].r, inc_r);
     native[i].g = k1_lever2_sq_to_u16(scaled[i].g, inc_g);
     native[i].b = k1_lever2_sq_to_u16(scaled[i].b, inc_b);
 #ifdef K1_LOOK_LIB_V1
-    k1_look_apply_u16(&native[i].r, &native[i].g, &native[i].b, look_slot);
+    look.apply(&native[i].r, &native[i].g, &native[i].b);
 #endif
   }
 }
@@ -612,6 +617,11 @@ inline void apply_brightness() {
   // with drop_cut_scale by multiplication at the same application point — never
   // replaces or reorders the existing brightness factors. 1.0 when idle.
   brightness *= SQ15x16(k1_queue_transition_scale_primary);
+#if K1_AFE2_V1
+  // AFE2 exposure: section loudness against the slow anchor ("how much"). Live microphone
+  // only: a prepared show carries its own level.
+  if (!k1_authored_suppresses_live_update()) brightness *= SQ15x16(k1_afe2_brightness_scale());
+#endif
 
   if (debug_mode && (millis() % 5000 == 0)) {
     USBSerial.print("DEBUG: Brightness components - MASTER_BRIGHTNESS: ");
@@ -1344,6 +1354,10 @@ inline void show_leds() {
         k1_fe_gx_cache(false), CONFIG.LED_COUNT,
         k1_fe_gx_cache(true), gx_peer_count,
         k1_fe_gx_led_budget_ma(gx_power_token, CONFIG.MAX_CURRENT_MA));
+#ifdef K1_EMU_FIXTURE
+    k1_emu_fixture_note_gx_limit(gx_scale, k1_fe_gx_cache(false), CONFIG.LED_COUNT * sizeof(Pixel16),
+                                 k1_fe_gx_cache(true), gx_peer_count * sizeof(Pixel16));
+#endif
     k1_fe_gx_pack(k1_fe_gx_cache(false), CONFIG.LED_COUNT, ws2816_wire, gx_scale);
     if (gx_peer_count != 0) {
       k1_fe_gx_pack(k1_fe_gx_cache(true), gx_peer_count, ws2816_wire_secondary, gx_scale);
@@ -2159,17 +2173,8 @@ inline void run_transition_fade() {
       MASTER_BRIGHTNESS = 0.0;
     }
   } else {
-    if (mode_transition_queued == true) {  // If transition for MODE button press
-      mode_transition_queued = false;
-      if (mode_destination == -1) {  // Triggered via button
-        CONFIG.LIGHTSHOW_MODE++;
-        if (CONFIG.LIGHTSHOW_MODE >= NUM_MODES) {
-          CONFIG.LIGHTSHOW_MODE = 0;
-        }
-      } else {  // Triggered via Serial
-        CONFIG.LIGHTSHOW_MODE = mode_destination;
-        mode_destination = -1;
-      }
+    if (mode_transition_queued == true) {  // A mode request is pending
+      k1_mode_request_land();  // Stage D: take the complete request (globals.h)
     }
 
     if (noise_transition_queued == true) {  // If transition for NOISE button press
@@ -3041,6 +3046,9 @@ inline void apply_brightness_secondary() {
   // SECONDARY channel's independent dip, composed by multiplication at the
   // same application point as drop_cut_scale. 1.0 when idle.
   bright_val *= k1_queue_transition_scale_secondary;
+#if K1_AFE2_V1
+  if (!k1_authored_suppresses_live_update()) bright_val *= k1_afe2_brightness_scale();
+#endif
 
   if (debug_mode && (millis() % 5000 == 0)) {
     USBSerial.print("DEBUG: Secondary brightness curve = f(PHOTONS=");

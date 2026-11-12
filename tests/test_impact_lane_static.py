@@ -47,8 +47,9 @@ class ImpactLaneStaticTest(unittest.TestCase):
     # ---- #5 attack snap -----------------------------------------------------
     def test_peak_envelope_is_asymmetric_under_flag_with_legacy_retained(self):
         self.assertIn("#ifdef K1_PEAK_ASYM_ENV", I2S)
-        self.assertIn("waveform_peak_scaled += delta * peak_attack_a;", I2S)
-        self.assertIn("waveform_peak_scaled -= delta * peak_release_a;", I2S)
+        # AFE2 (10 Nov 2026): the envelope runs on its own level-free state, k1_peak_env.
+        self.assertIn("k1_peak_env += delta * peak_attack_a;", I2S)
+        self.assertIn("k1_peak_env -= delta * peak_release_a;", I2S)
         self.assertIn("K1_PEAK_TAU_ATTACK_SNAP_S", I2S)
         self.assertIn("K1_PEAK_TAU_RELEASE_SNAP_S", I2S)
         # Clock-off / probe path retains the original per-frame literals.

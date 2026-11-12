@@ -13,6 +13,7 @@
 #include "k1_show_state.h"
 #include "k1_edgemixer.h"
 #include "k1_ap_capture_telemetry.h"
+#include "k1_afe2.h"
 #if ENABLE_DIAG_CAPTURE
 #include "diagnostic_capture.h"
 #endif
@@ -737,6 +738,78 @@ static bool serial_typed_parse_or_reject(const char* command_type, char* command
   bad_command(command_type, command_data);
   return false;
 }
+
+#if K1_AFE2_V1
+// AFE2 exposure controls. RAM only: a reboot returns to the build default.
+//   :k1_afe=on|off|status   apply the exposure to output brightness, or only measure it
+//   :k1_afe_level=on|off    also scale the published level (changes each effect's geometry)
+//   :k1_afe_gamma=0..2      how strongly section loudness shows (0 = as before, 1 = proportional)
+//   :k1_afe_floor=0..1      the least a quiet section is shown at
+static void serial_print_k1_afe_status() {
+  USBSerial.print("K1_AFE: ");
+  USBSerial.println((k1_afe2_ready && k1_afe2_enabled) ? "on" : "off");
+  USBSerial.print("K1_AFE_LEVEL: ");
+  USBSerial.println((k1_afe2_ready && k1_afe2_level_enabled) ? "on" : "off");
+  USBSerial.print("K1_AFE_READY: ");
+  USBSerial.println(k1_afe2_ready ? 1 : 0);
+  USBSerial.print("K1_AFE_GAMMA: ");
+  USBSerial.println(k1_afe2_gamma, 3);
+  USBSerial.print("K1_AFE_FLOOR: ");
+  USBSerial.println(k1_afe2_floor, 3);
+  USBSerial.print("K1_AFE_HOW_MUCH: ");
+  USBSerial.println(k1_afe2.how_much, 3);
+  USBSerial.print("K1_AFE_SECTION_RMS: ");
+  USBSerial.println(sqrtf(k1_afe2.section), 1);
+  USBSerial.print("K1_AFE_ANCHOR_RMS: ");
+  USBSerial.println(sqrtf(k1_afe2.anchor), 1);
+  USBSerial.print("K1_AFE_SPEC_GAIN: ");
+  USBSerial.println(k1_afe2_spec_gain(k1_afe2), 4);
+  USBSerial.print("K1_AFE_SECTION_MEAN_RMS: ");
+  USBSerial.println(sqrtf(k1_afe2.section_mean), 1);
+}
+
+bool serial_typed_k1_afe(const char* command_type, char* command_data) {
+  bool value = false;
+  if (strcmp(command_data, "status") == 0) {
+    tx_begin(); serial_print_k1_afe_status(); tx_end();
+  } else if (vp_parse_bool(command_data, &value)) {
+    k1_afe2_enabled = value;
+    tx_begin(); serial_print_k1_afe_status(); tx_end();
+  } else {
+    bad_command(command_type, command_data);
+  }
+  return true;
+}
+
+bool serial_typed_k1_afe_level(const char* command_type, char* command_data) {
+  bool value = false;
+  if (vp_parse_bool(command_data, &value)) {
+    k1_afe2_level_enabled = value;
+    tx_begin(); serial_print_k1_afe_status(); tx_end();
+  } else {
+    bad_command(command_type, command_data);
+  }
+  return true;
+}
+
+bool serial_typed_k1_afe_gamma(const char* command_type, char* command_data) {
+  float value = 0.0f;
+  if (!serial_typed_parse_or_reject(command_type, command_data, &value)) return true;
+  if (!(value >= 0.0f) || value > 2.0f) { bad_command(command_type, command_data); return true; }
+  k1_afe2_gamma = value;
+  tx_begin(); serial_print_k1_afe_status(); tx_end();
+  return true;
+}
+
+bool serial_typed_k1_afe_floor(const char* command_type, char* command_data) {
+  float value = 0.0f;
+  if (!serial_typed_parse_or_reject(command_type, command_data, &value)) return true;
+  if (!(value >= 0.0f) || value > 1.0f) { bad_command(command_type, command_data); return true; }
+  k1_afe2_floor = value;
+  tx_begin(); serial_print_k1_afe_status(); tx_end();
+  return true;
+}
+#endif
 
 bool serial_typed_silence_enter(const char* command_type, char* command_data) {
   float value = 0.0f;

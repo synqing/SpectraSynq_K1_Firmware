@@ -80,6 +80,23 @@ void k1_prsm_rx_push(k1_prsm_rx_t *rx, uint8_t byte, uint32_t now_ms,
     abort_command(rx); /* stale half-typed line; treat this byte as fresh input */
   }
 
+  if (rx->discard_line) {
+    if (idle_ms > K1_PRSM_RX_CMD_IDLE_MS) {
+      rx->discard_line = false; /* stale; treat this byte as fresh input */
+    } else if (byte == '\r' || byte == '\n') {
+      rx->discard_line = false; /* end of the discarded line: interactive again */
+      return;
+    } else if (is_text(byte)) {
+      rx->n.dropped_bytes++;    /* never a hotkey, never part of a command */
+      return;
+    } else {
+      rx->discard_line = false; /* binary inside the line: as in a command line */
+      enter_session(rx);
+      rx->n.dropped_bytes++;
+      return;
+    }
+  }
+
   if (rx->command_mode) {
     if (byte == '\r' || byte == '\n') {
       rx->command_mode = false;
@@ -90,10 +107,17 @@ void k1_prsm_rx_push(k1_prsm_rx_t *rx, uint8_t byte, uint32_t now_ms,
       }
       return;
     }
-    if (!is_text(byte) || rx->cmd_len >= K1_PRSM_RX_CMD_MAX - 1) {
-      /* Binary in a command line, or a line longer than any command. */
+    if (!is_text(byte)) {
+      /* Binary in a command line. */
       abort_command(rx);
       enter_session(rx);
+      rx->n.dropped_bytes++;
+      return;
+    }
+    if (rx->cmd_len >= K1_PRSM_RX_CMD_MAX - 1) {
+      /* A text line longer than any command: drop it through its CR/LF. */
+      abort_command(rx);
+      rx->discard_line = true;
       rx->n.dropped_bytes++;
       return;
     }

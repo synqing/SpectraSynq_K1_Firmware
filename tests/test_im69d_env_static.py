@@ -242,34 +242,27 @@ def test_im69d_not_alias_of_im73d_flag():
     assert "-DK1_MIC_IM73D_PDM_V1" not in block
 
 
-def test_joint_silence_gate_is_scoped_to_im69d():
-    """The joint break-path must not compile into non-IM69D builds.
+def test_im69d_silence_is_the_afe2_meter_and_sph0645_keeps_its_schmitt():
+    """IM69D silence = the AFE2 meter's quiet flag (stage 2, accepted 2026-11-11).
 
-    Both its constants (K1_SILENCE_PEAKINESS_BREAK, K1_SILENCE_JOINT_LEVEL_SSL_FRAC)
-    were measured on IM69D130 silicon. Until 2026-08-12 the decision that consumes
-    them sat behind NO #ifdef and compiled into every environment including
-    k1_hardware, the SPH0645 production K1 — the same escape-the-measurement-context
-    defect GATE 0.1 (1bdf54d0) was created to stop. SPH0645's RMS Schmitt is
-    separately calibrated on the HarmonixSet corpus and must keep its own behaviour.
+    The joint crest x level gate (K1_SILENCE_PEAKINESS_BREAK, K1_SILENCE_JOINT_LEVEL_SSL_FRAC)
+    called loud dense music silent (up to 79 % of hops in the emulator; 23 of 82 telemetry
+    lines on the Main RPL) and was deleted. The decision must be IM69D-scoped (product
+    path, not the K1_AP_DRIVE_CONTRACT_V1 probe lane), and the SPH0645 raw-RMS Schmitt,
+    separately calibrated on the HarmonixSet corpus, must stay reachable for other builds.
     """
     i2s = I2S.read_text(encoding="utf-8")
     m = re.search(
-        r"#if\s+defined\(K1_MIC_IM69D_PDM_V1\)(.*?)#endif",
+        r"#if defined\(K1_MIC_IM69D_PDM_V1\) && !defined\(K1_AP_DRIVE_CONTRACT_V1\)(.*?)#else",
         i2s,
         re.DOTALL,
     )
-    assert m, (
-        "The joint silence break-path must be wrapped in "
-        "`#if defined(K1_MIC_IM69D_PDM_V1)` in i2s_audio.h."
-    )
-    block = m.group(1)
-    assert "K1_SILENCE_JOINT_LEVEL_SSL_FRAC" in block, (
-        "K1_SILENCE_JOINT_LEVEL_SSL_FRAC is consumed OUTSIDE the IM69D guard — it "
-        "would apply IM69D-measured values to SPH0645 production."
-    )
-    assert "K1_SILENCE_PEAKINESS_BREAK" in block, (
-        "K1_SILENCE_PEAKINESS_BREAK is consumed OUTSIDE the IM69D guard."
-    )
+    assert m, "the IM69D product silence path must be its own preprocessor branch in i2s_audio.h"
+    assert "k1_rms_silent_state = k1_afe2_ready && k1_afe2.quiet;" in m.group(1)
+    globals_h = (I2S.parent.parent / "system" / "globals.h").read_text(encoding="utf-8")
+    for gone in ("K1_SILENCE_PEAKINESS_BREAK", "K1_SILENCE_JOINT_LEVEL_SSL_FRAC"):
+        assert not re.search(rf"inline\s+float\s+{gone}\b", globals_h), f"{gone} must stay deleted"
+        assert gone not in i2s, f"{gone} is consumed again in i2s_audio.h"
     # The plain RMS Schmitt must remain reachable for non-IM69D builds.
     assert "K1_SILENCE_RMS_EXIT" in i2s and "K1_SILENCE_RMS_ENTER" in i2s
 

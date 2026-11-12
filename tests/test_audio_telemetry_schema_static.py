@@ -98,7 +98,9 @@ def test_agc_stream_schema_exposes_legacy_and_active_floor_fields():
         assert field in serial
 
     assert "agc_active_floor_debug[NUM_AGC_BANDS]" in globals_h
-    assert "agc_active_floor_debug[b] = pb_noise_floor[b];" in gdft
+    # The per-band writer went with the four-band AGC (AFE2 stage 4, 12 Nov 2026); the broadband
+    # fallback (builds without the AFE2 meter) still fills the field.
+    assert "agc_active_floor_debug[b] = pb_noise_floor[b];" not in gdft
     assert "agc_active_floor_debug[b] = agc_noise_floor;" in gdft
 
 

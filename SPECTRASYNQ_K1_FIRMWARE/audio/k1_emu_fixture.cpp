@@ -17,6 +17,7 @@
 #include "k1_vp_audio_access.h"   // the onset event the effects read (lane R1 consumer O lines)
 #endif
 #include "globals.h"
+#include "k1_afe2.h"           // AFE2 stage 4 probe fields (K1_EMU_TEMPO_PROBE only)
 #include "../control/k1_show_state.h"
 #include "k1_authored_source.h"
 
@@ -232,6 +233,14 @@ uint32_t s_shown_notes = 0;
 uint32_t s_pre_audio_shows = 0;
 
 constexpr uint16_t kMaxSidecar = 2000;  // = dual-edge trace capacity
+// K1_FE_BOARD_GX limiter record (GX line; "G," belongs to K1_EMU_TEMPO_PROBE): scale applied at packing and the
+// CRC-32 of each edge's pre-limit native RGB16 frame. valid=0 on other boards.
+struct GxLimit {
+  uint32_t a_crc;
+  uint32_t b_crc;
+  uint16_t scale;
+  uint8_t valid;
+};
 // Per-capture source identity, kept in PSRAM beside the trace itself.
 struct CapRecord {
   uint32_t generation;
@@ -240,6 +249,7 @@ struct CapRecord {
   uint32_t app_us;
   uint32_t power_mw;
   uint8_t limit_scale;
+  GxLimit gx;
   Meaning producer;
   Meaning consumed;
   uint32_t render_state[7];  // raw bits of render-thread globals at store time
@@ -303,11 +313,19 @@ struct ProbeRecord {
 #ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
   uint32_t us_presence;  // per-frame presence cost summed over the emit window (17th G field)
 #endif
+#if K1_AFE2_V1
+  // AFE2 stage 4 (11 Nov 2026), appended after every earlier field: mean magnitude before the
+  // spectrum gain, AFE2 S / A / M in counts rms, the spectrum gain applied (agc_bands[0].gain),
+  // and the mean of spectrogram[] in each of the four bands of freq_to_band_map.
+  float mag_mean, afe_s, afe_a, afe_m, spec_gain;
+  float band_mean[4];
+#endif
 };
 ProbeRecord* s_probe = nullptr;
 #endif
 Meaning s_last_consumed = {};
 int32_t s_pending_lim_idx = -1;
+GxLimit s_gx_pending = {};  // render task: noted before packing, attached at store
 uint32_t s_captured = 0;
 
 uint8_t s_last_ss[128];
@@ -558,6 +576,10 @@ void print_counters(const char* reason, const char* where) {
                         (unsigned long)p.us_publish, (unsigned long)p.us_emit);
 #ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
       K1_EMU_LOG.printf(",%lu", (unsigned long)p.us_presence);
+#endif
+#if K1_AFE2_V1
+      K1_EMU_LOG.printf(",%.6f,%.3f,%.3f,%.3f,%.6f,%.5f,%.5f,%.5f,%.5f", p.mag_mean, p.afe_s, p.afe_a, p.afe_m,
+                        p.spec_gain, p.band_mean[0], p.band_mean[1], p.band_mean[2], p.band_mean[3]);
 #endif
       K1_EMU_LOG.printf("\n");
       if ((i & 0xFF) == 0xFF) {
@@ -898,6 +920,24 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
 #ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
       p.us_presence = d.presence_elapsed_us;
 #endif
+#if K1_AFE2_V1
+      {
+        float msum = 0.0f, bsum[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        uint16_t bcnt[4] = {0, 0, 0, 0};
+        for (uint16_t i = 0; i < NUM_FREQS; i++) {
+          msum += magnitudes_final[i];
+          const uint8_t b = freq_to_band_map[i] & 3U;
+          bsum[b] += float(spectrogram[i]);
+          bcnt[b]++;
+        }
+        p.mag_mean = msum / (float)NUM_FREQS;
+        p.afe_s = sqrtf(k1_afe2.section);
+        p.afe_a = sqrtf(k1_afe2.anchor);
+        p.afe_m = sqrtf(k1_afe2.section_mean);
+        p.spec_gain = float(agc_bands[0].gain);
+        for (uint8_t b = 0; b < 4; b++) p.band_mean[b] = bcnt[b] ? bsum[b] / (float)bcnt[b] : 0.0f;
+      }
+#endif
     }
 #endif
     if (generation > s_nov_count) s_nov_count = generation;
@@ -955,6 +995,7 @@ void k1_emu_fixture_on_render_store(uint32_t capture_index) {
   c.app_us = known ? r.app_us : 0xFFFFFFFFu;
   c.limit_scale = 255;
   c.power_mw = s_power_mw;
+  c.gx = s_gx_pending;
   c.consumed = s_last_consumed;
   c.producer = known ? r.meaning : Meaning{};
   {
@@ -996,6 +1037,18 @@ void k1_emu_fixture_note_submission(void) {
 void k1_emu_fixture_note_power_limit_mw(uint32_t milliwatts) {
   s_power_mw = milliwatts;
   K1_EMU_LOG.printf("EMU_POWER_LIMIT installed_mw=%lu\n", (unsigned long)milliwatts);
+}
+
+void k1_emu_fixture_note_gx_limit(uint16_t scale, const void* a, uint32_t a_bytes,
+                                  const void* b, uint32_t b_bytes) {
+  // Render task, every frame: no allocation, no clock read; CRCs over the two
+  // static pre-limit caches only.
+  s_gx_pending.scale = scale;
+  s_gx_pending.a_crc = (a != nullptr && a_bytes != 0)
+                           ? esp_crc32_le(0, static_cast<const uint8_t*>(a), a_bytes) : 0;
+  s_gx_pending.b_crc = (b != nullptr && b_bytes != 0)
+                           ? esp_crc32_le(0, static_cast<const uint8_t*>(b), b_bytes) : 0;
+  s_gx_pending.valid = 1;
 }
 
 void k1_emu_fixture_note_save(const char* kind, bool ok) {
@@ -1070,6 +1123,10 @@ void k1_emu_fixture_write_sidecar(uint32_t capture_index) {
                     (unsigned long)s.generation, (unsigned long)s.admitted,
                     (unsigned long)s.processed, (unsigned long)s.app_us,
                     (unsigned)s.limit_scale, (unsigned long)s.power_mw);
+  if (s.gx.valid) {
+    K1_EMU_LOG.printf("GX,%lu,%u,%08lx,%08lx\n", (unsigned long)capture_index, (unsigned)s.gx.scale,
+                      (unsigned long)s.gx.a_crc, (unsigned long)s.gx.b_crc);
+  }
 }
 
 extern "C" uint64_t k1_emu_fixture_app_us(void) {

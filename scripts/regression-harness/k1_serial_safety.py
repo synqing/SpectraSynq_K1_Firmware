@@ -85,8 +85,8 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "01b53783afa66e9eb99257d8e5bd63ef142fb969"
-BARE_DEF_BLOB_SHA = "ca8350134d4ff593e2aac3576c825ba469b5e1f6"
+TYPED_DEF_BLOB_SHA = "cfb7765419dce7d1cdc5e7b513e46cb7d385e399"  # 2026-11-11 fe-rc3 merge: typed table = fe/k1-afe2 (k1_afe rows); bare table = bd5d5a83
+BARE_DEF_BLOB_SHA = "c0a494d45e0317aff62f44b63ddff7cdc604d721"  # 2026-11-10: vp_out_test row gated by ENABLE_VP_PROBE_CMD (classification unchanged)
 
 # --------------------------------------------------------------------------
 # Literals generated from the two .def files (see module docstring).
@@ -282,6 +282,10 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "help",
     "identify",
     "image_id",
+    "k1_afe",
+    "k1_afe_floor",
+    "k1_afe_gamma",
+    "k1_afe_level",
     "k1_loud_guard",
     "k1_pin_evidence",
     "led_fps",

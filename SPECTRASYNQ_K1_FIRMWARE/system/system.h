@@ -1,3 +1,4 @@
+#include "k1_afe2.h"
 #include <stdint.h>
 #include <USB.h> // For USBSerial
 #include <FastLED.h>
@@ -531,6 +532,9 @@ void init_system() {
   max_waveform_val = 0.0f;
   max_waveform_val_raw = 0.0f;
   waveform_peak_scaled = 0.0f;
+#if K1_AFE2_V1
+  k1_afe2_peak_env = 0.0f;
+#endif
   max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed the division denominator
 
   // PDM cal persistence: scrub removed SPH-file-derived state; restore last
@@ -714,6 +718,10 @@ void check_settings(uint32_t t_now) {
   const bool quiet_save_due = silence && int32_t(t_now - next_save_time) >= 0;
   // Failed writes keep their backoff even if another control change arrives.
   if (retry_wait && uint32_t(t_now - last_attempt_ms) < 5000U) return;
+  // Stage D: a mode request posted with this save has not reached CONFIG
+  // until the render task's fade lands it; save after it lands (never past
+  // the 60 s maximum deferral).
+  if (mode_transition_queued && !maximum_deferral_reached) return;
   if (maximum_deferral_reached || quiet_save_due) {
     if (debug_mode) USBSerial.println("QUEUED CONFIG SAVE TRIGGERED");
     settings_updated = false;

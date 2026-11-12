@@ -19,7 +19,8 @@
 #ifdef K1_MIC_AUTO_SENSE_V1
 #include "k1_mic_auto_sense.h"
 #endif
-#include "k1_agc_dt_clock.h"  // follower / peak_scaled α = dt/(τ+dt)
+#include "k1_agc_dt_clock.h"
+#include "k1_afe2.h"          // AFE2 exposure: one loudness meter, one slow anchor ("how much")  // follower / peak_scaled α = dt/(τ+dt)
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
 #endif
@@ -182,15 +183,6 @@ static inline float k1_loud_guard_approach(float current, float target, float dt
   return current + (target - current) * k1_loud_guard_alpha(dt, tau);
 }
 
-// A/B retune: GDFT release select by k1_loud_guard_mode. Attack is never mode-switched
-// (engage must stay fast; the invariant attack < release must hold). Mode 0 = baseline.
-static inline float k1_loud_guard_gdft_release_sec() {
-  switch (k1_loud_guard_mode) {
-    case 1:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS;
-    case 2:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR;
-    default: return K1_LOUD_GUARD_GDFT_RELEASE_SEC;
-  }
-}
 
 static inline float k1_loud_guard_effective_sensitivity() {
   if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
@@ -243,7 +235,11 @@ static inline void k1_loud_guard_update(uint32_t t_now) {
   const float sample_count = k1_loud_frame_sample_count > 0 ? float(k1_loud_frame_sample_count) : 1.0f;
   const float clip_now = float(k1_loud_frame_clip_count) / sample_count;
   const float near_now = float(k1_loud_frame_near_rail_count) / sample_count;
+#if K1_AFE2_V1
+  const float peak_pin_now = (k1_afe2_peak_env >= K1_LOUD_GUARD_PEAK_PIN_THRESHOLD) ? 1.0f : 0.0f;
+#else
   const float peak_pin_now = (waveform_peak_scaled >= K1_LOUD_GUARD_PEAK_PIN_THRESHOLD) ? 1.0f : 0.0f;
+#endif
 
   uint16_t spec_sat_bins = 0;
   for (uint16_t i = 0; i < NUM_FREQS; i++) {
@@ -268,17 +264,13 @@ static inline void k1_loud_guard_update(uint32_t t_now) {
     input_target = 0.75f;
   }
 
-  float gdft_target = 1.0f;
-  if (k1_loud_spec_sat_duty > 0.35f || k1_loud_peak_pin_duty > 0.60f) {
-    gdft_target = K1_LOUD_GUARD_GDFT_TRIM_MIN;
-  } else if (k1_loud_spec_sat_duty > 0.12f || k1_loud_peak_pin_duty > 0.30f) {
-    gdft_target = 0.70f;
-  } else if (k1_loud_spec_sat_duty > 0.04f || k1_loud_peak_pin_duty > 0.12f) {
-    gdft_target = 0.85f;
-  }
-
   k1_loud_input_trim = k1_loud_guard_approach(k1_loud_input_trim, input_target, dt, K1_LOUD_GUARD_INPUT_ATTACK_SEC, K1_LOUD_GUARD_INPUT_RELEASE_SEC);
-  k1_loud_gdft_trim = k1_loud_guard_approach(k1_loud_gdft_trim, gdft_target, dt, K1_LOUD_GUARD_GDFT_ATTACK_SEC, k1_loud_guard_gdft_release_sec());
+  // AFE2 stage 3 (11 Nov 2026): the guard no longer acts on the spectrum. peak_pin read the
+  // self-normalised envelope and spec_sat read the guard's own output, so both fired on dense
+  // music at any volume (89-97 % of music lines at room level). Their duties are still
+  // measured above, for telemetry only; the spectrum trim stays 1.000. The input trim
+  // (real near-clip protection, clip and near-rail counts) stays until stage 5.
+  k1_loud_gdft_trim = 1.0f;
 }
 #else
 static inline float k1_audio_response_gain_effective() {
@@ -567,6 +559,9 @@ void acquire_sample_chunk(uint32_t t_now) {
   }
   if (k1_fe_line) {
 #endif
+#if K1_PCM1808_LINE_SWITCH && K1_AFE2_V1
+  k1_afe2_metered = false;   // line-in owns this hop: no AFE2 meter on it until stage 7
+#endif
   int16_t pcm_hop[96];
   k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
   const K1PcmCanonicalReadTiming pcm_read = k1_pcm1808_last_canonical_read_timing();
@@ -847,6 +842,25 @@ void acquire_sample_chunk(uint32_t t_now) {
   im69d_raw_i16_abs_peak = im69d_raw_peak;
   im69d_raw_i16_rms = sqrtf((float)im69d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
   im69d_raw_i16_near_pct = (float)im69d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#if K1_AFE2_V1
+  // AFE2 exposure: the one loudness meter, fed with the RAW hop (before gain and clamp), so
+  // it is independent of SENSITIVITY. It always runs; k1_afe2_enabled decides whether its
+  // result is applied to the published level further down.
+  if (!k1_afe2_ready) {
+    k1_afe2_init(k1_afe2, (float)CONFIG.SAMPLE_RATE);
+    k1_afe2_ready = true;
+  }
+  const int64_t k1_afe2_t0_us = AP_STREAM_ENABLED ? esp_timer_get_time() : 0;
+  k1_afe2_process_hop(k1_afe2, im69d_samples_i16, (uint16_t)CONFIG.SAMPLES_PER_CHUNK,
+                      k1_afe2_gamma, k1_afe2_floor);
+  k1_afe2_metered = true;
+  if (AP_STREAM_ENABLED) {
+    const uint32_t k1_afe2_us = (uint32_t)(esp_timer_get_time() - k1_afe2_t0_us);
+    k1_afe2_us_sum += k1_afe2_us;
+    k1_afe2_us_count++;
+    if (k1_afe2_us > k1_afe2_us_max) k1_afe2_us_max = k1_afe2_us;
+  }
+#endif
 #ifdef K1_MIC_HEALTH_V1
   {
     const K1MicHealthFrame health_frame = {
@@ -1270,15 +1284,29 @@ void acquire_sample_chunk(uint32_t t_now) {
     if (!isfinite(waveform_peak_scaled_raw)) waveform_peak_scaled_raw = 0.0f;
 #endif
 
-    if (waveform_peak_scaled_raw > waveform_peak_scaled) {
-      float delta = waveform_peak_scaled_raw - waveform_peak_scaled;
+#if K1_AFE2_V1
+    // AFE2: the envelope keeps its own level-free state ("what"). The published
+    // waveform_peak_scaled is that state, times how_much when the exposure is enabled.
+    float& k1_peak_env = k1_afe2_peak_env;
+#else
+    float& k1_peak_env = waveform_peak_scaled;
+#endif
+    if (waveform_peak_scaled_raw > k1_peak_env) {
+      float delta = waveform_peak_scaled_raw - k1_peak_env;
       // ATTACK SNAP (2026-06-11): asymmetric envelope when K1_PEAK_ASYM_ENV.
       // Alphas are dt-derived when K1_AGC_DT_CLOCK_V1 so wall-clock stays put.
-      waveform_peak_scaled += delta * peak_attack_a;
-    } else if (waveform_peak_scaled_raw < waveform_peak_scaled) {
-      float delta = waveform_peak_scaled - waveform_peak_scaled_raw;
-      waveform_peak_scaled -= delta * peak_release_a;
+      k1_peak_env += delta * peak_attack_a;
+    } else if (waveform_peak_scaled_raw < k1_peak_env) {
+      float delta = k1_peak_env - waveform_peak_scaled_raw;
+      k1_peak_env -= delta * peak_release_a;
     }
+#if K1_AFE2_V1
+    if (k1_afe2_ready) {
+      waveform_peak_scaled = k1_afe2_level_enabled ? (k1_afe2_peak_env * k1_afe2.how_much) : k1_afe2_peak_env;
+    } else {
+      waveform_peak_scaled = k1_afe2_peak_env;   // no meter on this microphone path yet
+    }
+#endif
 
     // Use the maximum amplitude of the captured frame to set
     // the Sweet Spot state. Think of this like a coordinate
@@ -1407,12 +1435,19 @@ void acquire_sample_chunk(uint32_t t_now) {
 #ifdef K1_AP_DRIVE_CONTRACT_V1
     static K1ApStructuredEvidenceState k1_structured_evidence = {};
 #endif
+#if defined(K1_MIC_IM69D_PDM_V1) && !defined(K1_AP_DRIVE_CONTRACT_V1)
+    // AFE2 stage 2 (accepted 11 Nov 2026): the IM69D silence test is the AFE2 meter's
+    // two-level quiet flag on section loudness (audio/k1_afe2.h); the dwell below applies.
+    // It replaced the crest x SSL-level break path and the raw-RMS Schmitt for this
+    // microphone, which called loud dense music silent (up to 79 % of hops in the
+    // emulator, 23 of 82 telemetry lines on the Main RPL). The test reads Sq, a 0.3 s-release
+    // copy of the meter, so silence after a stop takes a few seconds plus the dwell however
+    // loud the music was (AFE2-PLAN section 6). The SPH0645 path keeps its Schmitt below.
+    k1_rms_silent_state = k1_afe2_ready && k1_afe2.quiet;
+#else
 #if defined(K1_MIC_IM69D_PDM_V1)
-    // Scope-gated to the IM69D diagnostic lane. The production SPH0645 path retains
-    // its independently characterised Schmitt trigger below. The new contract is
-    // derived from equal-window, Captain-confirmed silence and low-music captures on
-    // B489A500; it is not transferred to another capsule or configuration epoch.
-#ifdef K1_AP_DRIVE_CONTRACT_V1
+    // IM69D diagnostic contract lane (K1_AP_DRIVE_CONTRACT_V1, probe envs only). Derived
+    // from equal-window, Captain-confirmed silence and low-music captures on B489A500.
     const bool k1_structured_candidate =
         k1_silence_peakiness >= ap_drive.silence_threshold.peakiness_floor &&
         k1_silence_peakiness <= ap_drive.silence_threshold.peakiness_ceiling &&
@@ -1423,12 +1458,7 @@ void acquire_sample_chunk(uint32_t t_now) {
         t_now,
         ap_drive.silence_threshold.structured_evidence_ms);
     if (k1_structured_audio) {
-#else
-    if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
-        (float)max_waveform_val_raw >=
-            (float)CONFIG.SWEET_SPOT_MIN_LEVEL * K1_SILENCE_JOINT_LEVEL_SSL_FRAC) {
-#endif
-        k1_rms_silent_state = false;             // peaky AND loud enough → structured audio
+        k1_rms_silent_state = false;             // structured audio evidence
     } else
 #endif
     if (k1_rms_silent_state) {
@@ -1444,6 +1474,7 @@ void acquire_sample_chunk(uint32_t t_now) {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_ENTER);  // enter when below
 #endif
     }
+#endif  // IM69D product path vs SPH0645 / IM69D contract probe
 
     if (!k1_rms_silent_state) {
         if (silence && debug_mode) {
@@ -1479,6 +1510,9 @@ void acquire_sample_chunk(uint32_t t_now) {
     if (silence) {
       max_waveform_val = 0.0f;
       waveform_peak_scaled = 0.0f;
+#if K1_AFE2_V1
+      k1_afe2_peak_env = 0.0f;
+#endif
     }
 #endif
 
@@ -1686,6 +1720,24 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_spec_sat_fraction,
       k1_loud_guard_mode,
       (unsigned)CONFIG.LIGHTSHOW_MODE);
+#endif
+#if K1_AFE2_V1
+    // afe = exposure applied (1) or measured only (0); how = how_much; env = level-free beat
+    // envelope; sec / anc = section and anchor level in raw counts rms; fast = re-anchoring.
+    USBSerial.printf(" | afe=%d afe_level=%d how=%.3f env=%.3f sec=%.1f anc=%.1f fast=%d gamma=%.2f floor=%.2f",
+      (k1_afe2_ready && k1_afe2_enabled) ? 1 : 0, (k1_afe2_ready && k1_afe2_level_enabled) ? 1 : 0,
+      k1_afe2.how_much, k1_afe2_peak_env,
+      sqrtf(k1_afe2.section), sqrtf(k1_afe2.anchor), k1_afe2.fast ? 1 : 0, k1_afe2_gamma, k1_afe2_floor);
+    // afe_us = mean and worst time of the meter per hop since the last line (microseconds).
+    // quiet = the stage 2 silence test's flag (before the dwell; `silence=` is after it).
+    USBSerial.printf(" quiet=%d qsec=%.1f", k1_afe2.quiet ? 1 : 0, sqrtf(k1_afe2.section_quiet));
+    // sgain = stage 4's one spectrum gain; smean = its 2 s section mean in raw counts rms.
+    USBSerial.printf(" sgain=%.4f smean=%.1f", k1_afe2_spec_gain(k1_afe2), sqrtf(k1_afe2.section_mean));
+    USBSerial.printf(" afe_us=%.1f afe_us_max=%u",
+      k1_afe2_us_count ? (float)k1_afe2_us_sum / (float)k1_afe2_us_count : 0.0f, (unsigned)k1_afe2_us_max);
+    k1_afe2_us_sum = 0;
+    k1_afe2_us_max = 0;
+    k1_afe2_us_count = 0;
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     USBSerial.printf(" | i2s_wait_us=%u i2s_seq=%u",

@@ -1504,10 +1504,13 @@ void led_thread(void* arg) {
     static int64_t led_park_start_us = 0;
     if (led_thread_halt == true) {
       render_thread_parked = true;
+      // Stage E: a fresh acknowledgement per parked iteration (diagnostics wait
+      // for it), and no 1 s self-heal while a diagnostic holds the park.
+      k1_render_park_acks.fetch_add(1, std::memory_order_acq_rel);
       const int64_t park_now_us = esp_timer_get_time();
       if (led_park_start_us == 0) {
         led_park_start_us = park_now_us;
-      } else if (park_now_us - led_park_start_us > 1000000) {  // 1 s self-heal
+      } else if (k1_render_park_should_self_heal(park_now_us - led_park_start_us)) {  // 1 s self-heal (10 s under a diagnostic hold)
         led_thread_halt = false;  // force-resume; a stuck halt must not freeze the plate
         led_park_start_us = 0;
       }
@@ -1583,6 +1586,19 @@ void led_thread(void* arg) {
         vp_perf_vp_stack_last_us = 0;
       }
 #endif
+
+      // Stage E: :identify is drawn by the render task on its own frames (the
+      // serial/audio loop only posted the request). Like the motion probe below
+      // it owns the frame while active: pattern into leds_16, the canonical
+      // show path, then yield (no new clock reads: frame time is the seam).
+      // Same two flashes as the old blocking_flash().
+      if (k1_identify_render_frame((uint32_t)(vp_frame_start_us / 1000), leds_16,
+                                   (uint16_t)NATIVE_RESOLUTION, CRGB16{1.00, 0.25, 0.00},
+                                   CRGB16{0, 0, 0})) {
+        show_leds();
+        vTaskDelay(1);
+        continue;
+      }
 
 #ifdef ENABLE_MOTION_PROBE
       // NON-SHIPPING: apparent-motion test harness. When armed it OWNS the frame

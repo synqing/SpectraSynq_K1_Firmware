@@ -3,6 +3,7 @@
 
 #include <stdint.h>        // For standard integer types
 #include <stdbool.h>       // For bool type
+#include <atomic>          // k1_mode_request (Stage D)
 #include <FixedPoints.h>   // For SQ15x16
 #include <FixedPointsCommon.h> // Row 2 (Finding #1b): SQ15x16 alias lives here — self-contained for multi-TU include
 #include <Ticker.h>        // For Ticker type
@@ -568,8 +569,56 @@ struct button{
 inline button noise_button;
 inline button mode_button;
 
-inline bool    mode_transition_queued  = false;
-inline int16_t mode_destination = -1;
+// Written by producers (core 0) and the render task: atomic (Stage D).
+inline std::atomic<bool> mode_transition_queued{false};
+inline int16_t mode_destination = -1;  // display mirror of the last posted request only
+
+// Mode change request (Stage D, 10 Nov 2026). A producer (serial set_mode,
+// mode button, control facade) posts the COMPLETE request in one atomic store;
+// run_transition_fade() on the render task takes and clears it in one exchange
+// once the fade reaches black. Previously the "queued" flag was raised before
+// the destination was written and the render task cleared both, so a request
+// could be read as a button press, or a newer request wiped by the clear.
+// Values: K1_MODE_REQUEST_NONE, -1 = next mode (button), 0..255 = ordinal.
+// A newer request replaces an untaken one (latest wins).
+inline constexpr int32_t K1_MODE_REQUEST_NONE = INT32_MIN;
+inline std::atomic<int32_t> k1_mode_request{K1_MODE_REQUEST_NONE};
+
+inline void k1_mode_request_post(int16_t destination) {
+  mode_destination = destination;
+  k1_mode_request.store(destination, std::memory_order_release);
+  mode_transition_queued = true;  // starts the fade; raised after the request is complete
+}
+inline void k1_mode_request_cancel() {
+  // Flag first: a post landing between the two stores leaves the flag up with
+  // no request (the fade then finds nothing), never a request with no fade.
+  mode_transition_queued = false;
+  k1_mode_request.store(K1_MODE_REQUEST_NONE, std::memory_order_release);
+}
+inline int32_t k1_mode_request_peek() {
+  return k1_mode_request.load(std::memory_order_acquire);
+}
+inline int32_t k1_mode_request_take() {
+  return k1_mode_request.exchange(K1_MODE_REQUEST_NONE, std::memory_order_acq_rel);
+}
+// Render task, at black in run_transition_fade(). Clears the fade flag BEFORE
+// taking the request: a request posted after the take raises the flag again
+// and lands on the next pass (already black); one posted in between is taken
+// here and its later flag finds nothing to do. A missing destination is never
+// read as a button press. Returns the request it landed.
+inline int32_t k1_mode_request_land() {
+  mode_transition_queued = false;
+  const int32_t request = k1_mode_request_take();
+  if (request == -1) {  // mode button: next mode
+    CONFIG.LIGHTSHOW_MODE++;
+    if (CONFIG.LIGHTSHOW_MODE >= NUM_MODES) {
+      CONFIG.LIGHTSHOW_MODE = 0;
+    }
+  } else if (request >= 0) {  // serial / control facade destination
+    CONFIG.LIGHTSHOW_MODE = (uint8_t)request;
+  }
+  return request;
+}
 
 inline bool    noise_transition_queued = false;
 
@@ -869,7 +918,9 @@ inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not 
 // silently desynchronised the absolute thresholds above.
 //   MEASURED: quiet room 1.24   ·   music 3.17
 #define K1_SILENCE_PEAK_WIN 64                    // ~0.48 s at the 133 Hz AP frame rate
-inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured audio, never silence
+// K1_SILENCE_PEAKINESS_BREAK deleted 2026-11-11: the IM69D silence test is the AFE2 meter
+// (audio/k1_afe2.h, stage 2). k1_silence_peakiness is still measured for telemetry and the
+// K1_AP_DRIVE_CONTRACT_V1 probe lane.
 // LEVEL FLOOR (2026-08-11, measured on Unit 2 at G=8): peakiness alone is NOT
 // sufficient once the gain revert lifted the quiet-room noise floor's dynamic
 // range. Measured over 90 s of a confirmed-quiet room (-59.4 dB on an
@@ -951,7 +1002,7 @@ inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured
 // music sat near 2.5 and was marginal. Narrowband hum cannot exploit the extra
 // sensitivity: the gate is an AND, and hum's crest ~1.26 is rejected by the
 // peakiness term regardless of level.
-inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 1.75f; // peakiness may only break silence at/above SSL x this
+// K1_SILENCE_JOINT_LEVEL_SSL_FRAC deleted 2026-11-11 with the crest x level break path (AFE2 stage 2).
 inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 

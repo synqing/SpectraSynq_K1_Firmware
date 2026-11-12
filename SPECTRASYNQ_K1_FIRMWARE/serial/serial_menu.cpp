@@ -17,6 +17,8 @@
       k1_parse_edge_uniform. Pure leaves: strcmp + K1EdgeMixer* enums only.
 */
 
+#include "k1_afe2.h"
+#include "serial_typed_dispatch.h"
 #include <Arduino.h>
 #ifdef K1_SERIAL_REPLAY_HOST
 #ifndef ESP_RST_UNKNOWN
@@ -42,6 +44,7 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_prsm.h"
 #include "k1_prsm_rx.h"
 #include "k1_authored_source.h"
+#include "k1_diag_ownership.h"  // Stage E: render-owned :identify
 #ifdef K1_TUNABLE_REGISTRY_V1
 #include "k1_tunables.h"  // generic AP/VP runtime parameter access (:tune)
 #endif
@@ -1573,11 +1576,10 @@ void serial_queue_slot_save(uint8_t slot_index, bool from_secondary) {
   }
 }
 void serial_queue_commit() {
-  if (!k1_queue_any_armed()) {
+  if (!k1_queue_request_commit(true, millis())) {  // Stage D: only this loop's drafts
     USBSerial.println("QUEUE: nothing armed");
     return;
   }
-  k1_queue_request_commit(true, millis());
   if (k1_queue_commit_quantise() == K1_QUEUE_QUANTISE_BEAT) {
     USBSerial.println("COMMIT (waiting for beat)");
   } else {
@@ -2575,9 +2577,15 @@ void cmd_bootloop_inject() {
   abort();  // -> panic handler -> ESP_RST_PANIC -> k1_bootloop_reason_is_crash()==1
 }
 void cmd_identify() {
+  // Stage E: the render task draws the flash (k1_diag_ownership.h); this loop
+  // keeps acquiring audio. "IDENTIFY: done" follows from check_serial().
+  if (!k1_identify_post()) {
+    tx_begin();
+    USBSerial.println("IDENTIFY: busy");
+    tx_end();
+    return;
+  }
   ack();
-  CRGB16 col = {1.00, 0.25, 0.00};
-  blocking_flash(col);
 }
 void cmd_start_noise_cal_guidance() {
   tx_begin(true);
@@ -2758,9 +2766,11 @@ void cmd_event_status() {
   USBSerial.println(audio.silence ? 1 : 0);
   tx_end();
 }
+#if ENABLE_VP_PROBE_CMD
 void cmd_vp_out_test() {
   vp_run_output_probe();
 }
+#endif  // ENABLE_VP_PROBE_CMD
 void cmd_get_knobs() {
   USBSerial.print("{");
   USBSerial.print('"'); USBSerial.print("PHOTONS"); USBSerial.print('"'); USBSerial.print(':'); USBSerial.print(CONFIG.PHOTONS);
@@ -2987,6 +2997,19 @@ void parse_command(char* command_buf) {
       }
 	    }
 	    // PARSER #############################
+
+    // Stage F (10 Nov 2026): a name or value longer than its buffer is rejected
+    // whole. Acting on the truncated prefix turned e.g. note_offset=<93 zeros>12
+    // into note_offset=0 + save + reboot.
+    {
+      const char* eq = strchr(command_buf, '=');
+      const size_t name_len = eq ? (size_t)(eq - command_buf) : strlen(command_buf);
+      const size_t data_len = eq ? strlen(eq + 1) : 0;
+      if (name_len > sizeof(command_type) - 1 || data_len > sizeof(command_data) - 1) {
+        bad_command(command_type, "<field too long>");
+        return;
+      }
+    }
 
 	    if (serial_command_marks_manual_visual_control(command_type)) {
 	      k1_smart_director_mark_manual_control(millis(), K1_MANUAL_REASON_SERIAL_COMMAND);
@@ -3641,6 +3664,24 @@ void parse_command(char* command_buf) {
     // STANDBY_DIMMING STRUCK 2026-08-09 — legacy A/B toggle removed from available options.
     // Validate before committing: atof/atol turned text into 0 (or NaN), which
     // silently changed the silence classifier that also gates automatic saves.
+#if K1_AFE2_V1
+    // k1_afe / k1_afe_gamma / k1_afe_floor — AFE2 exposure controls (audio/k1_afe2.*).
+    // GATE-MATCHED: rows in serial_typed_cmd_table.def, handlers in serial_typed_dispatch.cpp,
+    // and this call-site. Without this hop the commands compile and answer Bad command.
+    else if (strcmp(command_type, "k1_afe") == 0) {
+      serial_typed_k1_afe(command_type, command_data);
+    }
+    else if (strcmp(command_type, "k1_afe_level") == 0) {
+      serial_typed_k1_afe_level(command_type, command_data);
+    }
+    else if (strcmp(command_type, "k1_afe_gamma") == 0) {
+      serial_typed_k1_afe_gamma(command_type, command_data);
+    }
+    else if (strcmp(command_type, "k1_afe_floor") == 0) {
+      serial_typed_k1_afe_floor(command_type, command_data);
+    }
+#endif
+
     else if (strcmp(command_type, "silence_enter") == 0) {
       float value = 0.0f;
       if (!vp_parse_float(command_data, &value)) {
@@ -4136,9 +4177,15 @@ void parse_command(char* command_buf) {
     // Do not fall through the whole typed table here: that would silently
     // re-route family-dispatcher commands (secondary_*, chroma, …) when a
     // dispatcher call-site is severed, and would activate dormant typed rows.
+    // look_load / look_clear (K1_LOOK_LIB_V1 rows) were in the table since
+    // 38428a82 but never routed here, so both answered "Bad command" on the
+    // device (found on Main RPL, 11 Nov 2026). Without the rows the lookup
+    // returns nullptr and they stay "Bad command".
     else if (strcmp(command_type, "look") == 0 ||
              strcmp(command_type, "look_status") == 0 ||
-             strcmp(command_type, "secondary_look") == 0) {
+             strcmp(command_type, "secondary_look") == 0 ||
+             strcmp(command_type, "look_load") == 0 ||
+             strcmp(command_type, "look_clear") == 0) {
       const serial_typed_cmd_row_t* typed = serial_typed_cmd_lookup(command_type);
       if (typed != nullptr) {
         (void)serial_dispatch_typed_setter(typed, command_type, command_data);
@@ -4220,6 +4267,12 @@ void check_serial(uint32_t t_now) {
   // Update timer
   serial_iter++;
 
+  if (k1_identify_take_completion()) {  // Stage E: deferred :identify completion
+    tx_begin();
+    USBSerial.println("IDENTIFY: done");
+    tx_end();
+  }
+
   /* Drain every AP tick (not 10 ms). 120 Hz PRSM is 4080 B/s; a 32-byte/10 ms
    * cap starves the stream. Every byte goes through k1_prsm_rx_push() first
    * (audio/k1_prsm_rx.h): it alone decides whether a byte is part of a
@@ -4240,13 +4293,13 @@ void check_serial(uint32_t t_now) {
 
 #ifdef K1_LOOK_LIB_V1
       if (k1_look_rx_need > 0 && k1_look_rx_got < k1_look_rx_need) {
-        const uint32_t need = k1_look_rx_need;
-        const bool done = (k1_look_rx_got + 1u >= need);
-        const bool ok = k1_look_rx_push(byte);
-        if (done) {
+        // "ok" = live and saved; "installed, not saved" = live until reboot;
+        // "fail" = refused, old table unchanged.
+        const char *reply = k1_look_rx_reply(k1_look_rx_push(byte));
+        if (reply != nullptr) {
           tx_begin();
           USBSerial.print("LOOK_LOAD: ");
-          USBSerial.println(ok ? "ok" : "fail");
+          USBSerial.println(reply);
           tx_end();
         }
         continue;

@@ -18,6 +18,15 @@ configuration. This profile replays microphone PCM only: it skips physical
 PCM1808 initialisation and FE power/jack detection with the declared
 `K1_EMU_FE_MIC_ONLY` adapter. It does not qualify line-input acquisition,
 resampling, automatic jack switching, power sequencing or LED transmission.
+`k1_fe` is the K1-FE-Gx board: its emit block neutralises FastLED's limit and
+applies `k1_fe_gx_led_scale`, one logical RGB16 scale over both edges, before
+packing. The FE profile therefore runs `limit-base`/`limit-a` at
+`max_current_ma=500` (300 mA is below the 2 x 160 px idle model and darkens
+both edges) and grades them with `gx_limit_coupling`. The fixture adds a
+`GX,idx,scale,a_crc,b_crc` line per frame (not `G,`, which the tempo probe
+uses): the Gx scale (65535 = identity) and
+the CRC-32 of each edge's pre-limit native RGB16 frame. The check observes
+current behaviour; it does not rule on whether coupling is product intent.
 All product flags remain present; the runner checks that only the declared
 adapters differ. The selected scenario is saved and hashed separately from
 its source. FE also checks each edge's complete 48-bit pixel reversal and
@@ -319,8 +328,9 @@ all rejected before anything is built.
   `stall_ms`, and `expect` `{end_reason, saves}`. A recovery run starts from the
   source case's saved LittleFS region in a freshly merged flash, with zero
   commands.
-- `comparisons`: `equal`, `isolation`, `limit_coupling`, `recovery_state`,
-  `fallback_state`, `differs` and `case`, each mapped to an SW criterion.
+- `comparisons`: `equal`, `isolation`, `limit_coupling`, `gx_limit_coupling`
+  (FE profile only), `recovery_state`, `fallback_state`, `differs` and `case`,
+  each mapped to an SW criterion.
 - `planted.base_case`: the fresh capture that the planted negative cases
   mutate.
 
@@ -434,3 +444,4 @@ audiovisual quality. No software trace here proves any of them.
 | 2026-10-20 | agent:claude-code (next phase) | Added the client transport: existing client → run-owned pty → USB-Serial/JTAG → production receive loop, trace on UART1, client gates, SW13 cases. |
 | 2026-11-10 | agent:claude (FW lead) | Adopted the RX-record adapter (`rx_stream`) from the K1-FE-SHOW lane into mainline tooling; `EMU_HCMD` text is hex-escaped. |
 | 2026-11-10 | agent:claude (FW lead) | `EMU_PREP` / `EMU_PREP_END` report the prepared-show epoch and lost-frame counters (change request R3-1). |
+| 2026-11-11 | agent:claude-code (Modernes C++ W3) | FE profile: `gx_limit_coupling` grades the Gx RGB16 limiter (GX lines) at 500 mA instead of FastLED's unused scale; Main RPL `limit_coupling` unchanged. |
