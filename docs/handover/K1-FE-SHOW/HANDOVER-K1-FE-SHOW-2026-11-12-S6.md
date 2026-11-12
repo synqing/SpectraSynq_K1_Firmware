@@ -47,7 +47,7 @@ Each: purpose → method → acceptance → failure → STOP. Repair authority: 
 
 **S7 — line-in gets the meter; ritual; dead code.** Purpose and acceptance: plan §4 AFE2-S7. Facts found: the FE jack path (`audio/i2s_audio.h` `#if K1_PCM1808_LINE_SWITCH` branch, `pcm_hop[96]` → `k1_audio_commit_canonical_frame`) never reaches the meter; since `9ff2addf` line-in hops use the broadband AGC fallback and brightness factor 1.0 (`k1_afe2_metered`). Method: a second meter state for line-in (`k1_afe2_line`) fed from `pcm_hop` (no ×21.6, no SENSITIVITY on that path, so its K and floors differ from the microphone's: **measure** them on line audio, never scale by inference); stage 1/4 read the active source's meter; then delete the broadband fallback (last trace of the old AGC). Emulator cannot replay PCM1808 capture: measurement needs the FE board or the bench K1's PCM1808 module with a cabled source. STOP: FE board identity not confirmed (plan S7).
 
-**S5, S6** (only if the Captain does not cut them): plan §4 text; S5 STOP on any Core 0 overrun.
+**S5, S6: skipped for `fe-1.0.0`** (Captain, 12 Nov: "Stage 5: Skip"; S6 "Skip it then" after the lead corrected its own claim that S6 fixes mode 32). Stage 1 is on for the FE (`b204f792`, "Yes turn it on"); release lane `24edfb59`. AFE2's software for `fe-1.0.0` is complete; what remains is hardware (T7).
 
 **S8** — picture for the Captain only (mode 22 dark stretches). Note: the S4 camera stills show mode 22 dark at 1:42 with the old AGC and lit with S4.
 
