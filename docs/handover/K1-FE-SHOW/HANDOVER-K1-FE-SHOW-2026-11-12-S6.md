@@ -43,6 +43,8 @@ Each: purpose → method → acceptance → failure → STOP. Repair authority: 
 
 **Q (open questions to the Captain, asked 12 Nov ~05:30, unanswered):** (1) Cut S5 (clipping only at venue volume) and S6 (VU modes) from `fe-1.0.0`? Lead's recommendation: yes, ship without them, do them after. (2) Is any line source cabled to the bench K1's loose PCM1808 module? Do not proceed on S5/S6 order or line-in measurement assumptions until answered; S7 code work below does not wait.
 
+**Captain ruling 12 Nov ~06:30 (verbatim): "Captain, for the moment, let's leave the Aux jack out of this development phase".** S7's line-in part below is deferred; line-in ships on the broadband fallback (as before AFE2). Q2 is closed by this ruling; T7 no longer waits for line-in.
+
 **S7 — line-in gets the meter; ritual; dead code.** Purpose and acceptance: plan §4 AFE2-S7. Facts found: the FE jack path (`audio/i2s_audio.h` `#if K1_PCM1808_LINE_SWITCH` branch, `pcm_hop[96]` → `k1_audio_commit_canonical_frame`) never reaches the meter; since `9ff2addf` line-in hops use the broadband AGC fallback and brightness factor 1.0 (`k1_afe2_metered`). Method: a second meter state for line-in (`k1_afe2_line`) fed from `pcm_hop` (no ×21.6, no SENSITIVITY on that path, so its K and floors differ from the microphone's: **measure** them on line audio, never scale by inference); stage 1/4 read the active source's meter; then delete the broadband fallback (last trace of the old AGC). Emulator cannot replay PCM1808 capture: measurement needs the FE board or the bench K1's PCM1808 module with a cabled source. STOP: FE board identity not confirmed (plan S7).
 
 **S5, S6** (only if the Captain does not cut them): plan §4 text; S5 STOP on any Core 0 overrun.
