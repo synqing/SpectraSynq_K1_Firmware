@@ -19,7 +19,17 @@ Every simulator number here is **simulated, not hardware**. No S31 exists on the
 
 The S31 suite's own matrix shows SW07 FAIL. That was the suite's host pytest step: two repository tests failed on the port's first draft (`test_im69_idf_freeze_stays_on_s3_only`, and the `constants.h` reference hash in `k1_lightshow_acceptance.json`). Both were fixed before `7a36f8c7`; the product-build part of SW07 passed (no emulator flag or symbol in the S31 product image; emulator env upload-blocked). SW11 is proven only by a clean-export run.
 
-Independent re-run from clean exports (lane E, fresh agent): see the section below.
+### Independent re-run from clean exports (lane E, fresh agent that did not write the port)
+
+`git archive` exports, no `.git` (`runs/laneE-driver.sh`):
+
+| Gate | Result |
+|---|---|
+| G1 | exports of `fcdefec5` then `7a36f8c7` built at the same path: exit 0, `k1_fe` and `k1_main_rpl_im69d` byte-identical (`runs/laneE-g1.json`) |
+| G2 | S31 suite from the export of `7a36f8c7`: **SOFTWARE COMPLETE**, every SW criterion PASS including SW07 and SW11 (clean export); `EMU_BUILD git=unknown env=k1_fe_emu@esp32s31 tag=untagged chip=esp32s31 idf=v6.1.1` (`runs/laneE-out-s31-result-summary.json`) |
+| G3 | S3 suite from the same commit's export (SOFTWARE COMPLETE) against the S31 suite: exit 1, 27 MATCH, 1 DIFFER (`startup-sqr`, edge A 114 frames, max 9,666; edge B none; first divergence render, `LED_FPS`), 0 not compared (`runs/laneE-cross-chip-export-s3-vs-s31.json`) |
+
+The worktree results above and the clean-export results agree exactly.
 
 ## How the port is built
 

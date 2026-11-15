@@ -1,0 +1,240 @@
+{
+ "schema": "k1-emu-result/3",
+ "overall": "SOFTWARE COMPLETE",
+ "suite": "default",
+ "hardware_accessed": false,
+ "scenario": {
+  "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware-s31/_scratch/s31-port-20261115/laneE/run-s31/tools/esp_emulator/s31_music_regression.json",
+  "sha256": "d1608a235ac95af78d5b42322a35cc3f6ae539e21092eaabbf45c9c6a25ad31f",
+  "source_sha256": "4e5ca364d6f516dba253ecbc04b16cc927561bd362baa85483c319892794cc1d",
+  "profile_selection": "fe",
+  "name": "s3-music-regression-esp32s31-fe-mic"
+ },
+ "tool": {
+  "lock": "/Users/spectrasynq/SpectraSynq_K1_Firmware-s31/_scratch/s31-port-20261115/laneE/run-s31/tools/esp_emulator/tool-lock.json",
+  "lock_sha256": "dab17a5f75959c7a2c908ba65c496e3f5a052e5967550f90be43f5e782c92212",
+  "executable": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/tools/esp-emu-pin/bin/esp-emu",
+  "executable_sha256": "dea564e36990fcea727eb11e33c5430eccdfe673fc5462c0604e0001d25d84a0",
+  "version": "0.49.0",
+  "rejected_candidates": []
+ },
+ "source": {
+  "repository": "/Users/spectrasynq/SpectraSynq_K1_Firmware-s31/_scratch/s31-port-20261115/laneE/run-s31",
+  "kind": "export",
+  "head": "7a36f8c78155c305d647d4832af59159f18a573a",
+  "branch": "lane/k1-s31-port",
+  "dirty_paths": [],
+  "dirty_inputs_sha256": "d1c077ff61ccd84d14a86c4a17b7ff35a3c39d428f2de632d1ea7766d01ac4e5",
+  "export_tree_sha256": "d1c077ff61ccd84d14a86c4a17b7ff35a3c39d428f2de632d1ea7766d01ac4e5",
+  "identity_paths": [
+   "SPECTRASYNQ_K1_FIRMWARE",
+   "platformio.ini",
+   "tools/esp_emulator",
+   "scripts/platformio",
+   "tests/test_esp_emulator_acceptance.py",
+   "tests/test_esp_emulator_report.py"
+  ]
+ },
+ "emu_build": {
+  "env": "k1_fe_emu",
+  "exit_code": 0,
+  "seconds": 96.9,
+  "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware-s31/_scratch/s31-port-20261115/laneE/out-s31/build-emu.log",
+  "command": "bash targets/esp32s31/build.sh k1_fe_emu",
+  "firmware.elf_sha256": "0c31fd3188c40f066ec34834e08b1cb6ea34e95cb4c79dd4f25a2d3e98d890f2",
+  "firmware.bin_sha256": "9ac5f06bb7dd13105f7ef1fbe0fbcba5314b81d364012dd9305e8701adb92371",
+  "bootloader.bin_sha256": "54230ed70496d3558e84927171fa3e9020796700f8f411f8493d6b9c764fc447",
+  "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+ },
+ "criteria": [
+  {
+   "id": "SW01",
+   "status": "PASS",
+   "evidence": "28/28 runs accepted with firmware-observed run id, scenario CRC and counters; executed app region == built firmware.bin; image never patched"
+  },
+  {
+   "id": "SW02",
+   "status": "PASS",
+   "evidence": "repeat-smoke: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+  },
+  {
+   "id": "SW03",
+   "status": "PASS",
+   "evidence": "time-zero-tail: PASS accepted: end=eof admitted=12288 processed=13056 published=136 shown=136 captured=136; epoch zero 0 us; first captured hop app_us=7500 (processed 96) | stall: PASS accepted: end=stall admitted=0 processed=0 published=0 shown=0 captured=0; epoch None None us; first captured hop app_us=None (processed None) | repeat-time: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+  },
+  {
+   "id": "SW04",
+   "status": "PASS",
+   "evidence": "10/10 planted captures rejected for the stated reason through ec.accept; "
+  },
+  {
+   "id": "SW05",
+   "status": "PASS",
+   "evidence": "iso-a: PASS edge A: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | iso-b: PASS edge B: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | limit-coupling: PASS Gx limiter binding in 105/128 base frames; before hop 40: scale differs 0, emitted frames differ 0; after: A pre-limit frames changed 88, shared scale changed 88; edge B pre-limit frames differing 0 (all hops), emitted B frames changed 88 (lit 88), B changes with an equal scale 0. Observes current behaviour: one Gx scale covers both edges. | fe-reverse-a: PASS edge A: full 48-bit pixel reversal from hop 40; asymmetric frames=88, mismatch hops=[], other edge unchanged required | fe-reverse-b: PASS edge B: full 48-bit pixel reversal from hop 40; asymmetric frames=88, mismatch hops=[], other edge unchanged required"
+  },
+  {
+   "id": "SW06",
+   "status": "PASS",
+   "evidence": "reject-unchanged: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca | recovery-state: PASS applied state before save == recovered boot state: True; differing fields=[]; show save ok=True; LittleFS changed=True; recovery commands=0 saves=0; requested composition fields applied before save: True []; 95-byte V1 record | recovery-output: PASS deterministic payload+source metadata equal=True frames=128/128 sha fd692188f3ff/fd692188f3ff | fallback-missing-show: PASS config saved=True, show file saved=False; recovered == implementation fallback (primary from saved CONFIG, palettes from the boot palette lock, secondary/edge compiled defaults): True | fe-reverse-boot-recovery_state: PASS applied state before save == recovered boot state: True; differing fields=[]; show save ok=True; LittleFS changed=True; recovery commands=0 saves=0; requested composition fields applied before save: True []; 95-byte V1 record | fe-reverse-boot-equal: PASS deterministic payload+source metadata equal=True frames=128/128 sha fd692188f3ff/fd692188f3ff"
+  },
+  {
+   "id": "SW07",
+   "status": "PASS",
+   "evidence": "pio run -e k1_fe exit=0; forbidden flags=[]; fixture symbols=0; emu-only flags=['K1_EMU_FE_MIC_ONLY', 'K1_EMU_FIXTURE', 'K1_EMU_ONSET_TRACE', 'K1_EMU_SKIP_EMIT', 'K1_EMU_SPECTRUM_TRACE', 'K1_EMU_UART0', 'K1_RENDER_TRACE_V1']; positive control symbols=17; upload blocked=True; host tests PASS (1861 passed, 8 skipped in 201.52s (0:03:21); pio run -e k1_hardware exit=0; 8 git-history test file(s) excluded in this export (run in the checkout))"
+  },
+  {
+   "id": "SW08",
+   "status": "PASS",
+   "evidence": "repeat-music: PASS deterministic payload+source metadata equal=True frames=1334/1334 sha b1b9b6c65dd6/b1b9b6c65dd6 | startup-quiet-return: PASS {'startup_traversed': True, 'A_dark_below_fade_gate': True, 'A_lit_after_gate': True, 'B_lit_from_first_hop': True, 'both_dark_before_return': True, 'both_lit_on_first_return_hop': True}; startup frames before audio=113; first lit A hop=60 at app 1003504 us; zero section from hop 934 dark from hop 976; first return frame hop 1334 | music-tempo-lane: PASS k1_av_layer_classifier: PASS_timing_but_weak_lock (near-target but no locked-near rows); median bpm 127.0, near-target 1334/1334, locked-near 0, lock_frac 0.00, max_conf 0.664, beat ticks 0, onsets 580"
+  },
+  {
+   "id": "SW09",
+   "status": "PASS",
+   "evidence": "music-semantic-continuity: PASS 1334 frames: producer meaning == render-thread meaning for the same generation on 1334/1334 (first mismatch []); onset/beat sequence monotone=True; onset_seq 559->1139, beat_seq 0->0 | startup-semantic-continuity: PASS 1067 frames: producer meaning == render-thread meaning for the same generation on 1067/1067 (first mismatch []); onset/beat sequence monotone=True; onset_seq 0->635, beat_seq 0->0"
+  },
+  {
+   "id": "SW10",
+   "status": "PASS",
+   "evidence": "report.html from this invocation; {'identical_pair': True, 'planted_pixel': True, 'incompatible_rejected': True, 'self_contained': True, 'names_invocation': True}; html 17989296 bytes"
+  },
+  {
+   "id": "SW11",
+   "status": "PASS",
+   "evidence": "invocation ran from a clean export of the committed candidate (no .git, no prior outputs, no emulator-workspace sources); tool via K1_ESP_EMU, hash-checked"
+  },
+  {
+   "id": "SW12",
+   "status": "NOT_APPLICABLE",
+   "evidence": "no learned-model runtime in the product ELF (no tflite/tensorflow/interpreter/esp_nn/MicroInterpreter symbols); model inference is not active on k1_main_rpl_im69d"
+  },
+  {
+   "id": "SW13",
+   "status": "PASS",
+   "evidence": "local client chain (existing client -> run-owned pty -> esp-emu USB-Serial/JTAG -> production parser), not physical USB; client cases [('client-a', 'PASS'), ('client-b', 'PASS'), ('client-reject', 'PASS'), ('client-comp-save', 'PASS')] client-a-matches-scheduled: PASS deterministic payload+source metadata equal=True frames=128/128 sha 41a8bbf4fc3b/41a8bbf4fc3b | client-iso-a: PASS edge A: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | client-b-matches-scheduled: PASS deterministic payload+source metadata equal=True frames=128/128 sha c30f4d59b1de/c30f4d59b1de | client-iso-b: PASS edge B: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | client-reject-unchanged: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca | client-recovery-state: PASS applied state before save == recovered boot state: True; differing fields=[]; show save ok=True; LittleFS changed=True; recovery commands=0 saves=0; requested composition fields applied before save: True []; 95-byte V1 record | client-recovery-output: PASS deterministic payload+source metadata equal=True frames=128/128 sha fd692188f3ff/fd692188f3ff"
+  },
+  {
+   "id": "EX01",
+   "status": "DEFERRED_EXTERNAL",
+   "evidence": "physical parity, device/optical/AV/leave-state evidence: shelved by the Captain's R3 instruction; no hardware accessed"
+  },
+  {
+   "id": "EX02",
+   "status": "DEFERRED_EXTERNAL",
+   "evidence": "hosted CI/publication: no push authorised; no Linux-pinned esp-emu executable hash exists, so CI only builds k1_main_rpl_im69d and k1_main_rpl_emu"
+  }
+ ],
+ "cases": {
+  "smoke-a": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "smoke-b": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "time-zero-tail": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "stall-probe": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "ctl-a": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "ctl-b": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "reject": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "limit-base": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "limit-a": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "comp-save": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "comp-ref": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "comp-recover": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "cfg-save": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "cfg-recover": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "music-a": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "music-b": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "startup-sqr": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "client-a": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "client-b": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "client-reject": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "client-comp-save": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "client-comp-recover": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "fe-reverse-base": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "fe-reverse-a": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "fe-reverse-b": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "fe-reverse-save": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "fe-reverse-ref": {
+   "status": "PASS",
+   "reasons": []
+  },
+  "fe-reverse-recover": {
+   "status": "PASS",
+   "reasons": []
+  }
+ }
+}
