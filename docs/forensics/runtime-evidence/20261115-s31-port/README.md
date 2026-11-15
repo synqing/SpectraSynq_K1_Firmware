@@ -35,7 +35,13 @@ Board file `~/Downloads/K1-FE-S31-Gx2_black-gold-v6.epro2` (sha256 `5769d794…1
 
 - Fine: LED0-3 on GPIO22/23/25/24, MIC_CLK GPIO20, MIC_DATA GPIO16 (I2S0, the only PDM-to-PCM port), POWER_PERMIT 11, VBUS_PG 17, JACK_DET 12, ADC_SHDNZ 35, NAV 8/13/15, SW_USER3 14, USB 33/34.
 - Firmware setting (done): LED_N_OE GPIO21 and LED_S_OE GPIO54 are pulled DOWN on Gx2 (R_PWR27/R_PWR33), so the firmware drives them high; GPIO54 is the MTDO pad, used as GPIO.
-- Cannot work, needs a wire fix: PCM_LRCK and PCM_DOUT (line-in), I2C_SDA/SCL, CC1/CC2_SENSE (USB-C current qualification; LED budget stays at the USB default), SW_USER1/2, ADC_DOUT (parked ADC), HEARTBEAT (no net). Checked twice: no pad binding and no copper end point on any J_S31 pad (`board/gx2-copper-vs-socket.txt`). Free contacts for wires are listed in `pin-check.json`.
+- Cannot work, needs a wire fix: PCM_LRCK and PCM_DOUT (line-in), I2C_SDA/SCL, CC1/CC2_SENSE, SW_USER1/2, ADC_DOUT (parked ADC), HEARTBEAT (no net). Checked twice: no pad binding and no copper end point on any J_S31 pad (`board/gx2-copper-vs-socket.txt`). Free contacts for wires are listed in `pin-check.json`.
+- **Consequence of the missing CC sense: the LEDs stay dark.** With CC1 = CC2 = 0 mV, `k1_fe_gx_classify_cc` returns Invalid and `k1_fe_gx_source_led_ma` allows 0 mA (`system/k1_fe_gx_power_policy.h`); the Gx limiter then scales both edges to zero. Seen in the S31 product image's emulator boot: `[FEPWR] ... cc1_mv=0 cc2_mv=0 source=unqualified permit=0 led_budget_est_ma=0`. The power rule was not changed (a product safety rule); CC1/CC2 wires to free ADC pins (GPIO42-45) fix it.
+- INFERENCE for the board lane: the LED_N_OE/LED_S_OE pull-downs (pull-ups on the S3 Gx board) may be deliberate. The S31 firmware drives them high at board start to keep S3 behaviour.
+
+## S31 product image (no emulator hooks)
+
+The staged S31 `k1_fe` image booted in `esp-emu --chip esp32s31 --console usb-jtag` for 60 s (`runs/s31-product-k1_fe-emu-boot-usb.txt`, simulated): serial, LittleFS (formatted on first boot), LEDs, I2S0 PDM RX (slot RIGHT) and I2S enable PASS; PCM1808 clock gate FAIL (pins unwired), line-in reported UNAVAILABLE and the source stays on the microphone (the emulator's jack pin reads "in"); `[FEBOARD] profile=Gx i2c=FAIL sda=-1 scl=-1`; the audio loop then runs (silent input). No panic. The image links FastLED's RMT5 controller (`fl::RmtController5`, `rmt_new_tx_channel`, `rmt_transmit`), `i2s_channel_init_pdm_rx_mode` and `pcnt_new_unit` (riscv32-esp-elf-nm).
 
 ## Not proven (needs a real S31-Zero)
 

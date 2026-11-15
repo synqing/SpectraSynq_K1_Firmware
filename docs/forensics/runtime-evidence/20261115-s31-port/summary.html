@@ -2,16 +2,19 @@
 <div><h3>What works</h3><ul>
 <li>The FE firmware builds for the ESP32-S31 on plain ESP-IDF 6.1.1, from the same 78 files and the same compiler settings as the S3 build. Arduino 4.0 RC1 and FastLED 3.10.3 come in as ESP-IDF components.</li>
 <li>The S31 image starts in the emulator and prints its build line. All 28 replay cases are accepted.</li>
+<li>The S31 product image (no test hooks) also boots in the emulator. Microphone, LEDs, file system and serial start; line-in reports "unavailable" and the firmware stays on the microphone.</li>
 <li>27 of 28 cases give the same light frames as the S3, bit for bit, on both edges. That includes both real-music cases (1,334 frames each).</li>
 <li>The S3 builds (k1_fe and Main RPL) are unchanged, byte for byte, in the sections the repo's check compares.</li>
 </ul></div>
 <div><h3>What differs</h3><ul>
 <li>Only the startup case. Its clock starts at the emulated boot time, and the emulator boots the S31 image 200 ms later than the S3 image (546 ms against 346 ms). With the clock fixed at 1.0 s, as in the other music cases, S3 and S31 are identical (1,067 frames).</li>
 <li>The ordered board (Gx2 black-gold-v6) does not connect line-in data, I2C, the USB-C current sense, two user buttons or the heartbeat LED to the S31.</li>
+<li><b>Biggest consequence:</b> without the USB-C current sense the FE power rule allows the LEDs 0 mA, so <b>the LEDs stay dark</b> on this board as built. The emulator boot shows it: <code>cc1_mv=0 cc2_mv=0 source=unqualified led_budget_est_ma=0</code>. Two wires (CC1, CC2 to free S31 analogue pins) fix it.</li>
 </ul></div>
 <div><h3>What was set or switched off</h3><ul>
-<li>The two LED buffer enables are pulled low on Gx2, so the S31 firmware drives them high at start.</li>
-<li>The signals the board does not wire are marked "not connected", and the firmware leaves them alone. Line-in, the buttons and USB-C power qualification cannot work until wires are added. LED power stays at the USB default limit.</li>
+<li>The two LED buffer enables are pulled low on Gx2 (on the S3 board they were pulled high), so the S31 firmware drives them high at start. If the board designer meant them to stay off until a later point, that needs saying.</li>
+<li>The signals the board does not wire are marked "not connected", and the firmware leaves them alone. Line-in, two buttons and the USB-C power check cannot work until wires are added.</li>
+<li>Disclosed: the emulator test hook now prints one extra line (the build line), and one recorded file fingerprint in the light-show acceptance file was refreshed because <code>constants.h</code> gained the S31 LED pins. No limits or tolerances changed.</li>
 <li>The USB update-mode callback is left out on the S31, because this Arduino core has no TinyUSB. The FE does not use that mode.</li>
 <li>No driver had to be stubbed: ESP-IDF 6.1.1 has every driver the FE uses. No Bluetooth or Wi-Fi.</li>
 </ul></div>
@@ -20,8 +23,13 @@
 <li>LED wire order within an edge (no LED bar exists yet), the Zero variant (N16R16 assumed), and the 3.3 V level of GPIO20–25.</li>
 <li>The LED waveform: the emulator's RMT loopback needs a receive channel the K1 does not have.</li>
 </ul></div>
+<div><h3>Terms</h3><ul>
+<li><b>ESP-IDF</b>: Espressif's own software kit for its chips. <b>S3 / S31</b>: the current ESP32-S3 chip and the new ESP32-S31 on the Zero board. <b>FE</b>: Founders' Edition.</li>
+<li><b>I2S</b>: the chip's audio input port. <b>PDM</b>: the microphone's one-bit sound signal. <b>RMT</b>: the chip's pulse generator that sends LED data. <b>DIN-A / DIN-B</b>: the two data inputs feeding each LED edge.</li>
+<li><b>GPIO</b> / <b>IO</b>: a numbered chip pin. <b>PSRAM</b>: the extra memory chip. <b>CC</b>: the USB-C wires that say how much current the charger allows. <b>OE</b>: output enable on the LED level shifters. <b>TinyUSB</b>: a USB library the S31 build does not include.</li>
+</ul></div>
 <div><h3>First three things when boards arrive</h3><ol>
-<li>Plug the S31-Zero into Gx2, flash the S31 k1_fe image over its USB-C, and check the boot and the <code>:build</code> reply.</li>
+<li>Before powering LEDs: add the CC1/CC2 wires (or decide to change the power rule), then plug the S31-Zero into Gx2, flash the S31 k1_fe image over its USB-C, and check the boot and the <code>:build</code> reply.</li>
 <li>Microphone: record the IM69D through I2S0 and confirm slot order and level against the S3.</li>
 <li>LEDs: check all four lines with the enables high, then set the DIN-A/DIN-B order on a real bar.</li>
 </ol></div>
