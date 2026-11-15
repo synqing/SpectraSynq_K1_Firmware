@@ -32,6 +32,9 @@ RX_RECORD_DATA = 128
 
 FLASH_SIZE = 16 * 1024 * 1024
 BOOTLOADER_AT = 0x0
+# Second-stage bootloader offset by chip (ESP-IDF CONFIG_BOOTLOADER_OFFSET_IN_FLASH):
+# 0x0 on the S3, 0x2000 on the S31 (targets/esp32s31 build/flasher_args.json).
+BOOTLOADER_AT_BY_CHIP = {"esp32s3": 0x0, "esp32s31": 0x2000}
 PARTITIONS_AT = 0x8000
 APP_AT = 0x10000
 APP_SIZE = 0x640000
@@ -124,16 +127,19 @@ def build_blob(spec: BlobSpec) -> tuple[bytes, int]:
     return head + payload, payload_crc
 
 
-def merge_flash(bootloader: bytes, partitions: bytes, app: bytes) -> bytearray:
+def merge_flash(bootloader: bytes, partitions: bytes, app: bytes, bootloader_at: int = BOOTLOADER_AT) -> bytearray:
     """Erased 16 MB flash with bootloader, partition table and app0 placed as built.
 
     otadata stays erased, so the bootloader selects ota_0 (app0). No header
     patching: the bootloader and app bytes are exactly the build outputs.
+    bootloader_at is the chip's bootloader offset (BOOTLOADER_AT_BY_CHIP).
     """
     if len(app) > APP_SIZE:
         raise ValueError("app image larger than app0")
+    if bootloader_at + len(bootloader) > PARTITIONS_AT:
+        raise ValueError("bootloader overlaps the partition table")
     flash = bytearray(b"\xff" * FLASH_SIZE)
-    flash[BOOTLOADER_AT:BOOTLOADER_AT + len(bootloader)] = bootloader
+    flash[bootloader_at:bootloader_at + len(bootloader)] = bootloader
     flash[PARTITIONS_AT:PARTITIONS_AT + len(partitions)] = partitions
     flash[APP_AT:APP_AT + len(app)] = app
     return flash

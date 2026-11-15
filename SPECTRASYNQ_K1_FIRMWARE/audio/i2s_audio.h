@@ -86,10 +86,20 @@
 #ifdef K1_MIC_IM69D_PDM_V1
 #include <esp_idf_version.h>
 #ifndef K1_PLATFORM_P4
+#ifndef K1_PLATFORM_S31
 #if K1_AUDIO_SOURCE_MIC
 #if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(5, 4, 1)
 #error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
 #endif
+#endif
+#endif
+#endif
+#if defined(K1_PLATFORM_S31) && K1_AUDIO_SOURCE_MIC
+// S31: ESP-IDF 6.1 is the only release that supports the chip. The contract is frozen to
+// that release line; the slot asserts below still guard the PDM naming. It is NOT yet
+// proven on S31 silicon (needs an S31-Zero with the IM69D on I2S0).
+#if ESP_IDF_VERSION_MAJOR != 6 || ESP_IDF_VERSION_MINOR != 1
+#error "S31 IM69D slot/order contract is source-frozen to ESP-IDF 6.1"
 #endif
 #endif
 #if K1_AUDIO_SOURCE_MIC

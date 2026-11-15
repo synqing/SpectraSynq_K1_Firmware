@@ -16,7 +16,10 @@
 
 #include <stdint.h>
 
-#ifdef K1_FE_BOARD_GX
+#if defined(K1_FE_BOARD_GX) && defined(K1_PLATFORM_S31)
+// ESP32-S31-Zero on the K1-FE-S31-Gx2 carrier: one board file, built from the ordered board.
+#include "k1_fe_board_s31_zero.h"
+#elif defined(K1_FE_BOARD_GX)
 // PCB net -> ESP32-S3 GPIO, not module land number. This is the common map
 // consumed by board startup, PCM1808 I2S1 and the PDM microphone on I2S0.
 // RN_C1 stays fitted: PCM1808 is the 48 kHz BCLK/LRCK master.

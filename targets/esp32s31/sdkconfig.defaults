@@ -1,0 +1,46 @@
+# K1 FE on the ESP32-S31 (Waveshare ESP32-S31-Zero N16R16): 16 MB flash, 16 MB in-package PSRAM.
+# Behaviour-relevant values mirror the S3 Arduino framework sdkconfig the S3 k1_fe build links
+# (pioarduino 54.03.20, framework-arduinoespressif32-libs/esp32s3/sdkconfig); PSRAM mode and
+# speed follow the pioarduino ESP32-S31 framework (61.04.00-RC1).
+CONFIG_IDF_TARGET="esp32s31"
+
+# Flash and partitions (S3 k1_fe: 16 MB, default_16MB.csv)
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_16MB.csv"
+
+# PSRAM (S3: SPIRAM_USE_MALLOC, ALWAYSINTERNAL 4096, RESERVE_INTERNAL 0)
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_250M=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=4096
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=0
+CONFIG_SPIRAM_IGNORE_NOTFOUND=y
+
+# Arduino as a component. S3 k1_fe builds the core with -DARDUINO_RUNNING_CORE=0 (loop on
+# core 0); here the core reads the Kconfig value, so the same choice is made in Kconfig.
+CONFIG_AUTOSTART_ARDUINO=y
+CONFIG_ARDUINO_RUN_CORE0=y
+CONFIG_FREERTOS_HZ=1000
+
+# Compiler and C library as the S3 framework: C++ exceptions on, warnings not errors,
+# stack check on, newlib (IDF 6.1 defaults to picolibc; S3/IDF 5.4.1 uses newlib).
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_COMPILER_CXX_EXCEPTIONS=y
+CONFIG_COMPILER_DISABLE_DEFAULT_ERRORS=y
+CONFIG_COMPILER_STACK_CHECK_MODE_NORM=y
+CONFIG_LIBC_NEWLIB=y
+CONFIG_LIBC_STDOUT_LINE_ENDING_CRLF=y
+CONFIG_LIBC_STDIN_LINE_ENDING_CR=y
+
+# Watchdogs, main task and logging as the S3 framework
+CONFIG_ESP_INT_WDT_TIMEOUT_MS=300
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=5
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
+CONFIG_LOG_DEFAULT_LEVEL_ERROR=y
+
+# Console: UART0 first, USB Serial/JTAG second (as the S3 framework). The K1 serial
+# protocol itself runs on the Arduino HWCDC (USB Serial/JTAG) object.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG=y

@@ -51,7 +51,7 @@ def _one(args: tuple) -> dict:
     sc["cases"][name]["trace_novelty"] = trace   # --no-trace: the run without the N-line diagnostic
     lock = json.loads((HERE / "tool-lock.json").read_text())
     emu, _ = runner.resolve_esp_emu(lock)
-    build_dir = runner.REPO / ".pio/build" / sc["profile"]["env"]
+    build_dir = runner.build_dir_for(sc, sc["profile"]["env"])
     # Decode the case's PCM in a per-run folder first and hand it to run_case through its asset cache.
     # run_case decodes inventory_excerpt assets into its output folder; parallel workers sharing that folder
     # raced on the same ffmpeg target ("already exists") and the losers ran with no valid PCM (lane R1,

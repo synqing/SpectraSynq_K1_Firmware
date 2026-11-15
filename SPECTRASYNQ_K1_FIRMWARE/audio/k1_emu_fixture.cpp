@@ -761,6 +761,25 @@ void k1_emu_fixture_poll(void) {
 #endif
     char arm[] = "600,1";
     k1_render_trace_dispatch("rtrace_arm", arm);
+    // The firmware's own build identity (k1_build_provenance.py stamps; the S31 build
+    // stamps the same defines), so a replay names the binary it ran. Diagnostic only.
+#ifndef K1_BUILD_GIT_HASH
+#define K1_BUILD_GIT_HASH "unknown"
+#endif
+#ifndef K1_BUILD_EPOCH
+#define K1_BUILD_EPOCH 0
+#endif
+#ifndef K1_BUILD_ENV
+#define K1_BUILD_ENV "unknown"
+#endif
+#ifdef K1_BUILD_TAG
+    const char* build_tag = K1_BUILD_TAG;
+#else
+    const char* build_tag = "-";
+#endif
+    K1_EMU_LOG.printf("EMU_BUILD git=%s epoch=%lu env=%s tag=%s chip=%s idf=%s\n", K1_BUILD_GIT_HASH,
+                      (unsigned long)K1_BUILD_EPOCH, K1_BUILD_ENV, build_tag, CONFIG_IDF_TARGET,
+                      esp_get_idf_version());
     K1_EMU_LOG.printf(
         "EMU_FIXTURE_ARMED run=%s source=%s valid=%d invalid=%s rate=%lu hop=%lu "
         "real_samples=%lu pad_samples=%lu total_hops=%lu capture=%lu..%lu every=%lu "

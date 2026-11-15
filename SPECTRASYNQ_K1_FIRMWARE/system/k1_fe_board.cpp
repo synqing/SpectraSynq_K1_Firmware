@@ -440,12 +440,19 @@ static void k1_fe_gx_power_status_poll(uint32_t now) {
   s_gx_sampled = true;
   s_gx_sample_ms = now;
   const int pg = digitalRead(K1_FE_VBUS_PG_PIN);
+#if defined(K1_PLATFORM_S31) && (K1_FE_CC1_SENSE_PIN < 0 || K1_FE_CC2_SENSE_PIN < 0)
+  // Gx2 does not wire CC1/CC2 sense to the S31: no CC means default USB power, the
+  // policy's own safe floor (LED budget stays low, POWER_PERMIT stays low).
+  s_gx_cc1_mv = 0;
+  s_gx_cc2_mv = 0;
+#else
   // Discard one conversion after each channel change. This is not proof that
   // the fitted 100k source impedance meets ADC settling/error requirements.
   (void)analogReadMilliVolts(K1_FE_CC1_SENSE_PIN);
   s_gx_cc1_mv = analogReadMilliVolts(K1_FE_CC1_SENSE_PIN);
   (void)analogReadMilliVolts(K1_FE_CC2_SENSE_PIN);
   s_gx_cc2_mv = analogReadMilliVolts(K1_FE_CC2_SENSE_PIN);
+#endif
 
   const uint32_t token = s_gx_budget_token.load(std::memory_order_acquire);
   const bool lower_frame = token != 0 && uint16_t(token) <= K1_FE_GX_LED_LOW_MA &&
@@ -545,6 +552,9 @@ static void k1_fe_source_poll(uint32_t t_now) {
 
 // ── Public ──────────────────────────────────────────────────────────────────
 static void k1_fe_input(int pin) {
+#ifdef K1_PLATFORM_S31
+  if (pin < 0) return;  // K1_FE_PIN_NC: not wired to the S31 on Gx2
+#endif
   gpio_config_t io = {};
   io.pin_bit_mask = 1ULL << pin;
   io.mode = GPIO_MODE_INPUT;
@@ -555,6 +565,9 @@ static void k1_fe_input(int pin) {
 }
 
 static void k1_fe_output_low(int pin) {
+#ifdef K1_PLATFORM_S31
+  if (pin < 0) return;  // K1_FE_PIN_NC: not wired to the S31 on Gx2
+#endif
   gpio_set_level((gpio_num_t)pin, 0);
   gpio_config_t io = {};
   io.pin_bit_mask = 1ULL << pin;
@@ -579,17 +592,34 @@ void k1_fe_board_begin() {
   // available for the ADC header, regardless of whether a board is plugged in.
   k1_fe_output_low(K1_FE_ADC_SHDNZ_PIN);
   k1_fe_output_low(K1_FE_POWER_PERMIT_PIN);  // low until stable 3 A CC qualification
+#if defined(K1_PLATFORM_S31) && K1_S31_LED_OE_DRIVE_HIGH
+  // Gx2 pulls both TXU0102 OEs DOWN (R_PWR27/R_PWR33); the S3 Gx board pulled them up.
+  // Drive them high so both LED edges are enabled from boot, as on the S3 Gx board.
+  k1_fe_output_low(K1_FE_LED_OE_A_PIN);
+  k1_fe_output_low(K1_FE_LED_OE_B_PIN);
+  gpio_set_level((gpio_num_t)K1_FE_LED_OE_A_PIN, 1);
+  gpio_set_level((gpio_num_t)K1_FE_LED_OE_B_PIN, 1);
+#else
   k1_fe_input(K1_FE_LED_OE_A_PIN);          // external 10k pull-up enables buffer
   k1_fe_input(K1_FE_LED_OE_B_PIN);          // these are OE controls, not PG inputs
+#endif
   k1_fe_input(K1_FE_CC1_SENSE_PIN);
   k1_fe_input(K1_FE_CC2_SENSE_PIN);
+#if !defined(K1_PLATFORM_S31)
   analogSetPinAttenuation(K1_FE_CC1_SENSE_PIN, ADC_11db);
   analogSetPinAttenuation(K1_FE_CC2_SENSE_PIN, ADC_11db);
+#endif
   k1_fe_input(K1_FE_ADC_DOUT_PIN);  // separate from PCM_DOUT; never drive the strap
   k1_fe_input(K1_FE_VBUS_PG_PIN);
   k1_fe_input(K1_FE_JACK_DET_PIN);
   k1_fe_output_low(K1_FE_HEARTBEAT_PIN);
+#if defined(K1_PLATFORM_S31)
+  // Gx2 does not wire I2C to the S31; never let Wire pick its own default pins.
+  s_i2c_ready = (K1_FE_I2C_SDA_PIN >= 0 && K1_FE_I2C_SCL_PIN >= 0)
+                    ? Wire.begin(K1_FE_I2C_SDA_PIN, K1_FE_I2C_SCL_PIN, 100000) : false;
+#else
   s_i2c_ready = Wire.begin(K1_FE_I2C_SDA_PIN, K1_FE_I2C_SCL_PIN, 100000);
+#endif
   s_board = true;
   s_jack_raw = s_jack_stable = digitalRead(K1_FE_JACK_DET_PIN) != 0;
   USBSerial.printf("[FEBOARD] profile=Gx i2c=%s sda=%d scl=%d external_adc=held_shutdown\n",
@@ -671,6 +701,9 @@ void k1_fe_heartbeat_tick(int64_t now_us) {
   if (!s_board) {
     return;
   }
+#ifdef K1_PLATFORM_S31
+  if (K1_FE_HEARTBEAT_PIN < 0) return;  // Gx2 has no HEARTBEAT net
+#endif
   if (now_us - last_us >= K1_FE_HEARTBEAT_HALF_US) {
     last_us = now_us;
     level ^= 1;

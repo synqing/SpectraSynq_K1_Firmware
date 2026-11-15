@@ -70,6 +70,10 @@ void check_current_function() {
   function_hits[function_id]++;
 }
 
+// S31: the arduino-esp32 4.0 component builds without TinyUSB (USB-OTG), so the USB event
+// names do not exist there. The callback is only used by the USB MSC update mode, which
+// K1_HARDWARE builds (k1_fe) switch off.
+#if !defined(K1_PLATFORM_S31) || K1_ENABLE_USB_MSC_UPDATE
 static void usb_event_callback(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
   if (event_base == ARDUINO_USB_EVENTS) {
     //arduino_usb_event_data_t * data = (arduino_usb_event_data_t*)event_data;
@@ -119,6 +123,7 @@ static void usb_event_callback(void* arg, esp_event_base_t event_base, int32_t e
   }
 #endif
 }
+#endif  // !K1_PLATFORM_S31 || K1_ENABLE_USB_MSC_UPDATE
 
 #if K1_ENABLE_USB_MSC_UPDATE
 void enable_usb_update_mode() {

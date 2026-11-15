@@ -481,6 +481,13 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define LED_CLOCK_PIN 3
       #define SECONDARY_LED_DATA_PIN 5
       #define SECONDARY_LED_CLOCK_PIN 6
+    #elif defined(K1_PLATFORM_S31)
+      // ESP32-S31-Zero on K1-FE-S31-Gx2: the four WS2816 feeds from the S31 board file
+      // (k1_fe_board_s31_zero.h, included above through k1_fe_board.h).
+      #define LED_DATA_PIN K1_S31_LED_PRIMARY_DIN_A_PIN
+      #define LED_CLOCK_PIN K1_S31_LED_PRIMARY_DIN_B_PIN
+      #define SECONDARY_LED_DATA_PIN K1_S31_LED_SECONDARY_DIN_A_PIN
+      #define SECONDARY_LED_CLOCK_PIN K1_S31_LED_SECONDARY_DIN_B_PIN
     #else
       #define LED_DATA_PIN 15
       #define LED_CLOCK_PIN 16

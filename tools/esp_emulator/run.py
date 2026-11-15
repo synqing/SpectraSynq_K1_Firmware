@@ -290,7 +290,28 @@ def platformio_core_dir() -> Path:
     return Path(os.environ.get("PLATFORMIO_CORE_DIR", Path.home() / ".platformio"))
 
 
-def find_nm() -> Path | None:
+S31_DIR = REPO / "targets/esp32s31"
+
+
+def chip_of(sc: dict) -> str:
+    return sc["profile"]["emulator"]["chip"]
+
+
+def build_dir_for(sc: dict, env: str) -> Path:
+    """Where an env's firmware.elf/.bin, bootloader.bin and partitions.bin are.
+
+    esp32s3: the PlatformIO build. esp32s31: the plain ESP-IDF v6.1 build of the same
+    PlatformIO env (targets/esp32s31/build.sh), staged under the same file names.
+    """
+    if chip_of(sc) == "esp32s31":
+        return S31_DIR / "build" / env / "stage"
+    return REPO / ".pio/build" / env
+
+
+def find_nm(chip: str = "esp32s3") -> Path | None:
+    if chip == "esp32s31":
+        hits = sorted(glob.glob(str(Path.home() / ".espressif/tools/riscv32-esp-elf/*/riscv32-esp-elf/bin/riscv32-esp-elf-nm")))
+        return Path(hits[-1]) if hits else None
     hits = sorted(glob.glob(str(platformio_core_dir() / "packages/toolchain-xtensa-esp*/bin/xtensa-esp32s3-elf-nm")))
     return Path(hits[0]) if hits else None
 
@@ -345,15 +366,20 @@ def effective_env(env: str) -> dict:
     raise SystemExit(f"env {env} not in platformio.ini")
 
 
-def build(env: str, log: Path) -> dict:
+def build(env: str, log: Path, sc: dict | None = None) -> dict:
     t0 = time.time()
-    with log.open("w") as fh:
+    if sc is not None and chip_of(sc) == "esp32s31":
+        # ESP32-S31: the same PlatformIO env built by plain ESP-IDF v6.1 (build only, never flashes).
+        argv = ["bash", "targets/esp32s31/build.sh", env]
+        d = build_dir_for(sc, env)
+    else:
         # The repository's prescribed build-only wrapper (allowlisted envs; never uploads).
-        rc = subprocess.run(["bash", "scripts/agent/pio-build.sh", env], cwd=REPO, stdout=fh,
-                            stderr=subprocess.STDOUT).returncode
-    d = REPO / ".pio/build" / env
+        argv = ["bash", "scripts/agent/pio-build.sh", env]
+        d = REPO / ".pio/build" / env
+    with log.open("w") as fh:
+        rc = subprocess.run(argv, cwd=REPO, stdout=fh, stderr=subprocess.STDOUT).returncode
     rec = {"env": env, "exit_code": rc, "seconds": round(time.time() - t0, 1), "log": str(log),
-           "command": f"bash scripts/agent/pio-build.sh {env}"}
+           "command": " ".join(argv)}
     for name in ("firmware.elf", "firmware.bin", "bootloader.bin", "partitions.bin"):
         if (d / name).is_file():
             rec[f"{name}_sha256"] = sha256_file(d / name)
@@ -383,7 +409,7 @@ FIXTURE_STRINGS = (b"EMU_FIXTURE_ARMED", b"K1EMUSC2", b"EMU_END reason", b"RTRAC
 def normal_build_check(sc: dict, out: Path, nm: Path | None) -> dict:
     """WP3: actual normal-target build, effective flags and symbols, with a positive control."""
     prof = sc["profile"]
-    rec = build(prof["product_env"], out / "build-product.log")
+    rec = build(prof["product_env"], out / "build-product.log", sc)
     env = effective_env(prof["product_env"])
     emu_env = effective_env(prof["env"])
     product_flags = flag_names(env.get("build_flags", []))
@@ -395,8 +421,8 @@ def normal_build_check(sc: dict, out: Path, nm: Path | None) -> dict:
     forced_clock = "k1_emu_clock_force" in src_flags
     added = sorted(emu_flags - product_flags)
     removed = sorted(product_flags - emu_flags)
-    elf = REPO / ".pio/build" / prof["product_env"] / "firmware.elf"
-    emu_elf = REPO / ".pio/build" / prof["env"] / "firmware.elf"
+    elf = build_dir_for(sc, prof["product_env"]) / "firmware.elf"
+    emu_elf = build_dir_for(sc, prof["env"]) / "firmware.elf"
     prod_syms = {s for s in symbols(elf, nm) if FIXTURE_SYMBOL_RE.search(s)}
     emu_syms = {s for s in symbols(emu_elf, nm) if FIXTURE_SYMBOL_RE.search(s)}
     blob = elf.read_bytes() if elf.is_file() else b""
@@ -624,8 +650,9 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
     boot = (build_dir / "bootloader.bin").read_bytes()
     parts = (build_dir / "partitions.bin").read_bytes()
     app = (build_dir / "firmware.bin").read_bytes()
+    boot_at = emu_blob.BOOTLOADER_AT_BY_CHIP[chip_of(sc)]
     if flash_spec["from"] == "blank":
-        flash = emu_blob.merge_flash(boot, parts, app)
+        flash = emu_blob.merge_flash(boot, parts, app, boot_at)
         input_fs = None
     else:
         src = results.get(flash_spec["from"])
@@ -634,7 +661,7 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
             return rec
         flash = bytearray(Path(src["flash_after"]).read_bytes())
         # Same built image; only the LittleFS region carries over from the saved run.
-        fresh = emu_blob.merge_flash(boot, parts, app)
+        fresh = emu_blob.merge_flash(boot, parts, app, boot_at)
         fs = emu_blob.littlefs_region(flash)
         flash = fresh
         flash[emu_blob.LITTLEFS_AT:emu_blob.LITTLEFS_AT + emu_blob.LITTLEFS_SIZE] = fs
@@ -1416,17 +1443,17 @@ def main() -> int:
     lock_path = (scenario_path.parent / sc["tool_lock"]).resolve()
     lock = json.loads(lock_path.read_text())
     emu, tried = resolve_esp_emu(lock)
-    nm = find_nm()
+    nm = find_nm(chip_of(sc))
     identity = source_identity()
     if args.profile == "scenario":
         shutil.copy(scenario_path, out / "scenario.json")
     else:
         (out / "scenario.json").write_text(json.dumps(sc, indent=2) + "\n")
     print(f"invocation {invocation} source {identity['head'][:12]} dirty_inputs {identity['dirty_inputs_sha256'][:12]}")
-    emu_build = build(sc["profile"]["env"], out / "build-emu.log")
+    emu_build = build(sc["profile"]["env"], out / "build-emu.log", sc)
     if emu_build["exit_code"] != 0:
         print("emulator env build failed; see", emu_build["log"])
-    build_dir = REPO / ".pio/build" / sc["profile"]["env"]
+    build_dir = build_dir_for(sc, sc["profile"]["env"])
     product = normal_build_check(sc, out, nm)
     hosts = host_checks(sc, out, Path(args.host_receipt).resolve() if args.host_receipt else None)
     results: dict[str, dict] = {}
@@ -1647,8 +1674,8 @@ def identity_kind() -> str:
 
 
 def model_symbols(sc: dict) -> list[str]:
-    elf = REPO / ".pio/build" / sc["profile"]["product_env"] / "firmware.elf"
-    syms = symbols(elf, find_nm())
+    elf = build_dir_for(sc, sc["profile"]["product_env"]) / "firmware.elf"
+    syms = symbols(elf, find_nm(chip_of(sc)))
     return sorted(s for s in syms if re.search(r"tflite|tensorflow|MicroInterpreter|esp_nn|onnx", s, re.I))[:20]
 
 
