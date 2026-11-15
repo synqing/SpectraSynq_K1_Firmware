@@ -6,6 +6,15 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ## [Unreleased]
 
+### Added — 2026-11-15
+
+- ESP32-S31 build of the FE firmware (`targets/esp32s31`, plain ESP-IDF 6.1.1,
+  Arduino 4.0 RC1 as a component) for the Waveshare ESP32-S31-Zero on the
+  K1-FE-S31-Gx2 carrier, behind `K1_PLATFORM_S31`. Same sources and flags as
+  `k1_fe`; S3 binaries unchanged. Emulator runner builds and replays it
+  (`s31_music_regression.json`, `cross_chip_compare.py`). Not run on silicon.
+  Evidence: `docs/forensics/runtime-evidence/20261115-s31-port/`.
+
 ### Fixed — 2026-11-05
 
 - Saturation-preserving colour scaling uses an exact 32-bit unit quotient in

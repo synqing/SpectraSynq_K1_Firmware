@@ -253,6 +253,7 @@ Then `prime_corpus` / `reprime_corpus`. See [docs/agent-memory/claude-mem-pre-13
 - `2026-06-07-silence-anti-creep-verdict.md` — primary anti-creep closure
 - `2026-06-07-scene-policy-v2-serial-ab-state-gate.md` — Scene Policy v2 state gate
 - `2026-06-07-ap-vp-visualisation-semantic-canon.md` — AP/VP visualisation semantics, proof boundaries, and experiment matrix
+- `20261115-s31-port/README.md` — K1 FE on the ESP32-S31-Zero (plain ESP-IDF 6.1.1, `targets/esp32s31`): S3 unchanged, S31 boots in esp-emu, 27/28 replay cases bit-identical to S3; ordered Gx2 pin verdicts. Simulated, not hardware.
 
 ---
 

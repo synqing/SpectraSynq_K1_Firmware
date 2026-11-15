@@ -1,0 +1,7 @@
+{
+ "exit_code": 0,
+ "command": "cp g1-head.reference scripts/regression-harness/results/mic_stable_byte_gate.reference && bash scripts/regression-harness/mic_stable_byte_gate.sh k1_fe k1_main_rpl_im69d (then git checkout of the reference)",
+ "text": "k1_fe and k1_main_rpl_im69d stable sections byte-identical to head fcdefec5 (lane 7a36f8c7, clean tree)",
+ "head_reference": "k1_fe fc12217429e2b10fbc1fb2815a1350b6b39e21b31550d14367ae40a2882446ca\nk1_main_rpl_im69d fc193f7b652dcf548c15189bbd88c0d97ca570cce737cd03bea354f5e70e15bc\n",
+ "first_attempt": "exit 1 on a dirty tree: k1_fe is a release env, its build tag became untagged-dirty (6 bytes longer); k1_main_rpl_im69d (no tag) was identical. Re-run with the tree committed (provenance held constant): exit 0."
+}
